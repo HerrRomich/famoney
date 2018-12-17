@@ -1,0 +1,3 @@
+Bundle-Version: 1.0.0.${tstamp}
+Private-Package: com.hrrm.infrastructure.persistence.internal
+Export-Package: com.hrrm.infrastructure.persistence

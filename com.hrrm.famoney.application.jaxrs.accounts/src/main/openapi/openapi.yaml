@@ -1,0 +1,40 @@
+openapi: 3.0.0
+info:
+  contact:
+    email: karmara.roman@gmail.com
+    name: Roman Smushkevich
+    url: https://example.com/
+  title: Accounts API
+  version: 1.0.0
+servers:
+- url: /
+tags:
+- description: Accounts related requests
+  name: accounts
+paths:
+  /accountGroups:
+    get:
+      description: Lists all account groups
+      operationId: getAllAccountGroups
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/AccountGroup'
+                type: array
+          description: A list of all account groups
+      tags:
+      - accounts
+      x-tags:
+      - tag: accounts
+components:
+  schemas:
+    AccountGroup:
+      example:
+        id: id
+      properties:
+        id:
+          type: string
+      type: object
