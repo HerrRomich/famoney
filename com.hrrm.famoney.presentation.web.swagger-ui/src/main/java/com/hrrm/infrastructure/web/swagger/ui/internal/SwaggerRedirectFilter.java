@@ -36,8 +36,8 @@ public class SwaggerRedirectFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
             ServletException {
-        var httpRequest = (HttpServletRequest) request;
-        var httpResponse = (HttpServletResponse) response;
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
 
         if ( StringUtils.isEmpty(httpRequest.getPathInfo())) {
             httpResponse.sendRedirect(httpRequest.getContextPath() + "/");

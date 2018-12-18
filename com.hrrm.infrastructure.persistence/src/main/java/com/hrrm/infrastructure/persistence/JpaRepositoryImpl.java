@@ -1,4 +1,4 @@
-package com.hrrm.infrastructure.persistence.internal;
+package com.hrrm.infrastructure.persistence;
 
 import java.io.Serializable;
 import java.util.List;
@@ -11,9 +11,6 @@ import javax.persistence.criteria.CriteriaQuery;
 
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.transaction.control.TransactionControl;
-
-import com.hrrm.infrastructure.persistence.DomainEntity;
-import com.hrrm.infrastructure.persistence.JpaRepository;
 
 public abstract class JpaRepositoryImpl<T extends DomainEntity<P>, P extends Serializable> implements
         JpaRepository<T, P> {

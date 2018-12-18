@@ -45,13 +45,13 @@ public class SwaggerRedirectFilterTest {
 
     @Test
     public void whenSlashPathInfoThenForwardToIndex() throws IOException, ServletException {
-        var requestDispathcer = mock(RequestDispatcher.class);
-        var request = mock(HttpServletRequest.class);
+        RequestDispatcher requestDispathcer = mock(RequestDispatcher.class);
+        HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getPathInfo()).thenReturn("/");
         when(request.getRequestDispatcher(eq("/index.html"))).thenReturn(requestDispathcer);
         when(request.getContextPath()).thenReturn(CONTEXT_PATH);
-        var response = mock(HttpServletResponse.class);
-        var chain = mock(FilterChain.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        FilterChain chain = mock(FilterChain.class);
         
         swaggerRedirectFilterUnderTest.doFilter(request, response, chain);
         
@@ -61,11 +61,11 @@ public class SwaggerRedirectFilterTest {
 
     @Test
     public void whenOthersPathInfoThenDoFilter() throws IOException, ServletException {
-        var request = mock(HttpServletRequest.class);
+        HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getPathInfo()).thenReturn("/index.html");
         when(request.getContextPath()).thenReturn(CONTEXT_PATH);
-        var response = mock(HttpServletResponse.class);
-        var chain = mock(FilterChain.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        FilterChain chain = mock(FilterChain.class);
         
         swaggerRedirectFilterUnderTest.doFilter(request, response, chain);
         

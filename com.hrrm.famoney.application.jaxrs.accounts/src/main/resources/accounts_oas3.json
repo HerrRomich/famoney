@@ -14,22 +14,22 @@
     "description": "Accounts related requests"
   }],
   "paths": {
-    "/accountGroups": {
+    "/accounts": {
       "get": {
         "tags": [
           "accounts"
         ],
-        "operationId": "getAllAccountGroups",
-        "description": "Lists all account groups",
+        "operationId": "getAllAccounts",
+        "description": "Lists all accounts",
         "responses": {
           "200": {
-            "description": "A list of all account groups",
+            "description": "A list of all accounts",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/AccountGroup"
+                    "$ref": "#/components/schemas/Account"
                   }
                 }
               }
@@ -41,10 +41,13 @@
   },
   "components": {
     "schemas": {
-      "AccountGroup": {
+      "Account": {
         "type": "object",
         "properties": {
           "id": {
+            "type": "integer"
+          },
+          "name": {
             "type": "string"
           }
         }

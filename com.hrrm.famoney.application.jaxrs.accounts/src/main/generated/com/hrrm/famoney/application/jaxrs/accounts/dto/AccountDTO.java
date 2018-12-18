@@ -10,23 +10,39 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.hrrm.famoney.infrastructure.jaxrs.DTO;
 
-public class AccountGroupDTO  implements DTO {
+public class AccountDTO  implements DTO {
   
-  private @Valid String id;
+  private @Valid Integer id;
+  private @Valid String name;
 
   /**
    **/
-  public AccountGroupDTO id(String id) {
+  public AccountDTO id(Integer id) {
     this.id = id;
     return this;
   }
 
   @JsonProperty("id")
-  public String getId() {
+  public Integer getId() {
     return id;
   }
-  public void setId(String id) {
+  public void setId(Integer id) {
     this.id = id;
+  }
+
+  /**
+   **/
+  public AccountDTO name(String name) {
+    this.name = name;
+    return this;
+  }
+
+  @JsonProperty("name")
+  public String getName() {
+    return name;
+  }
+  public void setName(String name) {
+    this.name = name;
   }
 
 
@@ -38,21 +54,23 @@ public class AccountGroupDTO  implements DTO {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    AccountGroupDTO accountGroup = (AccountGroupDTO) o;
-    return Objects.equals(id, accountGroup.id);
+    AccountDTO account = (AccountDTO) o;
+    return Objects.equals(id, account.id) &&
+        Objects.equals(name, account.name);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id);
+    return Objects.hash(id, name);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class AccountGroupDTO {\n");
+    sb.append("class AccountDTO {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("}");
     return sb.toString();
   }

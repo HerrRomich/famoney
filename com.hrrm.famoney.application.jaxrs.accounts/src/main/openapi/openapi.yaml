@@ -12,29 +12,33 @@ tags:
 - description: Accounts related requests
   name: accounts
 paths:
-  /accountGroups:
+  /accounts:
     get:
-      description: Lists all account groups
-      operationId: getAllAccountGroups
+      description: Lists all accounts
+      operationId: getAllAccounts
       responses:
         200:
           content:
             application/json:
               schema:
                 items:
-                  $ref: '#/components/schemas/AccountGroup'
+                  $ref: '#/components/schemas/Account'
                 type: array
-          description: A list of all account groups
+          description: A list of all accounts
       tags:
       - accounts
       x-tags:
       - tag: accounts
 components:
   schemas:
-    AccountGroup:
+    Account:
       example:
-        id: id
+        name: name
+        id: 0
       properties:
         id:
+          format: int32
+          type: integer
+        name:
           type: string
       type: object

@@ -19,7 +19,7 @@ import org.osgi.service.jpa.EntityManagerFactoryBuilder;
 import org.osgi.service.transaction.control.TransactionControl;
 import org.osgi.service.transaction.control.jpa.JPAEntityManagerProviderFactory;
 
-@Component(name = "com.hrrm.budget.entity-manager-provider")
+@Component(name = "com.hrrm.famoney.entity-manager-provider")
 public class EntityMnagerProvider implements ManagedService {
 
     private static final String POOL_PREFIX = "pool.";
@@ -85,6 +85,7 @@ public class EntityMnagerProvider implements ManagedService {
 	mds.setPassword(config.getProperty(DataSourceFactory.JDBC_PASSWORD));
 	mds.setDataSource(ds);
 	mds.setTransactionManager(tm);
+	mds.setExceptionSorter("none");
 	String name = properties.get("name").toString();
 	if (name != null) {
 	    mds.setName("accounts");
