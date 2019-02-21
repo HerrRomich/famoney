@@ -1,0 +1,30 @@
+<configuration scan="true" scanPeriod="5 seconds" >
+
+    <!-- defined a console append -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level [%.15thread] %logger{36}:%line - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- log all Bundle events -->
+    <logger name="Events.Bundle" level="OFF"/>
+
+    <!-- log WARN Framework service events of bundles whose BSN starts with `org.eclipse.osgi` (guess who that is?) -->
+    <logger name="Events.Service.org.eclipse.osgi" level="WARN"/>
+
+    <!-- turn OFF legacy Log Service records from bundles whose BSN starts with `org.baz` -->
+    <logger name="LogService.org.baz" level="OFF"/>
+
+    <!-- log DEBUG Service events for bundles whose BSN starts with `org.fum` -->
+    <logger name="Events.Service.org.fum" level="DEBUG"/>
+
+    <logger name="com.hrrm.famoney" level="INFO"/>
+    <logger name="org.eclipse.persistence.jpa" level="TRACE"/>
+    
+    
+
+    <root level="ERROR">
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>

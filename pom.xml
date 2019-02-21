@@ -16,12 +16,14 @@
         <module>_distro</module>
         <module>_index</module>
         <module>_assembly</module>
-        <module>com.hrrm.infrastructure.jetty</module>
+        <module>com.hrrm.famoney.infrastructure.jetty</module>
         <module>com.hrrm.famoney.presentation.web.swagger-ui</module>
-        <module>com.hrrm.famoney.application.jaxrs.accounts</module>
         <module>com.hrrm.famoney.infrastructure.jaxrs</module>
-        <module>com.hrrm.infrastructure.persistence</module>
+        <module>com.hrrm.famoney.infrastructure.persistence</module>
         <module>com.hrrm.famoney.domain.accounts</module>
+        <module>com.hrrm.faminey.infrastracture.logging</module>
+        <module>com.hrrm.famoney.presentation.ui</module>
+        <module>com.hrrm.famoney.application.api.accounts</module>
     </modules>
 
     <properties>
@@ -29,6 +31,9 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <local.index.policy>REQUIRED</local.index.policy>
         <bnd.maven.version>4.1.0</bnd.maven.version>
+        <eclipselink.version>2.6.6</eclipselink.version>
+        <famoney.ui.angular>com.hrrm.famoney.presentation.ui/src/angular/famoney</famoney.ui.angular>
+        <org.apache.aries.jpa.version>2.7.1</org.apache.aries.jpa.version>
     </properties>
 
     <repositories>
@@ -181,22 +186,22 @@
             <dependency>
                 <groupId>org.apache.aries.jax.rs</groupId>
                 <artifactId>org.apache.aries.jax.rs.whiteboard</artifactId>
-                <version>1.0.1</version>
+                <version>1.0.3</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.aries.spec</groupId>
                 <artifactId>org.apache.aries.javax.jax.rs-api</artifactId>
-                <version>1.0.1</version>
+                <version>1.0.3</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.9.7</version>
+                <version>2.9.8</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.datatype</groupId>
                 <artifactId>jackson-datatype-jdk8</artifactId>
-                <version>2.9.7</version>
+                <version>2.9.8</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.servicemix.specs</groupId>
@@ -221,17 +226,17 @@
             <dependency>
                 <groupId>org.apache.aries.jax.rs</groupId>
                 <artifactId>org.apache.aries.jax.rs</artifactId>
-                <version>1.0.1</version>
+                <version>1.0.3</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.aries.jax.rs</groupId>
                 <artifactId>org.apache.aries.jax.rs.jackson</artifactId>
-                <version>1.0.0</version>
+                <version>1.0.1</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.aries.jpa.javax.persistence</groupId>
                 <artifactId>javax.persistence_2.1</artifactId>
-                <version>2.7.1</version>
+                <version>${org.apache.aries.jpa.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.aries.tx-control</groupId>
@@ -241,7 +246,7 @@
             <dependency>
                 <groupId>org.ops4j.pax.jdbc</groupId>
                 <artifactId>pax-jdbc-pool-common</artifactId>
-                <version>1.3.1</version>
+                <version>1.3.4</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.aries.transaction</groupId>
@@ -273,17 +278,17 @@
             <dependency>
                 <groupId>org.apache.aries.jpa</groupId>
                 <artifactId>org.apache.aries.jpa.api</artifactId>
-                <version>2.7.1</version>
+                <version>${org.apache.aries.jpa.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.aries.jpa</groupId>
                 <artifactId>org.apache.aries.jpa.support</artifactId>
-                <version>2.7.1</version>
+                <version>${org.apache.aries.jpa.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.ops4j.pax.jdbc</groupId>
                 <artifactId>pax-jdbc-mariadb</artifactId>
-                <version>1.3.1</version>
+                <version>1.3.4</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
@@ -299,35 +304,35 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.aries.tx-control</groupId>
-                <artifactId>tx-control-service-xa</artifactId>
+                <artifactId>tx-control-service-local</artifactId>
                 <version>1.0.0</version>
             </dependency>
             <dependency>
                 <groupId>org.ops4j.pax.jdbc</groupId>
                 <artifactId>pax-jdbc-config</artifactId>
-                <version>1.3.1</version>
+                <version>1.3.4</version>
             </dependency>
             <dependency>
                 <groupId>org.ops4j.pax.jdbc</groupId>
                 <artifactId>pax-jdbc-pool-aries</artifactId>
-                <version>1.3.1</version>
+                <version>1.3.4</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.aries.jpa</groupId>
                 <artifactId>org.apache.aries.jpa.container</artifactId>
-                <version>2.7.1</version>
+                <version>2.7.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.persistence</groupId>
                 <artifactId>org.eclipse.persistence.jpa</artifactId>
-                <version>2.6.5</version>
+                <version>${eclipselink.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.aries.jpa</groupId>
                 <artifactId>
                     org.apache.aries.jpa.eclipselink.adapter
                 </artifactId>
-                <version>2.7.1</version>
+                <version>${org.apache.aries.jpa.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.johnzon</groupId>
@@ -339,24 +344,95 @@
                 <artifactId>
                     org.apache.aries.spifly.dynamic.bundle
                 </artifactId>
-                <version>1.0.8</version>
+                <version>1.0.14</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.persistence</groupId>
                 <artifactId>org.eclipse.persistence.core</artifactId>
-                <version>2.6.5</version>
+                <version>${eclipselink.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.persistence</groupId>
                 <artifactId>org.eclipse.persistence.asm</artifactId>
-                <version>2.6.5</version>
+                <version>${eclipselink.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.persistence</groupId>
                 <artifactId>
                     org.eclipse.persistence.jpa.jpql
                 </artifactId>
-                <version>2.6.5</version>
+                <version>${eclipselink.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>
+                    org.apache.felix.webconsole.plugins.packageadmin
+                </artifactId>
+                <version>1.0.4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>
+                    org.apache.felix.webconsole.plugins.ds
+                </artifactId>
+                <version>2.1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>
+                    org.apache.felix.webconsole.plugins.memoryusage
+                </artifactId>
+                <version>1.0.8</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.inventory</artifactId>
+                <version>1.0.6</version>
+            </dependency>
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.util.pushstream</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.webconsole</artifactId>
+                <version>4.3.8</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>1.2.3</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
+                <version>1.2.3</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.logback</artifactId>
+                <version>1.0.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ops4j.pax.jdbc</groupId>
+                <artifactId>pax-jdbc-pool-dbcp2</artifactId>
+                <version>1.3.4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.coordinator</artifactId>
+                <version>1.0.2</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations</artifactId>
+                <version>2.0.6</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-core</artifactId>
+                <version>2.0.6</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -484,7 +560,31 @@
                         </dependency>
                     </dependencies>
                 </plugin>
-
+                <plugin>
+                    <groupId>io.swagger.core.v3</groupId>
+                    <artifactId>swagger-maven-plugin</artifactId>
+                    <version>2.0.6</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>3.1.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>3.1.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>3.1.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-remote-resources-plugin</artifactId>
+                    <version>1.6.0</version>
+                </plugin>
             </plugins>
         </pluginManagement>
 

@@ -1,0 +1,14 @@
+<div fxLayout="row" fxLayoutAlign="start center">
+  <div fxFlex></div>
+  <mat-tab-group fxFlex="0 1 auto" class="accounts-tab-group">
+    <mat-tab label="{{account.name}}" *ngFor="let account of accounts | async">
+    </mat-tab>
+  </mat-tab-group>
+  <button mat-icon-button [matMenuTriggerFor]="menuRef">
+    <mat-icon>more_vert</mat-icon>
+  </button>
+  <mat-menu #menuRef="matMenu" [overlapTrigger]="false">
+    <button mat-menu-item>Новый счет</button>
+    <button mat-menu-item>Удалить</button>
+  </mat-menu>
+</div>

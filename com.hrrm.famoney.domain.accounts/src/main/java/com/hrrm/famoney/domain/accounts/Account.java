@@ -14,17 +14,20 @@ import javax.persistence.Table;
 
 @Entity
 @Table(schema = AccountBaseEntity.ACCOUNTS_SCHEMA_NAME, name = "account")
-@NamedQueries(value = { @NamedQuery(name = Account.ACCOUNT_FIND_ALL_QUERY, query = "select a from Account a") })
+@NamedQueries({ @NamedQuery(name = Account.FIND_ALL_QUERY, query = "select a from Account a"),
+        @NamedQuery(name = Account.FIND_ALL_TAGS_QUERY, query = "select distinct at from Account a join a.tags at") })
 public class Account extends AccountBaseEntity {
 
-    public static final String ACCOUNT_FIND_ALL_QUERY = "Account.findAll";
+    public static final String FIND_ALL_QUERY = "Account.findAll";
+    public static final String FIND_ALL_TAGS_QUERY = "Account.findAllTags";
 
     @Column(name = "name")
     private String name;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Column(name = "tag")
-    @CollectionTable(name = "account_tag", joinColumns = { @JoinColumn(name = "account_id") })
+    @CollectionTable(schema = AccountBaseEntity.ACCOUNTS_SCHEMA_NAME, name = "account_tag", joinColumns = {
+            @JoinColumn(name = "account_id") })
     private Set<String> tags;
 
     public String getName() {
@@ -33,6 +36,14 @@ public class Account extends AccountBaseEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Set<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<String> tags) {
+        this.tags = tags;
     }
 
 }

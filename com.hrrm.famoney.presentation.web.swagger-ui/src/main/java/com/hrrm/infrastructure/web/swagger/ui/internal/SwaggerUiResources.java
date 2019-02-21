@@ -6,12 +6,12 @@ import org.osgi.service.http.whiteboard.HttpWhiteboardConstants;
 import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardContextSelect;
 import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardResource;
 
-import com.hrrm.infrastructure.web.swagger.ui.WebResource;
+import com.hrrm.famoney.infrastructure.jetty.WebResource;
 
-@Component(scope = ServiceScope.PROTOTYPE, service = WebResource.class)
+@Component(service = WebResource.class, scope = ServiceScope.SINGLETON)
 @HttpWhiteboardContextSelect("(" +
         HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME +
-        "=com.hrrm.famoney.api.ui)")
+        "=com.hrrm.famoney.api.spec)")
 @HttpWhiteboardResource(pattern = { "/*" }, prefix = "/swagger-ui")
 public class SwaggerUiResources implements WebResource {
 

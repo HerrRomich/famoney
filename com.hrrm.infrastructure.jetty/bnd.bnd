@@ -1,6 +1,0 @@
-Bundle-Version: 1.0.0.${tstamp}
-Export-Package: com.hrrm.infrastructure.jetty
-
--includeresource: \
-    etc=src/main/resources/etc, \
-    OSGI-INF=src/main/resources/OSGI-INF

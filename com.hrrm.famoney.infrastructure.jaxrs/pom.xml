@@ -13,6 +13,7 @@
     <artifactId>com.hrrm.famoney.infrastructure.jaxrs</artifactId>
 
     <name>REST Basis Infrastructure</name>
+    <description>Basis Classes for REST API</description>
 
     <dependencies>
         <dependency>
@@ -26,6 +27,23 @@
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>osgi.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.ecf</groupId>
+            <artifactId>javax.servlet</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.aries.spec</groupId>
+            <artifactId>org.apache.aries.javax.jax.rs-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>com.hrrm.infrastructure.persistence</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>

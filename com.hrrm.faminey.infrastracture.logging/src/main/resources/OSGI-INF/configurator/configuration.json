@@ -1,0 +1,6 @@
+{
+	":configurator:resource-version": 1,
+	"org.osgi.service.log.admin|com.hrrm.famoney.application.jaxrs.accounts": {
+		"com.hrrm.famoney.application": "TRACE"
+	}
+}

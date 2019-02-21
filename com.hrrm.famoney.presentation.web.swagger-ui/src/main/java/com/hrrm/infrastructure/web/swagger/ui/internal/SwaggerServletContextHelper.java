@@ -8,7 +8,7 @@ import org.osgi.service.http.context.ServletContextHelper;
 import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardContext;
 
 @Component(service = ServletContextHelper.class, scope = ServiceScope.BUNDLE)
-@HttpWhiteboardContext(name = "com.hrrm.famoney.api.ui", path = "/api/ui")
+@HttpWhiteboardContext(name = "com.hrrm.famoney.api.spec", path = "/api/spec")
 public class SwaggerServletContextHelper extends ServletContextHelper {
 
     @Activate

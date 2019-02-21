@@ -22,7 +22,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>com.hrrm.infrastructure.jetty</artifactId>
+            <artifactId>com.hrrm.famoney.infrastructure.jetty</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -32,7 +32,12 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>com.hrrm.famoney.application.jaxrs.accounts</artifactId>
+            <artifactId>com.hrrm.famoney.presentation.web.ui</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>com.hrrm.famoney.application.api.accounts</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -43,6 +48,11 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>com.hrrm.infrastructure.persistence</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>com.hrrm.famoney.infrastructure.logging</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

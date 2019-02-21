@@ -11,6 +11,8 @@
     </parent>
 
     <artifactId>com.hrrm.famoney.domain.accounts</artifactId>
+    <name>Accounts Domain Objects</name>
+    <description>Domain Objects for Accounts Context</description>
 
     <dependencies>
         <dependency>
@@ -26,6 +28,12 @@
             <artifactId>osgi.core</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.apache.servicemix.specs</groupId>
+            <artifactId>
+                org.apache.servicemix.specs.json-api-1.1
+            </artifactId>
+        </dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>com.hrrm.infrastructure.persistence</artifactId>
             <version>${project.version}</version>
@@ -34,12 +42,31 @@
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.apache.servicemix.specs</groupId>
-            <artifactId>
-                org.apache.servicemix.specs.json-api-1.1
-            </artifactId>
-        </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <configuration>
+                    <resources>
+                        <resource>
+                            <directory>src/main/java</directory>
+                            <includes>
+                                <include>**/*.sql</include>
+                                <include>**/*.json</include>
+                            </includes>
+                        </resource>
+                        <resource>
+                            <directory>src/main/resources</directory>
+                            <includes>
+                                <include>**/*.xml</include>
+                            </includes>
+                        </resource>
+                    </resources>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
