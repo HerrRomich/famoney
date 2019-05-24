@@ -1,6 +1,7 @@
 package com.hrrm.famoney.api.accounts.resource;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.GET;
@@ -27,7 +28,7 @@ public interface AccountsApi {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponse(responseCode = "200", description = "A list of all accounts", content = @Content(mediaType = MediaType.APPLICATION_JSON, array = @ArraySchema(schema = @Schema(implementation = AccountDTO.class))))
-    List<AccountDTO> getAllAccounts();
+    List<AccountDTO> getAllAccounts(@QueryParam("tags") Set<String> tags);
 
     @GET
     @Path("tags")

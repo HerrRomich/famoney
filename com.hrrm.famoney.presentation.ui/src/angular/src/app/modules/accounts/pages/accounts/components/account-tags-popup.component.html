@@ -1,0 +1,20 @@
+  <mat-form-field fxFlex floatLabel="never" class="account-tags-popup">
+    <mat-chip-list #accountTagList fxFlex>
+      <mat-chip *ngFor="let tag of accountsService.selectedAccountTags | async" [selectable]="true" [removable]="true"
+        (removed)="removeTag(tag)">
+        {{tag}}
+        <mat-icon matChipRemove>cancel</mat-icon>
+      </mat-chip>
+      <input matInput #tagsInput placeholder="Tags" [formControl]="tagsCtrl" [matAutocomplete]="tagAutoComplete"
+        [matChipInputFor]="accountTagList" [matChipInputAddOnBlur]="true"
+        (matChipInputTokenEnd)="addTag($event)" />
+      <mat-autocomplete #tagAutoComplete="matAutocomplete" (optionSelected)="selectedTag($event)">
+        <mat-option *ngFor="let tag of (accountTags | async)" [value]="tag">
+          {{tag}}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-chip-list>
+    <button mat-button mat-icon-button matSuffix (click)="accountsService.clearTags()">
+      <mat-icon>cancel</mat-icon>
+    </button>
+  </mat-form-field>

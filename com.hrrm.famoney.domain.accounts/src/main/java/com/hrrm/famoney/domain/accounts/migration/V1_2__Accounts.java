@@ -17,9 +17,11 @@ public class V1_2__Accounts extends BaseJavaMigration {
 
     private static final String INSERT_INTO_ACCOUNT_STAEMENT = "" +
             "insert into account(\r\n" +
+            "                    budget_id,\r\n" +
             "                    name\r\n" +
             "                   )\r\n" +
             "             values(\r\n" +
+            "                    ?,\r\n" +
             "                    ?\r\n" +
             "                   )";
 
@@ -65,7 +67,8 @@ public class V1_2__Accounts extends BaseJavaMigration {
 
     private Integer insertAccount(PreparedStatement stmt, String name) {
         try {
-            stmt.setString(1, name);
+            stmt.setInt(1, 1);
+            stmt.setString(2, name);
             stmt.executeUpdate();
             final ResultSet generatedKeys = stmt.getGeneratedKeys();
             if (generatedKeys.next()) {

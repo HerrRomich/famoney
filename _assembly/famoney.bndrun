@@ -129,4 +129,6 @@
 	slf4j.api;version='[1.7.25,1.7.26)',\
 	slf4j.simple;version='[1.7.25,1.7.26)',\
 	tx-control-provider-jpa-local;version='[1.0.0,1.0.1)',\
-	tx-control-service-local;version='[1.0.0,1.0.1)'
+	tx-control-service-local;version='[1.0.0,1.0.1)',\
+	com.google.guava;version='[27.0.1,27.0.2)',\
+	com.google.guava.failureaccess;version='[1.0.1,1.0.2)'

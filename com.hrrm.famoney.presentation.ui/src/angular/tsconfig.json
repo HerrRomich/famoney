@@ -5,6 +5,7 @@
     "outDir": "./dist/out-tsc",
     "paths": {
       "@famoney-apis/*": ["src/app/shared/apis/*"],
+      "@famoney-shared/*": ["src/app/shared/modules/*"]
     },
     "sourceMap": true,
     "declaration": false,

@@ -53,7 +53,7 @@
                                 <resourceBundle>${project.groupId}:com.hrrm.famoney.application.api.accounts:${project.version}</resourceBundle>
                             </resourceBundles>
                             <attachToMain>false</attachToMain>
-                            <outputDirectory>${project.build.directory}/generated-resources/apis/accounts</outputDirectory>
+                            <outputDirectory>${project.basedir}/src/main/resources/apis/accounts</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -74,7 +74,7 @@
                     <generateSupportingFiles>true</generateSupportingFiles>
                     <supportingFilesToGenerate>models.ts,api.ts,index.ts,api.module.ts,configuration.ts,variables.ts,encoder.ts</supportingFilesToGenerate>
                     <configOptions>
-                        <additional-properties>ngVersion=7.0.0,serviceSuffix=ApiService,serviceFileSuffix=-api.service,modelSuffix=DTO,modelFileSuffix=.dto,fileNaming=kebab-case</additional-properties>
+                        <additional-properties>ngVersion=7.0.0,serviceSuffix=ApiService,serviceFileSuffix=-api.service,modelSuffix=DTO,modelFileSuffix=.dto,fileNaming=kebab-case,providedInRoot=false</additional-properties>
                     </configOptions>
                 </configuration>
                 <executions>
@@ -84,7 +84,7 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.build.directory}/generated-resources/apis/accounts/openapi.json</inputSpec>
+                            <inputSpec>${project.basedir}/src/main/resources/apis/accounts/openapi.json</inputSpec>
                             <output>src/angular/src/app/shared/apis/accounts</output>
                         </configuration>
                     </execution>

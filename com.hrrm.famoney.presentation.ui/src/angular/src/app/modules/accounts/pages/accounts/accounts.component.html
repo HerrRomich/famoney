@@ -1,14 +1,20 @@
 <div fxLayout="row" fxLayoutAlign="start center">
+  <ng-template [cdkPortalOutlet]="tagsPopupPortal"></ng-template>
+  <button mat-icon-button (click)="openAccountTagsPopup()" cdkOverlayOrigin #accountTagsPopupButton="cdkOverlayOrigin">
+    <mat-icon svgIcon="menu-down" matBadge="{{getAccountTagsCount()}}" [matBadgeHidden]="getAccountTagsCount() === 0"></mat-icon>
+  </button>
   <div fxFlex></div>
-  <mat-tab-group fxFlex="0 1 auto" class="accounts-tab-group">
-    <mat-tab label="{{account.name}}" *ngFor="let account of accounts | async">
-    </mat-tab>
-  </mat-tab-group>
+  <app-router-tab fxFlex="0 1 auto" class="accounts-tab-group">
+    <app-router-tab-item *ngFor="let account of accounts | async" [routerLink]="account.id" routerLinkActive #rlaRef="routerLinkActive"
+      label="{{account.name}}"></app-router-tab-item>
+  </app-router-tab>
   <button mat-icon-button [matMenuTriggerFor]="menuRef">
     <mat-icon>more_vert</mat-icon>
   </button>
   <mat-menu #menuRef="matMenu" [overlapTrigger]="false">
     <button mat-menu-item>Новый счет</button>
+    <button mat-menu-item>Свойства</button>
     <button mat-menu-item>Удалить</button>
   </mat-menu>
 </div>
+<router-outlet></router-outlet>
