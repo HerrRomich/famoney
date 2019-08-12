@@ -15,6 +15,15 @@
 
     <dependencies>
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>com.hrrm.famoney.domain.accounts</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>com.hrrm.famoney.infrastructure.jaxrs</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>osgi.cmpn</artifactId>
         </dependency>
@@ -26,18 +35,22 @@
             <groupId>org.osgi</groupId>
             <artifactId>osgi.core</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.apache.aries.spec</groupId>
             <artifactId>org.apache.aries.javax.jax.rs-api</artifactId>
         </dependency>
+
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
+
         <dependency>
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
         </dependency>
+
         <dependency>
             <groupId>io.swagger.core.v3</groupId>
             <artifactId>swagger-annotations</artifactId>
@@ -46,20 +59,12 @@
             <groupId>io.swagger.core.v3</groupId>
             <artifactId>swagger-core</artifactId>
         </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>com.hrrm.famoney.infrastructure.jaxrs</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>com.hrrm.famoney.domain.accounts</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>
+
     </dependencies>
 
     <build>
@@ -68,39 +73,12 @@
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-maven-plugin</artifactId>
                 <configuration>
-                    <outputFileName>openapi</outputFileName>
-                    <outputPath>${project.basedir}/src/main/resources</outputPath>
-                    <outputFormat>JSON</outputFormat>
+                    <outputPath>${project.build.outputDirectory}</outputPath>
+                    <outputFileName>accounts</outputFileName>
                     <resourcePackages>
                         <package>com.hrrm.famoney.api.accounts</package>
                     </resourcePackages>
-                    <prettyPrint>true</prettyPrint>
                 </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>resolve</goal>
-                        </goals>
-                        <phase>compile</phase>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <resources>
-                                <resource>
-                                    <directory>${project.build.directory}/generated-resources</directory>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-remote-resources-plugin</artifactId>
@@ -113,66 +91,12 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <resourcesDirectory>${project.build.outputDirectory}</resourcesDirectory>
                     <includes>
-                        <include>openapi.json</include>
+                        <include>accounts.json</include>
                     </includes>
                 </configuration>
             </plugin>
         </plugins>
-        <pluginManagement>
-            <plugins>
-                <!--This plugin's configuration is used to store Eclipse 
-                    m2e settings only. It has no influence on the Maven build itself. -->
-                <plugin>
-                    <groupId>org.eclipse.m2e</groupId>
-                    <artifactId>lifecycle-mapping</artifactId>
-                    <version>1.0.0</version>
-                    <configuration>
-                        <lifecycleMappingMetadata>
-                            <pluginExecutions>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>
-                                            io.swagger.core.v3
-                                        </groupId>
-                                        <artifactId>
-                                            swagger-maven-plugin
-                                        </artifactId>
-                                        <versionRange>
-                                            [2.0.6,)
-                                        </versionRange>
-                                        <goals>
-                                            <goal>resolve</goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <execute>
-                                            <runOnConfiguration>true</runOnConfiguration>
-                                            <runOnIncremental>false</runOnIncremental>
-                                        </execute>
-                                    </action>
-                                </pluginExecution>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>org.apache.maven.plugins</groupId>
-                                        <artifactId>maven-remote-resources-plugin</artifactId>
-                                        <versionRange>[1.6.0,)</versionRange>
-                                        <goals>
-                                            <goal>bundle</goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <execute>
-                                            <runOnIncremental>false</runOnIncremental>
-                                            <runOnConfiguration>true</runOnConfiguration>
-                                        </execute>
-                                    </action>
-                                </pluginExecution>
-                            </pluginExecutions>
-                        </lifecycleMappingMetadata>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
     </build>
 </project>

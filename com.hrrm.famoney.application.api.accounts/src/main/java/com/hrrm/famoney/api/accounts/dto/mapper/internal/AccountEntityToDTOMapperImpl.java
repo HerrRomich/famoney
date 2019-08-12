@@ -24,10 +24,10 @@ public class AccountEntityToDTOMapperImpl implements AccountEntityToDTOMapper {
     @Override
     public AccountDTO toDTO(Account entity, Supplier<AccountDTO> dtoSupplier) {
         return AccountDTO.builderFrom(dtoSupplier.get())
-        .id(entity.getId())
-        .name(entity.getName())
-        .tags(entity.getTags())
-        .build();
+            .id(entity.getId())
+            .name(entity.getName())
+            .tags(entity.getTags())
+            .build();
     }
 
     @Override

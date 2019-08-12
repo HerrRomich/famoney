@@ -1,6 +1,6 @@
 package com.hrrm.famoney.api.accounts.dto;
 
-import javax.annotation.Generated;
+import javax.annotation.processing.Generated;
 
 import com.hrrm.famoney.infrastructure.jaxrs.DTO;
 

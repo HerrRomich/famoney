@@ -3,6 +3,7 @@ package com.hrrm.famoney.api.accounts.resource.internal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -18,7 +19,6 @@ import org.osgi.service.log.Logger;
 import org.osgi.service.log.LoggerFactory;
 import org.osgi.service.transaction.control.TransactionControl;
 
-import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Sets;
 import com.hrrm.famoney.api.accounts.dto.AccountDTO;

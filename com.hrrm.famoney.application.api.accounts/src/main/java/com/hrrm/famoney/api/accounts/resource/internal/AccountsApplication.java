@@ -13,17 +13,27 @@ import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsName;
 
 import com.hrrm.famoney.infrastructure.jaxrs.ApiSpecification;
 
-@Component(service = { Application.class, ApiSpecification.class }, scope = ServiceScope.SINGLETON)
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@Component(service = { Application.class,
+        ApiSpecification.class }, scope = ServiceScope.SINGLETON)
 @JaxrsName("com.hrrm.famoney.application.api.accounts")
 @JaxrsApplicationBase(AccountsApplication.API_PATH)
-@HttpWhiteboardContextSelect("(" + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME + "=com.hrrm.famoney.api)")
-public class AccountsApplication extends Application implements ApiSpecification {
+@HttpWhiteboardContextSelect("(" +
+        HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME +
+        "=com.hrrm.famoney.api)")
+@OpenAPIDefinition(info = @Info(title = "Accounts", version = "1.0.0"), tags = {
+        @Tag(name = "accounts", description = "Accounts related requests") })
+public class AccountsApplication extends Application implements
+        ApiSpecification {
 
     static final String API_PATH = "accounts";
 
     @Override
     public String getPath() {
-        return API_PATH;
+        return "/" + API_PATH;
     }
 
     @Override
@@ -34,7 +44,7 @@ public class AccountsApplication extends Application implements ApiSpecification
     @Override
     public InputStream getSpecificationStream() {
         return this.getClass()
-            .getResourceAsStream("/openapi/openapi.json");
+            .getResourceAsStream("/accounts.json");
     }
 
 }

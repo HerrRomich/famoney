@@ -9,7 +9,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     
-    <artifactId>com.hrrm.infrastructure.persistence</artifactId>
+    <artifactId>com.hrrm.famoney.infrastructure.persistence</artifactId>
     
     <name>Basic Persistence</name>
     <description>Infrastractural persistence classes</description>

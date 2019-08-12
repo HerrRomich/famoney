@@ -10,7 +10,7 @@ import com.hrrm.infrastructure.persistence.DomainEntity;
 public abstract class AccountBaseEntity implements DomainEntity<Integer> {
 
     public static final String ACCOUNTS_SCHEMA_NAME = "famoney_accounts";
-    
+
     @Id
     @Column(name = "id")
     private Integer id;

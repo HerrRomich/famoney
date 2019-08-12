@@ -49,8 +49,10 @@ public class V1_2__Accounts extends BaseJavaMigration {
             accountsJsonArray.forEach(accountJsonValue -> {
                 final JsonObject accountJsonObject = accountJsonValue.asJsonObject();
                 final Integer accountId = insertAccount(insertAccountStmt, accountJsonObject.getString("name"));
-                accountJsonObject.getJsonArray("tags").getValuesAs(JsonString.class)
-                    .forEach(accountTagValue -> insertAccountTag(insertTagStmt, accountId, accountTagValue.getString()));
+                accountJsonObject.getJsonArray("tags")
+                    .getValuesAs(JsonString.class)
+                    .forEach(accountTagValue -> insertAccountTag(insertTagStmt, accountId, accountTagValue
+                        .getString()));
             });
         }
     }

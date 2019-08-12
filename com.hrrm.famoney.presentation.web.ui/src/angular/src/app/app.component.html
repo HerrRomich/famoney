@@ -1,0 +1,25 @@
+<mat-toolbar color="primary" fxLayout="column">
+  <mat-toolbar-row fxLayout="row" ngClass.lt-sm="hide-span">
+    <span >Бюджет</span>
+    <div fxFlex></div>
+    <button mat-button routerLink="/accounts" routerLinkActive="mat-raised-button">
+      <mat-icon>account_balance_wallet</mat-icon>
+      <span>Счета</span>
+    </button>
+    <button mat-button>
+      <mat-icon>account_balance</mat-icon>
+      <span>Бюджет</span>
+    </button>
+    <button mat-button>
+      <mat-icon>date_range</mat-icon>
+      <span>Календарь</span>
+    </button>
+    <button mat-button>
+      <mat-icon>pie_chart</mat-icon>
+      <span>Отчеты</span>
+    </button>
+  </mat-toolbar-row>
+</mat-toolbar>
+<div fxFlex fxLayout="column">
+  <router-outlet></router-outlet>
+</div>

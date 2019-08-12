@@ -28,7 +28,7 @@ public abstract class StartPageRedirectFilter implements Filter {
             ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
-        if ( StringUtils.isEmpty(httpRequest.getPathInfo())) {
+        if (StringUtils.isEmpty(httpRequest.getPathInfo())) {
             httpResponse.sendRedirect(httpRequest.getContextPath() + "/");
         } else if ("/".equals(httpRequest.getPathInfo())) {
             RequestDispatcher requestDispatcherToIndexHtml = httpRequest.getRequestDispatcher(getStartPagePath());

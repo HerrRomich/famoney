@@ -1,0 +1,10 @@
+:host {
+  flex-direction: column;
+  display: flex;
+  flex: 1 1 auto;
+  position: relative;
+}
+
+.hide-span button mat-icon + span {
+  display: none;
+}

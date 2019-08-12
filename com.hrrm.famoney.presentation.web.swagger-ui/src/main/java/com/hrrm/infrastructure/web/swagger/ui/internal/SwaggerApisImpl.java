@@ -1,17 +1,13 @@
 package com.hrrm.infrastructure.web.swagger.ui.internal;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.HttpHeaders;
 
@@ -21,6 +17,10 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ServiceScope;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 import com.hrrm.famoney.infrastructure.jaxrs.ApiSpecification;
 import com.hrrm.infrastructure.web.swagger.ui.SwaggerApis;
 
@@ -28,15 +28,17 @@ import com.hrrm.infrastructure.web.swagger.ui.SwaggerApis;
 public class SwaggerApisImpl implements SwaggerApis {
 
     private static final String API_JSON = "api.json";
-    private static final String API_JSON_PATH = API_JSON;
-    private static final String API_SPEC_URL_TEMPLATE = "%1$s/%2$s/" + API_JSON_PATH;
-    private static final String APIS_JS_ELEMENT_TEMPLATE = "    {url: '" + API_SPEC_URL_TEMPLATE + "', name: '%3$s'}";
+    private static final String API_SPEC_URL_TEMPLATE = "%1$s/%2$s.json";
+    private static final String APIS_JS_ELEMENT_TEMPLATE = "    {url: '" +
+            API_SPEC_URL_TEMPLATE +
+            "', name: '%3$s'}";
 
     private Map<String, ApiSpecification> apiSpecifications = new ConcurrentHashMap<>();
 
     @Reference(cardinality = ReferenceCardinality.MULTIPLE, bind = "bindApiSpecification", policy = ReferencePolicy.DYNAMIC)
     public void bindApiSpecification(ApiSpecification apiSpecification) {
-        apiSpecifications.putIfAbsent(apiSpecification.getPath(), apiSpecification);
+        apiSpecifications.putIfAbsent(apiSpecification.getPath(),
+                                      apiSpecification);
     }
 
     public void unbindApiSpecification(ApiSpecification apiSpecification) {
@@ -44,16 +46,19 @@ public class SwaggerApisImpl implements SwaggerApis {
     }
 
     @Override
-    public void writeApisJs(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void writeApisJs(HttpServletRequest request,
+            HttpServletResponse response) throws IOException {
         response.addHeader(HttpHeaders.CONTENT_TYPE, request.getServletContext()
             .getMimeType("apis.js"));
-        try (OutputStreamWriter writer = new OutputStreamWriter(response.getOutputStream())) {
+        try (var writer = new OutputStreamWriter(response.getOutputStream())) {
             writer.write("var apis = [\r\n");
-            String separator = "";
-            for (ApiSpecification apiSpecification : apiSpecifications.values()) {
+            var separator = "";
+            for (ApiSpecification apiSpecification : apiSpecifications
+                .values()) {
                 writer.write(separator);
-                writer.write(String.format(APIS_JS_ELEMENT_TEMPLATE, request.getContextPath(), apiSpecification
-                    .getPath(), apiSpecification.getDescription()));
+                writer.write(String.format(APIS_JS_ELEMENT_TEMPLATE, request
+                    .getContextPath(), apiSpecification.getPath(),
+                                           apiSpecification.getDescription()));
                 separator = ",\r\n";
             }
 
@@ -62,7 +67,8 @@ public class SwaggerApisImpl implements SwaggerApis {
     }
 
     @Override
-    public void writeApiJson(String apiName, HttpServletRequest request, HttpServletResponse response) {
+    public void writeApiJson(String apiName, HttpServletRequest request,
+            HttpServletResponse response) {
         apiSpecifications.compute(apiName, (name, specification) -> {
             if (specification == null) {
                 throw new NotFoundException();
@@ -73,23 +79,84 @@ public class SwaggerApisImpl implements SwaggerApis {
         });
     }
 
-    private void sendApiJson(ApiSpecification apiSpecification, HttpServletRequest request,
-            HttpServletResponse response) {
-        try {
-            response.addHeader(HttpHeaders.CONTENT_TYPE, request.getServletContext()
-                .getMimeType(API_JSON));
-
-            try (InputStream openStream = apiSpecification.getSpecificationStream();
-                    BufferedReader specReader = new BufferedReader(new InputStreamReader(openStream));
-                    BufferedWriter specWriter = new BufferedWriter(new OutputStreamWriter(response
-                        .getOutputStream()))) {
-                String line;
-                while ((line = specReader.readLine()) != null) {
-                    specWriter.write(line + "\r\n");
-                }
-            }
+    private void sendApiJson(ApiSpecification apiSpecification,
+            HttpServletRequest request, HttpServletResponse response) {
+        response.addHeader(HttpHeaders.CONTENT_TYPE, request.getServletContext()
+            .getMimeType(API_JSON));
+        JsonFactory jFactory = new JsonFactory();
+        try (InputStream specStream = apiSpecification.getSpecificationStream();
+                JsonParser jParser = jFactory.createParser(specStream);
+                JsonGenerator jGenerator = jFactory.createGenerator(response
+                    .getOutputStream());) {
+            String url = request.getContextPath()
+                .replace("/spec", apiSpecification.getPath());
+            pipeJson(jParser, jGenerator, url);
         } catch (IOException e) {
-            throw new InternalServerErrorException("Unable to stream api.json", e);
+        }
+    }
+
+    private void pipeJson(JsonParser jParser, JsonGenerator jGenerator,
+            String url) throws IOException {
+        jParser.nextToken();
+        jGenerator.writeStartObject();
+        while (jParser.nextToken() != JsonToken.END_OBJECT) {
+            if (jParser.getCurrentToken() == JsonToken.START_OBJECT) {
+                processJsonObject(jParser, jGenerator);
+                if ("info".equals(jParser.getCurrentName())) {
+                    jGenerator.writeFieldName("servers");
+                    jGenerator.writeStartArray();
+                    jGenerator.writeStartObject();
+                    jGenerator.writeStringField("url", url);
+                    jGenerator.writeEndObject();
+                    jGenerator.writeEndArray();
+                }
+            } else if (jParser.getCurrentToken() == JsonToken.START_ARRAY) {
+                processJsonArray(jParser, jGenerator);
+            } else {
+                processJsonValue(jParser, jGenerator);
+            }
+        }
+        jGenerator.writeEndObject();
+    }
+
+    private void processJsonObject(JsonParser jParser, JsonGenerator jGenerator)
+            throws IOException {
+        jGenerator.writeStartObject();
+        while (jParser.nextToken() != JsonToken.END_OBJECT) {
+            processJsonValue(jParser, jGenerator);
+        }
+        jGenerator.writeEndObject();
+    }
+
+    private void processJsonArray(JsonParser jParser, JsonGenerator jGenerator)
+            throws IOException {
+        jGenerator.writeStartArray();
+        while (jParser.nextToken() != JsonToken.END_ARRAY) {
+            processJsonValue(jParser, jGenerator);
+        }
+        jGenerator.writeEndArray();
+    }
+
+    private void processJsonValue(JsonParser jParser, JsonGenerator jGenerator)
+            throws IOException {
+        if (jParser.getCurrentToken() == JsonToken.FIELD_NAME) {
+            jGenerator.writeFieldName(jParser.getCurrentName());
+        } else if (jParser.getCurrentToken() == JsonToken.START_ARRAY) {
+            processJsonArray(jParser, jGenerator);
+        } else if (jParser.getCurrentToken() == JsonToken.START_OBJECT) {
+            processJsonObject(jParser, jGenerator);
+        } else if (jParser.getCurrentToken() == JsonToken.VALUE_FALSE) {
+            jGenerator.writeBoolean(false);
+        } else if (jParser.getCurrentToken() == JsonToken.VALUE_TRUE) {
+            jGenerator.writeBoolean(true);
+        } else if (jParser.getCurrentToken() == JsonToken.VALUE_NULL) {
+            jGenerator.writeNull();
+        } else if (jParser.getCurrentToken() == JsonToken.VALUE_NUMBER_FLOAT) {
+            jGenerator.writeNumber(jParser.getFloatValue());
+        } else if (jParser.getCurrentToken() == JsonToken.VALUE_NUMBER_INT) {
+            jGenerator.writeNumber(jParser.getIntValue());
+        } else if (jParser.getCurrentToken() == JsonToken.VALUE_STRING) {
+            jGenerator.writeString(jParser.getText());
         }
     }
 

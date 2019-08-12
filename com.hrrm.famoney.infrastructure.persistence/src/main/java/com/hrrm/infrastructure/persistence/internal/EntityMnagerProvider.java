@@ -58,7 +58,8 @@ public class EntityMnagerProvider {
         jpaProperties.put("javax.persistence.nonJtaDataSource", ds);
         Map<String, Object> resourceProviderProperties = new HashMap<>();
         resourceProviderProperties.put("osgi.connection.pooling.enabled", false);
-        JPAEntityManagerProvider entityManagerProvider = jpaPproviderFactory.getProviderFor(emfb, jpaProperties, resourceProviderProperties);
+        JPAEntityManagerProvider entityManagerProvider = jpaPproviderFactory.getProviderFor(emfb, jpaProperties,
+                                                                                            resourceProviderProperties);
         Dictionary<String, String> props = new Hashtable<>();
         String name = properties.get("name")
             .toString();

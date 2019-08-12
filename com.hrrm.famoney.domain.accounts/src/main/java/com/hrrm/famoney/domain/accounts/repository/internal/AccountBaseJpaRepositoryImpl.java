@@ -10,22 +10,22 @@ import com.hrrm.famoney.domain.accounts.AccountBaseEntity;
 import com.hrrm.famoney.domain.accounts.repository.AccountBaseEntityRepository;
 import com.hrrm.infrastructure.persistence.JpaRepositoryImpl;
 
-public abstract class AccountBaseJpaRepositoryImpl<T extends AccountBaseEntity>
-    extends JpaRepositoryImpl<T, Integer> implements AccountBaseEntityRepository<T> {
+public abstract class AccountBaseJpaRepositoryImpl<T extends AccountBaseEntity> extends JpaRepositoryImpl<T, Integer>
+        implements AccountBaseEntityRepository<T> {
 
-  @Reference(target = "(name=accounts)")
-  protected JPAEntityManagerProvider entityManagerProvider;
-  
-  private EntityManager entityManager;
+    @Reference(target = "(name=accounts)")
+    protected JPAEntityManagerProvider entityManagerProvider;
 
-  @Activate
-  public void activate() {
-      entityManager = entityManagerProvider.getResource(getTxControl());
-  }
-  
-  @Override
-  protected EntityManager getEntityManager() {
-    return entityManager;
-  }
+    private EntityManager entityManager;
+
+    @Activate
+    public void activate() {
+        entityManager = entityManagerProvider.getResource(getTxControl());
+    }
+
+    @Override
+    protected EntityManager getEntityManager() {
+        return entityManager;
+    }
 
 }

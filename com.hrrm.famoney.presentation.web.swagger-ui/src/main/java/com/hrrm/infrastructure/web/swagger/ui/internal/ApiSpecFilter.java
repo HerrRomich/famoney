@@ -1,7 +1,8 @@
 package com.hrrm.infrastructure.web.swagger.ui.internal;
 
 import java.io.IOException;
-import java.net.URI;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -12,7 +13,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -24,8 +24,13 @@ import com.hrrm.infrastructure.web.swagger.ui.SwaggerApis;
 
 @Component(service = Filter.class)
 @HttpWhiteboardFilterPattern("/*")
-@HttpWhiteboardContextSelect("(" + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME + "=com.hrrm.famoney.api.spec)")
+@HttpWhiteboardContextSelect("(" +
+        HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME +
+        "=com.hrrm.famoney.api.spec)")
 public class ApiSpecFilter implements Filter {
+
+    private static final Pattern API_JSON_PATTERN = Pattern.compile(
+                                                                    "/(.*)\\.json$");
 
     private SwaggerApis swaggerApis;
 
@@ -41,8 +46,8 @@ public class ApiSpecFilter implements Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
-            ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response,
+            FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         String apiName = null;
@@ -56,16 +61,12 @@ public class ApiSpecFilter implements Filter {
     }
 
     private String getapiName(String pathInfo) {
-        try {
-            String[] pathParts = URI.create(pathInfo)
-                .getPath()
-                .split("/");
-            if ((pathParts.length == 3) && StringUtils.isEmpty(pathParts[0]) && "api.json".equals(pathParts[2])) {
-                return pathParts[1];
-            } else {
-                return null;
-            }
-        } catch (Exception e) {
+        if (pathInfo == null)
+            return null;
+        Matcher apiMatcher = API_JSON_PATTERN.matcher(pathInfo);
+        if (apiMatcher.matches()) {
+            return apiMatcher.group(1);
+        } else {
             return null;
         }
     }

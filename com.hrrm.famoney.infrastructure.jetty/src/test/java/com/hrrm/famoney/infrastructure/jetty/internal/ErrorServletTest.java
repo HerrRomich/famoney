@@ -28,15 +28,17 @@ public class ErrorServletTest {
     public void testStaticService() throws ServletException, IOException {
         HttpServletRequest req = mock(HttpServletRequest.class);
         HttpServletResponse resp = mock(HttpServletResponse.class);
-        
+
         PrintWriter respPrintWriter = mock(PrintWriter.class);
         when(resp.getWriter()).thenReturn(respPrintWriter);
         errorServletUnderTest.service(req, resp);
-        
+
         InOrder inOrder = inOrder(resp, respPrintWriter);
-        
-        inOrder.verify(resp).setStatus(404);
-        inOrder.verify(resp).flushBuffer();
+
+        inOrder.verify(resp)
+            .setStatus(404);
+        inOrder.verify(resp)
+            .flushBuffer();
         inOrder.verifyNoMoreInteractions();
     }
 

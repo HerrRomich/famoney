@@ -2,8 +2,6 @@ package com.hrrm.famoney.domain.accounts.repository.internal;
 
 import java.util.List;
 
-import javax.persistence.TypedQuery;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
 
@@ -21,8 +19,7 @@ public class AccountRepositoryImpl extends AccountBaseJpaRepositoryImpl<Account>
     @Override
     public List<String> findAllTags() {
         return getTxControl().required(() -> {
-            TypedQuery<String> findAllTagsQuery = getEntityManager().createNamedQuery(Account.FIND_ALL_TAGS_QUERY,
-                                                                                      String.class);
+            var findAllTagsQuery = getEntityManager().createNamedQuery(Account.FIND_ALL_TAGS_QUERY, String.class);
             return findAllTagsQuery.getResultList();
         });
     }
