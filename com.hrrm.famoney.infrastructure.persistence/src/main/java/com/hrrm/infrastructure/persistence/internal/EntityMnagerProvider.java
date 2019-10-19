@@ -1,5 +1,6 @@
 package com.hrrm.infrastructure.persistence.internal;
 
+import java.sql.SQLException;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -7,7 +8,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.apache.aries.transaction.AriesTransactionManager;
 import org.ops4j.pax.jdbc.hook.PreHook;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -16,7 +16,6 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.jdbc.DataSourceFactory;
 import org.osgi.service.jpa.EntityManagerFactoryBuilder;
 import org.osgi.service.transaction.control.TransactionControl;
 import org.osgi.service.transaction.control.jpa.JPAEntityManagerProvider;
@@ -28,9 +27,6 @@ public class EntityMnagerProvider {
     @Reference
     private JPAEntityManagerProviderFactory jpaPproviderFactory;
 
-    @Reference(target = "(osgi.jdbc.driver.name=mariadb)")
-    private DataSourceFactory dsf;
-
     @Reference(name = "data_source")
     private DataSource ds;
 
@@ -41,15 +37,13 @@ public class EntityMnagerProvider {
     private PreHook migrationHook;
 
     @Reference
-    private AriesTransactionManager tm;
-
-    @Reference
     private TransactionControl txControl;
 
     private ServiceRegistration<JPAEntityManagerProvider> entityManagerProviderRegistration;
 
     @Activate
-    public void activate(BundleContext context, Map<String, Object> properties) throws Exception {
+    public void activate(BundleContext context, Map<String, Object> properties)
+            throws SQLException {
         if (migrationHook != null) {
             migrationHook.prepare(ds);
         }
@@ -57,23 +51,24 @@ public class EntityMnagerProvider {
         Map<String, Object> jpaProperties = new HashMap<>();
         jpaProperties.put("javax.persistence.nonJtaDataSource", ds);
         Map<String, Object> resourceProviderProperties = new HashMap<>();
-        resourceProviderProperties.put("osgi.connection.pooling.enabled", false);
-        JPAEntityManagerProvider entityManagerProvider = jpaPproviderFactory.getProviderFor(emfb, jpaProperties,
-                                                                                            resourceProviderProperties);
+        resourceProviderProperties.put("osgi.connection.pooling.enabled",
+                false);
+        final var entityManagerProvider = jpaPproviderFactory.getProviderFor(
+                emfb, jpaProperties, resourceProviderProperties);
         Dictionary<String, String> props = new Hashtable<>();
-        String name = properties.get("name")
+        final var name = properties.get("name")
             .toString();
         if (name != null) {
             props.put("name", name);
         }
-        entityManagerProviderRegistration = context.registerService(JPAEntityManagerProvider.class,
-                                                                    entityManagerProvider, props);
+        entityManagerProviderRegistration = context.registerService(
+                JPAEntityManagerProvider.class, entityManagerProvider, props);
     }
 
     @Deactivate
     public void deactivate(BundleContext context) {
-        JPAEntityManagerProvider entityManagerProvider = context.getService(entityManagerProviderRegistration
-            .getReference());
+        final var entityManagerProvider = context.getService(
+                entityManagerProviderRegistration.getReference());
         jpaPproviderFactory.releaseProvider(entityManagerProvider);
         entityManagerProviderRegistration.unregister();
     }

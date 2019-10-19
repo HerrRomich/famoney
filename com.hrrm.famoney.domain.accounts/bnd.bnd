@@ -1,7 +1,9 @@
 Bundle-Version: 1.0.0.${tstamp}
 Export-Package: \
 	com.hrrm.famoney.domain.accounts.repository,\
-	com.hrrm.famoney.domain.accounts
+	com.hrrm.famoney.domain.accounts,\
+	com.hrrm.famoney.domain.accounts.movement.repository,\
+	com.hrrm.famoney.domain.accounts.movements
 
 -includeresource: \
     META-INF=src/main/resources/META-INF, \
@@ -13,3 +15,4 @@ Private-Package: \
 Meta-Persistence: META-INF/persistence.xml
 
 -dsannotations-options: inherit
+-privatepackage: com.hrrm.famoney.domain.accounts.internal

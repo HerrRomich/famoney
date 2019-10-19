@@ -4,12 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.core.HttpHeaders;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -27,18 +26,19 @@ import com.hrrm.infrastructure.web.swagger.ui.SwaggerApis;
 @Component(service = SwaggerApis.class, scope = ServiceScope.SINGLETON)
 public class SwaggerApisImpl implements SwaggerApis {
 
+    private static final String CONTENT_TYPE = "Content-Type";
     private static final String API_JSON = "api.json";
     private static final String API_SPEC_URL_TEMPLATE = "%1$s/%2$s.json";
-    private static final String APIS_JS_ELEMENT_TEMPLATE = "    {url: '" +
-            API_SPEC_URL_TEMPLATE +
-            "', name: '%3$s'}";
+    private static final String APIS_JS_ELEMENT_TEMPLATE = "    {url: '"
+            + API_SPEC_URL_TEMPLATE
+            + "', name: '%3$s'}";
 
     private Map<String, ApiSpecification> apiSpecifications = new ConcurrentHashMap<>();
 
     @Reference(cardinality = ReferenceCardinality.MULTIPLE, bind = "bindApiSpecification", policy = ReferencePolicy.DYNAMIC)
     public void bindApiSpecification(ApiSpecification apiSpecification) {
         apiSpecifications.putIfAbsent(apiSpecification.getPath(),
-                                      apiSpecification);
+                apiSpecification);
     }
 
     public void unbindApiSpecification(ApiSpecification apiSpecification) {
@@ -48,7 +48,7 @@ public class SwaggerApisImpl implements SwaggerApis {
     @Override
     public void writeApisJs(HttpServletRequest request,
             HttpServletResponse response) throws IOException {
-        response.addHeader(HttpHeaders.CONTENT_TYPE, request.getServletContext()
+        response.addHeader(CONTENT_TYPE, request.getServletContext()
             .getMimeType("apis.js"));
         try (var writer = new OutputStreamWriter(response.getOutputStream())) {
             writer.write("var apis = [\r\n");
@@ -58,7 +58,7 @@ public class SwaggerApisImpl implements SwaggerApis {
                 writer.write(separator);
                 writer.write(String.format(APIS_JS_ELEMENT_TEMPLATE, request
                     .getContextPath(), apiSpecification.getPath(),
-                                           apiSpecification.getDescription()));
+                        apiSpecification.getDescription()));
                 separator = ",\r\n";
             }
 
@@ -71,7 +71,7 @@ public class SwaggerApisImpl implements SwaggerApis {
             HttpServletResponse response) {
         apiSpecifications.compute(apiName, (name, specification) -> {
             if (specification == null) {
-                throw new NotFoundException();
+                throw new NoSuchElementException();
             } else {
                 sendApiJson(specification, request, response);
                 return specification;
@@ -81,7 +81,7 @@ public class SwaggerApisImpl implements SwaggerApis {
 
     private void sendApiJson(ApiSpecification apiSpecification,
             HttpServletRequest request, HttpServletResponse response) {
-        response.addHeader(HttpHeaders.CONTENT_TYPE, request.getServletContext()
+        response.addHeader(CONTENT_TYPE, request.getServletContext()
             .getMimeType(API_JSON));
         JsonFactory jFactory = new JsonFactory();
         try (InputStream specStream = apiSpecification.getSpecificationStream();
@@ -89,9 +89,10 @@ public class SwaggerApisImpl implements SwaggerApis {
                 JsonGenerator jGenerator = jFactory.createGenerator(response
                     .getOutputStream());) {
             String url = request.getContextPath()
-                .replace("/spec", apiSpecification.getPath());
+                .replace("spec", apiSpecification.getPath());
             pipeJson(jParser, jGenerator, url);
-        } catch (IOException e) {
+        } catch (IOException ex) {
+            response.setStatus(500);
         }
     }
 

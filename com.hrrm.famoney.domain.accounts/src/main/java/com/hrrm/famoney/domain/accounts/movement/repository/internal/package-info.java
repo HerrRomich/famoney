@@ -1,0 +1,1 @@
+package com.hrrm.famoney.domain.accounts.movement.repository.internal;

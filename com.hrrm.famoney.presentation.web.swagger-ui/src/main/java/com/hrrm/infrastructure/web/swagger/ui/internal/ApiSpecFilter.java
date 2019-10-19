@@ -24,15 +24,14 @@ import com.hrrm.infrastructure.web.swagger.ui.SwaggerApis;
 
 @Component(service = Filter.class)
 @HttpWhiteboardFilterPattern("/*")
-@HttpWhiteboardContextSelect("(" +
-        HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME +
-        "=com.hrrm.famoney.api.spec)")
+@HttpWhiteboardContextSelect("("
+    + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME
+    + "=com.hrrm.famoney.api.spec)")
 public class ApiSpecFilter implements Filter {
 
-    private static final Pattern API_JSON_PATTERN = Pattern.compile(
-                                                                    "/(.*)\\.json$");
+    private static final Pattern API_JSON_PATTERN = Pattern.compile("/(.*)\\.json$");
 
-    private SwaggerApis swaggerApis;
+    private SwaggerApis          swaggerApis;
 
     @Activate
     public ApiSpecFilter(@Reference SwaggerApis swaggerApis) {
@@ -46,8 +45,8 @@ public class ApiSpecFilter implements Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response,
-            FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+        throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         String apiName = null;

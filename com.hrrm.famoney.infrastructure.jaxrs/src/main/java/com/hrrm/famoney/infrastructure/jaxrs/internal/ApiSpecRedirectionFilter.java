@@ -19,7 +19,9 @@ import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardFilterPatter
 
 @Component(service = Filter.class)
 @HttpWhiteboardFilterPattern("/*")
-@HttpWhiteboardContextSelect("(" + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME + "=com.hrrm.famoney.api)")
+@HttpWhiteboardContextSelect("("
+        + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME
+        + "=com.hrrm.famoney.api)")
 public class ApiSpecRedirectionFilter implements Filter {
 
     @Override
@@ -28,12 +30,14 @@ public class ApiSpecRedirectionFilter implements Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
-            ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response,
+            FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
-        if (StringUtils.isEmpty(httpRequest.getPathInfo()) || "/".equals(httpRequest.getPathInfo())) {
-            httpResponse.sendRedirect(httpRequest.getContextPath() + "/spec/");
+        if (StringUtils.isEmpty(httpRequest.getPathInfo()) || "/".equals(
+                httpRequest.getPathInfo())) {
+            httpResponse.sendRedirect(httpRequest.getContextPath()
+                    + "/spec/");
         } else {
             chain.doFilter(request, response);
         }

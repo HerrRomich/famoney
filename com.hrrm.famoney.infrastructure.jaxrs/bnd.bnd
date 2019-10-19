@@ -1,3 +1,9 @@
 Bundle-Version: 1.0.0.${tstamp}
 Private-Package: com.hrrm.famoney.infrastructure.jaxrs.internal
-Export-Package: com.hrrm.famoney.infrastructure.jaxrs
+Export-Package: \
+	com.hrrm.famoney.infrastructure.jaxrs,\
+	com.hrrm.famoney.infrastructure.jaxrs.mapper
+Import-Package: \
+	com.fasterxml.jackson.module.jaxb;version="[2.9,3)",\
+	*
+	

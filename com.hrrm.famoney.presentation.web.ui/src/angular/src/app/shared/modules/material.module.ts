@@ -11,7 +11,8 @@ import {
   MatAutocompleteModule,
   MatFormFieldModule,
   MatChipsModule,
-  MatTooltipModule
+  MatTooltipModule,
+  MatListModule
 } from '@angular/material';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -31,6 +32,7 @@ const MATERIAL_MODULES = [
   MatFormFieldModule,
   MatChipsModule,
   MatTooltipModule,
+  MatListModule,
   OverlayModule,
   PortalModule
 ];
@@ -41,6 +43,6 @@ const MATERIAL_MODULES = [
 })
 export class MaterailModule {
   constructor(private matIconRegistry: MatIconRegistry, private domSanitzer: DomSanitizer) {
-    this.matIconRegistry.addSvgIcon('menu-down', this.domSanitzer.bypassSecurityTrustResourceUrl('../assets/menu-down.svg'));
+    this.matIconRegistry.addSvgIcon('menu-down', this.domSanitzer.bypassSecurityTrustResourceUrl('/assets/menu-down.svg'));
   }
 }

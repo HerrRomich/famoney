@@ -5,4 +5,6 @@ import { Component } from '@angular/core';
   templateUrl: 'account-table.component.html',
   styleUrls: ['account-table.component.scss']
 })
-export class AccountTableComponent {}
+export class AccountTableComponent {
+  items = ['1', '2', '3', '4'];
+}

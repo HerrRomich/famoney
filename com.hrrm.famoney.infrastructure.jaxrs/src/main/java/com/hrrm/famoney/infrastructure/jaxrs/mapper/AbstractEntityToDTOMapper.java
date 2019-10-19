@@ -3,8 +3,8 @@ package com.hrrm.famoney.infrastructure.jaxrs.mapper;
 import com.hrrm.famoney.infrastructure.jaxrs.DTO;
 import com.hrrm.infrastructure.persistence.DomainEntity;
 
-public abstract class AbstractEntityToDTOMapper<T extends DomainEntity<?>, P extends DTO> implements
-        EntityToDTOMapper<T, P> {
+public abstract class AbstractEntityToDTOMapper<T extends DomainEntity<?>, P extends DTO>
+    implements EntityToDTOMapper<T, P> {
 
     @Override
     public final P toDTO(T entity) {

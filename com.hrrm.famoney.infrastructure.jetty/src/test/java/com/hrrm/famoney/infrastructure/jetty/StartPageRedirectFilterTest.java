@@ -20,14 +20,13 @@ import org.junit.Test;
 
 public class StartPageRedirectFilterTest {
 
-    private static final String INDEX_HTML = "/index.html";
+    private static final String INDEX_HTML   = "/index.html";
     private static final String CONTEXT_PATH = "/context-path";
-    StartPageRedirectFilter startPageRedirectFilterUnderTest;
+    StartPageRedirectFilter     startPageRedirectFilterUnderTest;
 
     @Before
     public void setUp() {
-        startPageRedirectFilterUnderTest = new StartPageRedirectFilter() {
-        };
+        startPageRedirectFilterUnderTest = new StartPageRedirectFilter() {};
     }
 
     @Test
@@ -40,7 +39,8 @@ public class StartPageRedirectFilterTest {
 
         startPageRedirectFilterUnderTest.doFilter(request, response, chain);
 
-        verify(response).sendRedirect(CONTEXT_PATH + "/");
+        verify(response).sendRedirect(CONTEXT_PATH
+            + "/");
         verify(chain, never()).doFilter(request, response);
     }
 

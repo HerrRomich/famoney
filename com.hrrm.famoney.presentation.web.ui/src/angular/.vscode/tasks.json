@@ -2,18 +2,15 @@
   // See https://go.microsoft.com/fwlink/?LinkId=733558
   // for the documentation about the tasks.json format
   "version": "2.0.0",
-  "tasks": [{
+  "tasks": [
+    {
       "label": "build dev",
       "type": "shell",
-      "command": "ng",
+      "command": ".\\node_modules\\.bin\\ng",
       "windows": {
-        "command": "ng"
+        "command": ".\\node_modules\\.bin\\ng"
       },
-      "args": [
-        "build",
-        "--configuration=development",
-        "--watch"
-      ],
+      "args": ["build", "--configuration=development", "--watch"],
       "group": "build",
       "presentation": {
         "echo": true,
@@ -22,22 +19,16 @@
         "panel": "shared",
         "showReuseMessage": true
       },
-      "problemMatcher": [
-        "$tsc-watch"
-      ]
+      "problemMatcher": ["$tsc-watch"]
     },
     {
       "label": "build prod",
       "type": "shell",
       "command": "ng",
       "windows": {
-        "command": "ng"
+        "command": ".\\node_modules\\.bin\\ng"
       },
-      "args": [
-        "build",
-        "--watch",
-        "--configuration=production"
-      ],
+      "args": ["build", "--watch", "--configuration=production"],
       "group": "build",
       "presentation": {
         "echo": true,
@@ -46,20 +37,16 @@
         "panel": "shared",
         "showReuseMessage": true
       },
-      "problemMatcher": [
-        "$tsc-watch"
-      ]
+      "problemMatcher": ["$tsc-watch"]
     },
     {
       "label": "serve",
       "type": "shell",
-      "command": "ng",
+      "command": ".\\node_modules\\.bin\\ng",
       "windows": {
-        "command": "ng"
+        "command": ".\\node_modules\\.bin\\ng"
       },
-      "args": [
-        "serve"
-      ],
+      "args": ["serve"],
       "group": "build",
       "presentation": {
         "echo": true,
@@ -68,10 +55,7 @@
         "panel": "shared",
         "showReuseMessage": true
       },
-      "problemMatcher": [
-        "$tsc-watch"
-      ]
+      "problemMatcher": ["$tsc-watch"]
     }
-
   ]
 }

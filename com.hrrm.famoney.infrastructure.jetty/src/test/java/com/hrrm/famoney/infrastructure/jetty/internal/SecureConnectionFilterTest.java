@@ -21,11 +21,11 @@ import org.junit.Test;
 
 public class SecureConnectionFilterTest {
 
-    private static final String SERVER_NAME = "server_name";
-    private static final Integer SERVER_PORT = 8080;
-    private static final String REQUEST_URI = "/part1/part2";
-    private static final String QUERY_STRING = "parameter1=value1&paramter2=value2";
-    private static final int SECURE_SERVER_PORT = 8443;
+    private static final String    SERVER_NAME        = "server_name";
+    private static final Integer   SERVER_PORT        = 8080;
+    private static final String    REQUEST_URI        = "/part1/part2";
+    private static final String    QUERY_STRING       = "parameter1=value1&paramter2=value2";
+    private static final int       SECURE_SERVER_PORT = 8443;
     private SecureConnectionFilter secureConnectionFilterUnderTest;
 
     @Before
@@ -65,7 +65,9 @@ public class SecureConnectionFilterTest {
 
         secureConnectionFilterUnderTest.doFilter(req, res, chain);
 
-        String file = REQUEST_URI + "?" + QUERY_STRING;
+        String file = REQUEST_URI
+            + "?"
+            + QUERY_STRING;
         String secureLocation = new URL("https", SERVER_NAME, SECURE_SERVER_PORT, file).toString();
         verify(res).sendRedirect(eq(secureLocation));
         verify(chain, never()).doFilter(any(), any());

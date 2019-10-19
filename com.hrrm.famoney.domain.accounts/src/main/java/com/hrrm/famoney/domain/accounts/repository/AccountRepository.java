@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.hrrm.famoney.domain.accounts.Account;
 
-public interface AccountRepository extends AccountBaseEntityRepository<Account> {
+public interface AccountRepository extends AccountsDomainRepository<Account> {
 
     List<String> findAllTags();
 

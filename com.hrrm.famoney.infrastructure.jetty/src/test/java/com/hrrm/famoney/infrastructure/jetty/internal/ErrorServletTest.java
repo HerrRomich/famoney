@@ -35,10 +35,8 @@ public class ErrorServletTest {
 
         InOrder inOrder = inOrder(resp, respPrintWriter);
 
-        inOrder.verify(resp)
-            .setStatus(404);
-        inOrder.verify(resp)
-            .flushBuffer();
+        inOrder.verify(resp).setStatus(404);
+        inOrder.verify(resp).flushBuffer();
         inOrder.verifyNoMoreInteractions();
     }
 

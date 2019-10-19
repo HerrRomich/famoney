@@ -24,12 +24,13 @@ public abstract class StartPageRedirectFilter implements Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
-            ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+        throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         if (StringUtils.isEmpty(httpRequest.getPathInfo())) {
-            httpResponse.sendRedirect(httpRequest.getContextPath() + "/");
+            httpResponse.sendRedirect(httpRequest.getContextPath()
+                + "/");
         } else if ("/".equals(httpRequest.getPathInfo())) {
             RequestDispatcher requestDispatcherToIndexHtml = httpRequest.getRequestDispatcher(getStartPagePath());
             requestDispatcherToIndexHtml.forward(httpRequest, httpResponse);

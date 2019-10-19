@@ -19,7 +19,7 @@ import com.hrrm.infrastructure.web.swagger.ui.internal.ApiSpecFilter;
 
 public class ApiSpecFilterTest {
 
-    ApiSpecFilter apiSpecFilterUnderTest;
+    ApiSpecFilter       apiSpecFilterUnderTest;
     private SwaggerApis swaggerApis;
 
     @Before
@@ -45,7 +45,8 @@ public class ApiSpecFilterTest {
     public void whenApiSpecJsonThenGenerate() throws IOException, ServletException {
         HttpServletRequest request = mock(HttpServletRequest.class);
         String apiName = "accounts";
-        when(request.getPathInfo()).thenReturn(apiName + "/api.json");
+        when(request.getPathInfo()).thenReturn(apiName
+            + "/api.json");
         HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain chain = mock(FilterChain.class);
 

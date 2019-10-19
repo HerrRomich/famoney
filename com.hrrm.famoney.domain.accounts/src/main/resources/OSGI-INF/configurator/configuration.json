@@ -1,7 +1,7 @@
 {
 	":configurator:resource-version": 1,
 	"com.hrrm.famoney.entity-manager-provider~accounts": {
-		"url": "jdbc:mariadb://localhost:3306/budget",
+		"url": "jdbc:mariadb://localhost:3306/famoney",
 		"user": "root",
 		"data_source": "famoney",
 		"password": "welcome1",
