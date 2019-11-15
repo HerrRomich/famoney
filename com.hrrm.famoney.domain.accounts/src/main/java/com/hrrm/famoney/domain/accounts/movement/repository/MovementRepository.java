@@ -1,5 +1,6 @@
 package com.hrrm.famoney.domain.accounts.movement.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
@@ -11,6 +12,7 @@ public interface MovementRepository extends AccountsDomainRepository<Movement> {
 
     List<Movement> findMovementsByAccountId(@NotNull Integer accountId);
 
-    List<Movement> findAllMovementsBySliceId(@NotNull Integer sliceId);
+    List<Movement> findByAccountIdBetweenDates(@NotNull Integer accountId, LocalDateTime dateFrom,
+        LocalDateTime dateTo);
 
 }

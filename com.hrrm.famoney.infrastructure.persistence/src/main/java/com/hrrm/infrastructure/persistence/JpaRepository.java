@@ -10,4 +10,6 @@ public interface JpaRepository<T extends DomainEntity<P>, P extends Serializable
 
     Optional<T> find(P id);
 
+    T save(T entity);
+
 }

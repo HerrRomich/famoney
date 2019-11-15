@@ -16,6 +16,8 @@ import javax.json.stream.JsonParser;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 
+import com.hrrm.infrastructure.persistence.migration.MigrationException;
+
 public class V2_2__Initial_movements extends BaseJavaMigration {
 
     private static final String INSERT_INTO_MOVEMENT_STATEMENT = ""

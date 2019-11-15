@@ -16,6 +16,10 @@ import com.hrrm.famoney.domain.accounts.AccountsDomainEntity;
 @Table(schema = AccountsDomainEntity.ACCOUNTS_SCHEMA_NAME, name = "movement_slice")
 public class MovementSlice extends AccountsDomainEntity {
 
+    public static final Integer FIRST_SLICE_ID = -1;
+    public static final LocalDateTime FIRST_SLICE_DATE = LocalDateTime.MIN;
+    public static final LocalDateTime LAST_SLICE_DATE = LocalDateTime.MAX;
+
     @ManyToOne
     @JoinColumn(name = "account_id")
     private Account account;
@@ -23,11 +27,17 @@ public class MovementSlice extends AccountsDomainEntity {
     @Column(name = "date")
     private LocalDateTime date;
 
-    @Column(name = "count")
-    private Integer count;
+    @Column(name = "movement_count")
+    private Integer movementCount;
 
-    @Column(name = "sum")
-    private BigDecimal sum;
+    @Column(name = "movement_sum")
+    private BigDecimal movementSum;
+
+    @Column(name = "booking_count")
+    private Integer bookingCount;
+
+    @Column(name = "booking_sum")
+    private BigDecimal bookingSum;
 
     public Account getAccount() {
         return account;
@@ -41,24 +51,40 @@ public class MovementSlice extends AccountsDomainEntity {
         return date;
     }
 
-    public void setDate(LocalDateTime sliceDate) {
-        this.date = sliceDate;
+    public void setDate(LocalDateTime date) {
+        this.date = date;
     }
 
-    public Integer getCount() {
-        return count;
+    public Integer getMovementCount() {
+        return movementCount;
     }
 
-    public void setCount(Integer movementSliceCount) {
-        this.count = movementSliceCount;
+    public void setMovementCount(Integer movementSliceCount) {
+        this.movementCount = movementSliceCount;
     }
 
-    public BigDecimal getSum() {
-        return sum;
+    public BigDecimal getMovementSum() {
+        return movementSum;
     }
 
-    public void setSum(BigDecimal movementSliceSum) {
-        this.sum = movementSliceSum;
+    public void setMovementSum(BigDecimal movementSliceSum) {
+        this.movementSum = movementSliceSum;
+    }
+
+    public Integer getBookingCount() {
+        return bookingCount;
+    }
+
+    public void setBookingCount(Integer bookingCount) {
+        this.bookingCount = bookingCount;
+    }
+
+    public BigDecimal getBookingSum() {
+        return bookingSum;
+    }
+
+    public void setBookingSum(BigDecimal bookingSum) {
+        this.bookingSum = bookingSum;
     }
 
 }

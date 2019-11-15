@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(name = "MovementSliceData", subTypes = { MovementSliceDTO.class })
-public interface MoventSliceDataDTO {
+public interface MovementSliceDataDTO {
 
     LocalDateTime getDate();
 

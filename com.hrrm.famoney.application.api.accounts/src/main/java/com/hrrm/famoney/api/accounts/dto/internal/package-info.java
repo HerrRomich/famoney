@@ -1,1 +1,0 @@
-package com.hrrm.famoney.api.accounts.dto.internal;

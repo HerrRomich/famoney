@@ -34,22 +34,17 @@ public abstract class JpaRepositoryImpl<T extends DomainEntity<P>, P extends Ser
 
     @Override
     public List<T> findAll() {
-        logger.debug("Searching all elements of entity class: {}.",
-                getEntityClass());
+        logger.debug("Searching all elements of entity class: {}.", getEntityClass());
         try {
-            List<T> entities = getTxControl().required(() -> getFindAllQuery()
-                .getResultList());
-            logger.debug(l -> l.debug(
-                    "Successfully found {} elements of entity class: {}.",
-                    entities.size(), getEntityClass()));
-            logger.trace(l -> l.trace(
-                    "Successfully found {} elements of entity class: {}/p/n{}.",
-                    entities.size(), getEntityClass(), entities));
+            List<T> entities = getTxControl().required(() -> getFindAllQuery().getResultList());
+            logger.debug(l -> l.debug("Successfully found {} elements of entity class: {}.",
+                entities.size(), getEntityClass()));
+            logger.trace(l -> l.trace("Successfully found {} elements of entity class: {}/p/n{}.",
+                entities.size(), getEntityClass(), entities));
             return entities;
         } catch (RuntimeException ex) {
-            logger.error(
-                    "A problem by searching all elements of entity class: {}.",
-                    getEntityClass(), ex);
+            logger.error("A problem by searching all elements of entity class: {}.",
+                getEntityClass(), ex);
             throw ex;
         }
     }
@@ -65,32 +60,29 @@ public abstract class JpaRepositoryImpl<T extends DomainEntity<P>, P extends Ser
         });
     }
 
-    protected final <S> TypedQuery<S> getNamedQueryOrAddNew(String queryName,
-            Class<S> resultClass, Supplier<TypedQuery<S>> querySupplier) {
+    protected final <S> TypedQuery<S> getNamedQueryOrAddNew(String queryName, Class<S> resultClass,
+        Supplier<TypedQuery<S>> querySupplier) {
         final var entityManager = getEntityManager();
         logger.debug("Trying to find a registered named query: {}", queryName);
         try {
-            TypedQuery<S> namedQuery = txControl.supports(() -> entityManager
-                .createNamedQuery(queryName, resultClass));
-            logger.debug("A named query: {} is successfully found in registry.",
-                    queryName);
+            TypedQuery<S> namedQuery = txControl.supports(() -> entityManager.createNamedQuery(
+                queryName, resultClass));
+            logger.debug("A named query: {} is successfully found in registry.", queryName);
             return namedQuery;
         } catch (ScopedWorkException ex) {
             logger.debug(
-                    "A named query: {} was not found in registry. Trying to create and register a new one.",
-                    queryName, ex);
+                "A named query: {} was not found in registry. Trying to create and register a new one.",
+                queryName, ex);
             var namedQuery = querySupplier.get();
             entityManager.getEntityManagerFactory()
                 .addNamedQuery(queryName, namedQuery);
-            logger.debug(
-                    "A named query: {} is successfully created and put into registry.",
-                    queryName);
+            logger.debug("A named query: {} is successfully created and put into registry.",
+                queryName);
             return namedQuery;
         }
     }
 
-    private CriteriaQuery<T> getEntityCriteriaQuery(
-            EntityManager entityManager) {
+    private CriteriaQuery<T> getEntityCriteriaQuery(EntityManager entityManager) {
         return entityManager.getCriteriaBuilder()
             .createQuery(getEntityClass());
     }
@@ -98,21 +90,29 @@ public abstract class JpaRepositoryImpl<T extends DomainEntity<P>, P extends Ser
     @Override
     public Optional<T> find(P id) {
         final var entityClass = getEntityClass();
-        logger.debug("Searching for an entity {} by its id: {}", entityClass,
-                id);
-        Optional<T> entity = getTxControl().supports(() -> Optional.ofNullable(
-                getEntityManager().find(entityClass, id)));
+        logger.debug("Searching for an entity {} by its id: {}", entityClass, id);
+        Optional<T> entity = getTxControl().supports(() -> Optional.ofNullable(getEntityManager()
+            .find(entityClass, id)));
         entity.ifPresentOrElse(e -> {
-            logger.debug("An entity {} by its id: {} is successfully found.",
-                    entityClass, id);
-            logger.trace(l -> l.trace(
-                    "An entity {} by its id: {} is successfully found./n/p{}",
-                    entityClass, id, e));
+            logger.debug("An entity {} by its id: {} is successfully found.", entityClass, id);
+            logger.trace(l -> l.trace("An entity {} by its id: {} is successfully found./n/p{}",
+                entityClass, id, e));
         }, () -> {
-            logger.debug("An entity {} by its id: {} is successfully found.",
-                    entityClass, id);
+            logger.debug("An entity {} by its id: {} is successfully found.", entityClass, id);
         });
         return entity;
+    }
+
+    @Override
+    public T save(T entity) {
+        if (entity.getId() == null) {
+            getEntityManager().persist(entity);
+            return entity;
+        } else if (!getEntityManager().contains(entity)) {
+            return getEntityManager().merge(entity);
+        } else {
+            return entity;
+        }
     }
 
 }

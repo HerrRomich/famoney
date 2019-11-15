@@ -1,8 +1,15 @@
 package com.hrrm.famoney.api.accounts.dto;
 
+import org.immutables.value.Value;
+
+import com.hrrm.famoney.infrastructure.jaxrs.DTO;
+import com.hrrm.famoney.infrastructure.jaxrs.ImmutableDtoStyle;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(name = "Movement", allOf = { MovementDataDTO.class })
-public interface MovementDTO extends WithIdDTO, MovementDataDTO {
+@Schema(name = "Movement", allOf = { MovementDataDTO.class, IdDTO.class })
+@Value.Immutable
+@ImmutableDtoStyle
+public interface MovementDTO extends DTO, IdDTO, MovementDataDTO {
 
 }

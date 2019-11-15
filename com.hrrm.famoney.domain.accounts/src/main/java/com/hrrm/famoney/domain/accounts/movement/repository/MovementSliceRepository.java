@@ -1,6 +1,8 @@
 package com.hrrm.famoney.domain.accounts.movement.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.constraints.NotNull;
 
@@ -11,6 +13,9 @@ public interface MovementSliceRepository extends
         AccountsDomainRepository<MovementSlice> {
 
     List<MovementSlice> getMovementSlicesByAccountId(
-            @NotNull Integer accountId);
+        @NotNull Integer accountId);
+
+    Optional<MovementSlice> findFirstByAccountIdAfterDate(
+        @NotNull Integer accountId, @NotNull LocalDateTime dateFrom);
 
 }

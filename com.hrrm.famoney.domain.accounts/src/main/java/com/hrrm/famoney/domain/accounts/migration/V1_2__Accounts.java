@@ -3,6 +3,10 @@ package com.hrrm.famoney.domain.accounts.migration;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -13,13 +17,17 @@ import javax.json.stream.JsonParser;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 
+import com.hrrm.infrastructure.persistence.migration.MigrationException;
+
 public class V1_2__Accounts extends BaseJavaMigration {
     private static final String INSERT_INTO_ACCOUNT_STATEMENT = ""
             + "insert into account(\r\n"
             + "                    budget_id,\r\n"
+            + "                    open_date,\r\n"
             + "                    name\r\n"
             + "                   )\r\n"
             + "             values(\r\n"
+            + "                    ?,\r\n"
             + "                    ?,\r\n"
             + "                    ?\r\n"
             + "                   )";
@@ -41,28 +49,30 @@ public class V1_2__Accounts extends BaseJavaMigration {
                 final PreparedStatement insertAccountStmt = context
                     .getConnection()
                     .prepareStatement(INSERT_INTO_ACCOUNT_STATEMENT,
-                            new String[] { "id" });
+                        new String[] { "id" });
                 final PreparedStatement insertTagStmt = context.getConnection()
                     .prepareStatement(INSERT_INTO_ACCOUNT_TAG_STATEMENT)) {
             final JsonObject rootJsonObject = parser.getObject();
             final JsonArray accountsJsonArray = rootJsonObject.getJsonArray(
-                    "accounts");
+                "accounts");
 
             accountsJsonArray.forEach(accountJsonValue -> {
                 final JsonObject accountJsonObject = accountJsonValue
                     .asJsonObject();
                 final Integer accountId = insertAccount(insertAccountStmt,
-                        accountJsonObject.getString("name"));
+                    DateTimeFormatter.ISO_DATE.parse(accountJsonObject
+                        .getString("openDate"), LocalDate::from)
+                        .atStartOfDay(), accountJsonObject.getString("name"));
                 accountJsonObject.getJsonArray("tags")
                     .getValuesAs(JsonString.class)
                     .forEach(accountTagValue -> insertAccountTag(insertTagStmt,
-                            accountId, accountTagValue.getString()));
+                        accountId, accountTagValue.getString()));
             });
         }
     }
 
     private void insertAccountTag(final PreparedStatement stmt,
-            final Integer accountId, final String accountTag) {
+        final Integer accountId, final String accountTag) {
         try {
             stmt.setInt(1, accountId);
             stmt.setString(2, accountTag);
@@ -72,8 +82,10 @@ public class V1_2__Accounts extends BaseJavaMigration {
         }
     }
 
-    private Integer insertAccount(PreparedStatement stmt, String name) {
-        try (final ResultSet generatedKeys = callInsertAccount(stmt, name)) {
+    private Integer insertAccount(PreparedStatement stmt,
+        LocalDateTime openDate, String name) {
+        try (final ResultSet generatedKeys = callInsertAccount(stmt, openDate,
+            name)) {
             if (generatedKeys.next()) {
                 return generatedKeys.getInt(1);
             }
@@ -83,10 +95,11 @@ public class V1_2__Accounts extends BaseJavaMigration {
         }
     }
 
-    private ResultSet callInsertAccount(PreparedStatement stmt, String name)
-            throws SQLException {
+    private ResultSet callInsertAccount(PreparedStatement stmt,
+        LocalDateTime openDate, String name) throws SQLException {
         stmt.setInt(1, 1);
-        stmt.setString(2, name);
+        stmt.setTimestamp(2, Timestamp.valueOf(openDate));
+        stmt.setString(3, name);
         stmt.executeUpdate();
         return stmt.getGeneratedKeys();
     }

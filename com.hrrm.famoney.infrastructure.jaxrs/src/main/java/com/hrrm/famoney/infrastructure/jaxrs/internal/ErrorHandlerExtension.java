@@ -10,7 +10,6 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.jaxrs.whiteboard.propertytypes.JSONRequired;
 import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsExtension;
 
-import com.hrrm.famoney.infrastructure.jaxrs.ApiErrorDTO;
 import com.hrrm.famoney.infrastructure.jaxrs.ApiException;
 
 @Component(service = { ExceptionMapper.class })
@@ -25,7 +24,7 @@ public class ErrorHandlerExtension implements ExceptionMapper<ApiException> {
 
     @Override
     public Response toResponse(ApiException exception) {
-        final var errorDTOBuilder = ApiErrorDTO.builder()
+        final var errorDTOBuilder = ApiErrorDTOImpl.builder()
             .code(exception.getErrorCode())
             .message(exception.getErrorMessage())
             .description(exception.getErrorDescription());

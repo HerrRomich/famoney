@@ -1,4 +1,4 @@
-package com.hrrm.famoney.domain.accounts.migration;
+package com.hrrm.infrastructure.persistence.migration;
 
 public class MigrationException extends RuntimeException {
 

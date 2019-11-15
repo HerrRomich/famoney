@@ -1,23 +1,21 @@
 package com.hrrm.famoney.infrastructure.jaxrs;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import java.util.Optional;
 
-import lombok.Builder;
-import lombok.ToString;
+import org.immutables.value.Value;
 
-@Builder
-@ToString
-public class ApiErrorDTO implements DTO {
+@Value.Immutable
+@ImmutableDtoStyle
+public interface ApiErrorDTO extends DTO {
 
-    public final Integer code;
+    String getCode();
 
-    public final String message;
+    String getMessage();
 
-    @JsonInclude(Include.NON_NULL)
-    public final String description;
+    @JsonIncludeNonNull
+    Optional<String> getDescription();
 
-    @JsonInclude(Include.NON_NULL)
-    public final String stackTrace;
+    @JsonIncludeNonNull
+    Optional<String> getStackTrace();
 
 }

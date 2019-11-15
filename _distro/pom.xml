@@ -221,9 +221,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.aries.jpa</groupId>
-            <artifactId>
-                org.apache.aries.jpa.eclipselink.adapter
-            </artifactId>
+            <artifactId>org.apache.aries.jpa.eclipselink.adapter</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -253,23 +251,17 @@
         </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>
-            <artifactId>
-                org.apache.felix.webconsole.plugins.ds
-            </artifactId>
+            <artifactId>org.apache.felix.webconsole.plugins.ds</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>
-            <artifactId>
-                org.apache.felix.webconsole.plugins.memoryusage
-            </artifactId>
+            <artifactId>org.apache.felix.webconsole.plugins.memoryusage</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>
-            <artifactId>
-                org.apache.felix.webconsole.plugins.packageadmin
-            </artifactId>
+            <artifactId>org.apache.felix.webconsole.plugins.packageadmin</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -314,9 +306,21 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.aries.component-dsl</groupId>
+            <artifactId>org.apache.aries.component-dsl.component-dsl</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.modelmapper</groupId>
             <artifactId>modelmapper</artifactId>
             <scope>runtime</scope>
         </dependency>
+
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-maven-plugin</artifactId>
+        </dependency>
+
     </dependencies>
 </project>

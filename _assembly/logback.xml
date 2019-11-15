@@ -21,8 +21,7 @@
 
     <logger name="com.hrrm.famoney" level="INFO"/>
     <logger name="org.eclipse.persistence.jpa" level="TRACE"/>
-    
-    
+    <logger name="com.hrrm.famoney.api.accounts.resource" level="TRACE"/>
 
     <root level="INFO">
         <appender-ref ref="STDOUT" />

@@ -4,36 +4,39 @@ import javax.ws.rs.core.Response.Status;
 
 public class ApiException extends RuntimeException {
 
-    private final Integer errorCode;
-
-    private final String errorMessage;
+    private final String errorCode;
 
     private final String errorDescription;
 
-    public ApiException(Integer errorCode, String errorMessage, String errorDescription, Throwable cause) {
-        super(errorMessage, cause);
-        this.errorCode = errorCode;
-        this.errorMessage = errorMessage;
-        this.errorDescription = errorDescription;
+    public ApiException(ApiError error, String description, Throwable cause) {
+        super(error.getMessage(), cause);
+        this.errorCode = getApiErrorCodePrefix()
+                + "-"
+                + error.getCode();
+        this.errorDescription = description;
     }
 
-    public ApiException(Integer errorCode, String errorMessage) {
-        this(errorCode, errorMessage, null, null);
+    public ApiException(ApiError error, String description) {
+        this(error, description, null);
     }
 
-    public ApiException(Integer errorCode, String errorMessage, String description) {
-        this(errorCode, errorMessage, description, null);
+    public ApiException(ApiError error) {
+        this(error, null);
     }
 
-    public Integer getErrorCode() {
+    public String getApiErrorCodePrefix() {
+        return "common";
+    }
+
+    public final String getErrorCode() {
         return errorCode;
     }
 
-    public String getErrorMessage() {
-        return errorMessage;
+    public final String getErrorMessage() {
+        return getMessage();
     }
 
-    public String getErrorDescription() {
+    public final String getErrorDescription() {
         return errorDescription;
     }
 

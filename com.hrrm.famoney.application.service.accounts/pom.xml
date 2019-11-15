@@ -9,7 +9,15 @@
     </parent>
     <artifactId>com.hrrm.famoney.application.service.accounts</artifactId>
 
+    <name>Accounts services</name>
+    <description>Services for Accounts bounded context.</description>
+
     <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>com.hrrm.famoney.domain.accounts</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>osgi.cmpn</artifactId>
@@ -22,5 +30,11 @@
             <groupId>org.osgi</groupId>
             <artifactId>osgi.core</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+        </dependency>
+
     </dependencies>
 </project>

@@ -6,7 +6,12 @@ import javax.persistence.MappedSuperclass;
 
 import com.hrrm.infrastructure.persistence.DomainEntity;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+
 @MappedSuperclass
+@EqualsAndHashCode
+@Getter
 public abstract class AccountsDomainEntity implements DomainEntity<Integer> {
 
     public static final String ACCOUNTS_SCHEMA_NAME = "famoney_accounts";
@@ -14,13 +19,5 @@ public abstract class AccountsDomainEntity implements DomainEntity<Integer> {
     @Id
     @Column(name = "id")
     private Integer id;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
 }

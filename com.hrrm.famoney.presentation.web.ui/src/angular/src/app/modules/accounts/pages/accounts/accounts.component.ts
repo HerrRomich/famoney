@@ -16,7 +16,7 @@ export class AccountsComponent implements OnInit, AfterViewInit {
   public accounts: Observable<Array<AccountDto>>;
   public accountTags: Observable<string[]>;
 
-  @ViewChild('accountTagsPopupButton', {static: true}) accountTagsPopupButton: CdkOverlayOrigin;
+  @ViewChild('accountTagsPopupButton', { static: true }) accountTagsPopupButton: CdkOverlayOrigin;
 
   accountTagsPopupPortal: ComponentPortal<AccountTagsPopupComponent>;
 
@@ -35,13 +35,14 @@ export class AccountsComponent implements OnInit, AfterViewInit {
     const position = this.overlay
       .position()
       .flexibleConnectedTo(this.accountTagsPopupButton.elementRef)
-      .withPositions([{ originX: 'start', originY: 'center', overlayX: 'start', overlayY: 'top' }])
+      .withPositions([{ originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top' }])
       .withFlexibleDimensions(true)
       .withGrowAfterOpen(true);
     const accountTagsPopup = this.overlay.create({
       disposeOnNavigation: true,
       positionStrategy: position,
       hasBackdrop: true,
+      panelClass: 'fm-tags-panel',
       backdropClass: 'cdk-overlay-dark-backdrop'
     });
     accountTagsPopup.attach(this.accountTagsPopupPortal);
@@ -50,5 +51,11 @@ export class AccountsComponent implements OnInit, AfterViewInit {
 
   getAccountTagsCount() {
     return this.acountsService.selectedAccountTags.value.size;
+  }
+
+  getAccountTags() {
+    return Array.from(this.acountsService.selectedAccountTags.value)
+      .map(tag => '- ' + tag)
+      .join('\n');
   }
 }

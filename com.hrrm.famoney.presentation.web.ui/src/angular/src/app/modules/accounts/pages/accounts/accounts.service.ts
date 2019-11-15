@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject, combineLatest } from 'rxjs';
 import { AccountDto, AccountsApiService } from '@famoney-apis/accounts';
-import { map } from 'rxjs/operators';
+import { map, flatMap } from 'rxjs/operators';
 
 @Injectable()
 export class AccountsService {
@@ -19,10 +19,8 @@ export class AccountsService {
   }
 
   public getAccounts(): Observable<AccountDto[]> {
-    return combineLatest([this.accountsApiService.getAllAccounts(), this._selectedAccountTags]).pipe(
-      map(([accounts, selected]) =>
-        selected.size === 0 ? accounts : accounts.filter(account => account.tags.reduce((prev, cur) => prev || selected.has(cur), false))
-      )
+    return this._selectedAccountTags.pipe(
+      flatMap(tags => this.accountsApiService.getAllAccounts(Array.from(tags)))
     );
   }
 

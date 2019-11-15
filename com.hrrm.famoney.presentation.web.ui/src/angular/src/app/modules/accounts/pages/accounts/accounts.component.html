@@ -1,11 +1,23 @@
 <div fxLayout="row" fxLayoutAlign="start center">
-  <button mat-icon-button (click)="openAccountTagsPopup()" cdkOverlayOrigin #accountTagsPopupButton="cdkOverlayOrigin" matTooltip="Account tags">
-    <mat-icon svgIcon="menu-down" matBadge="{{getAccountTagsCount()}}" [matBadgeHidden]="getAccountTagsCount() === 0"></mat-icon>
+  <button
+    mat-icon-button
+    (click)="openAccountTagsPopup()"
+    cdkOverlayOrigin
+    #accountTagsPopupButton="cdkOverlayOrigin"
+    matTooltip="{{ getAccountTags() }}"
+    matTooltipClass="wrapped-tooltip"
+  >
+    <mat-icon svgIcon="menu-down" matBadge="{{ getAccountTagsCount() }}" [matBadgeHidden]="getAccountTagsCount() === 0"></mat-icon>
   </button>
   <div fxFlex></div>
   <app-router-tab fxFlex="0 1 auto" class="accounts-tab-group">
-    <app-router-tab-item *ngFor="let account of accounts | async" [routerLink]="account.id" routerLinkActive #rlaRef="routerLinkActive"
-      label="{{account.name}}"></app-router-tab-item>
+    <app-router-tab-item
+      *ngFor="let account of accounts | async"
+      [routerLink]="account.id"
+      routerLinkActive
+      #rlaRef="routerLinkActive"
+      label="{{ account.name }}"
+    ></app-router-tab-item>
   </app-router-tab>
   <button mat-icon-button [matMenuTriggerFor]="menuRef">
     <mat-icon>more_vert</mat-icon>
