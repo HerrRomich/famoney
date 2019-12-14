@@ -5,6 +5,7 @@ import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -18,8 +19,8 @@ import com.hrrm.famoney.api.accounts.dto.AccountDTO;
 import com.hrrm.famoney.api.accounts.dto.AccountDataDTO;
 import com.hrrm.famoney.api.accounts.dto.MovementDTO;
 import com.hrrm.famoney.api.accounts.dto.MovementOrder;
-import com.hrrm.famoney.api.accounts.dto.MovementSliceDTO;
 import com.hrrm.famoney.api.accounts.dto.MovementSliceWithMovementsDTO;
+import com.hrrm.famoney.api.accounts.dto.MovementSlicesInfoDTO;
 import com.hrrm.famoney.infrastructure.jaxrs.ApiErrorDTO;
 
 import io.swagger.v3.oas.annotations.Parameter;
@@ -36,9 +37,8 @@ public interface AccountsApi {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponse(description = "A list of all accounts")
-    List<AccountDTO> getAllAccounts(@Parameter(
-            name = "tags",
-            description = "List of tags to filter accounts. If empty, all accounts will be provided") @QueryParam("tags") Set<String> tags);
+    List<AccountDTO> getAllAccounts(@Parameter(name = "tags",
+        description = "List of tags to filter accounts. If empty, all accounts will be provided") @QueryParam("tags") Set<String> tags);
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -50,63 +50,44 @@ public interface AccountsApi {
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponse(description = "A list of all accounts")
     AccountDataDTO changeAccount(@PathParam("accountId") Integer accountI,
-        AccountDataDTO accountData);
+            AccountDataDTO accountData);
 
     @GET
     @Path("{accountId}/movement-slices")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponse(description = "A list of slices of account movements of specified account")
-    @ApiResponse(
-            responseCode = "404",
-            description = "No account was found for specified id.",
-            content = @Content(
-                    mediaType = MediaType.APPLICATION_JSON,
-                    schema = @Schema(implementation = ApiErrorDTO.class)))
-    List<MovementSliceDTO> getMovementSlicesByAccountId(@Parameter(
-            name = "accountId",
-            in = ParameterIn.PATH) @NotNull @PathParam("accountId") Integer accountId);
+    @ApiResponse(responseCode = "404", description = "No account was found for specified id.",
+        content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(
+            implementation = ApiErrorDTO.class)))
+    MovementSlicesInfoDTO getMovementSlicesByAccountId(@Parameter(name = "accountId",
+        in = ParameterIn.PATH) @NotNull @PathParam("accountId") Integer accountId);
 
     @GET
     @Path("{accountId}/movements")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponse(description = "A list of account movements of specified account")
-    @ApiResponse(
-            responseCode = "404",
-            description = "No account was found for specified id.",
-            content = @Content(
-                    mediaType = MediaType.APPLICATION_JSON,
-                    schema = @Schema(implementation = ApiErrorDTO.class)))
-    List<MovementDTO> getMovements(@Parameter(
-            name = "accountId",
-            in = ParameterIn.PATH,
-            description = "Identifier of account, for which the movements will be searched.") @NotNull @PathParam("accountId") Integer accountId);
+    @ApiResponse(responseCode = "404", description = "No account was found for specified id.",
+        content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(
+            implementation = ApiErrorDTO.class)))
+    List<MovementDTO> getMovements(@Parameter(name = "accountId", in = ParameterIn.PATH,
+        description = "Identifier of account, for which the movements will be searched.") @NotNull @PathParam("accountId") Integer accountId);
 
     @GET
     @Path("{accountId}/movement-slices/{sliceId}/movements")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponse(description = "A list of movements by a specified slice ")
-    @ApiResponse(
-            responseCode = "404",
-            description = "No account was found for specified id.",
-            content = @Content(
-                    mediaType = MediaType.APPLICATION_JSON,
-                    schema = @Schema(implementation = ApiErrorDTO.class)))
-    @ApiResponse(
-            responseCode = "404",
-            description = "No slice was found in a specified account for specified id.",
-            content = @Content(
-                    mediaType = MediaType.APPLICATION_JSON,
-                    schema = @Schema(implementation = ApiErrorDTO.class)))
-    MovementSliceWithMovementsDTO getMovementsBySliceId(@Parameter(
-            name = "accountId",
-            in = ParameterIn.PATH) @NotNull @PathParam("accountId") Integer accountId, @Parameter(
-                    name = "sliceId",
-                    in = ParameterIn.PATH) @NotNull @PathParam("sliceId") Integer sliceId,
-        @Parameter(
-                name = "order",
-                in = ParameterIn.QUERY,
-                schema = @Schema(
-                        implementation = MovementOrder.class,
-                        defaultValue = "booking")) @QueryParam("order") MovementOrder order);
+    @ApiResponse(responseCode = "404", description = "No account was found for specified id.",
+        content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(
+            implementation = ApiErrorDTO.class)))
+    @ApiResponse(responseCode = "404",
+        description = "No slice was found in a specified account for specified id.",
+        content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(
+            implementation = ApiErrorDTO.class)))
+    MovementSliceWithMovementsDTO getMovementsBySliceId(@Parameter(name = "accountId",
+        in = ParameterIn.PATH) @NotNull @PathParam("accountId") Integer accountId, @Parameter(
+            name = "sliceId", in = ParameterIn.PATH) @NotNull @PathParam("sliceId") Integer sliceId,
+            @Parameter(name = "order", in = ParameterIn.QUERY, schema = @Schema(
+                implementation = MovementOrder.class,
+                defaultValue = "movement")) @QueryParam("order") @DefaultValue("MOVEMENT_DATE") MovementOrder order);
 
 }

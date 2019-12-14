@@ -15,10 +15,21 @@ import javax.persistence.Table;
 import com.hrrm.famoney.domain.accounts.Account;
 import com.hrrm.famoney.domain.accounts.AccountsDomainEntity;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.Accessors;
+
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Table(schema = AccountsDomainEntity.ACCOUNTS_SCHEMA_NAME, name = "movement")
 @DiscriminatorColumn(name = "type")
+@Accessors(chain = true)
+@Getter
+@Setter
+@ToString(callSuper = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 public abstract class Movement extends AccountsDomainEntity {
 
     public static final String FIND_MOVEMENTS_WITH_PAGINATION = "com.hrrm.famoney.domain.accounts.movement.AccountMovement#finMovenetsWithPagination";
@@ -37,37 +48,5 @@ public abstract class Movement extends AccountsDomainEntity {
 
     @Column(name = "amount")
     private BigDecimal amount;
-
-    public Account getAccount() {
-        return account;
-    }
-
-    public void setAccount(Account account) {
-        this.account = account;
-    }
-
-    public LocalDateTime getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDateTime date) {
-        this.date = date;
-    }
-
-    public LocalDateTime getBookingDate() {
-        return bookingDate;
-    }
-
-    public void setBookingDate(LocalDateTime bookingDate) {
-        this.bookingDate = bookingDate;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
 
 }

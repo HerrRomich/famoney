@@ -14,6 +14,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @ImmutableDtoStyle
 public interface MovementSliceWithMovementsDTO extends DTO, MovementSliceDTO {
 
+    MovementOrder getMovementOrder();
+
     List<MovementDTO> getMovements();
 
 }

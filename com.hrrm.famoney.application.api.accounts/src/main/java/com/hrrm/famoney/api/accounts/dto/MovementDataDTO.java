@@ -14,8 +14,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @ImmutableDtoStyle
 public interface MovementDataDTO {
 
+    @Schema(required = true)
     public LocalDateTime getDate();
 
+    @Schema(required = true)
     public BigDecimal getAmount();
 
 }

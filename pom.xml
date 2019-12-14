@@ -17,14 +17,15 @@
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <local.index.policy>REQUIRED</local.index.policy>
-        <bnd.maven.version>4.3.0</bnd.maven.version>
+        <bnd.maven.version>4.3.1</bnd.maven.version>
         <eclipselink.version>2.6.7</eclipselink.version>
         <famoney.ui.angular>com.hrrm.famoney.presentation.ui/src/angular/famoney</famoney.ui.angular>
         <org.apache.aries.jpa.version>2.7.2-SNAPSHOT</org.apache.aries.jpa.version>
-        <jackson.core.version>2.9.8</jackson.core.version>
+        <jackson.core.version>2.10.1</jackson.core.version>
         <org.apache.aries.tx-control.version>1.0.1</org.apache.aries.tx-control.version>
         <org.immutables.version>2.8.1</org.immutables.version>
         <org.mapstruct.version>1.3.1.Final</org.mapstruct.version>
+        <junit.jupiter.version>5.5.2</junit.jupiter.version>
     </properties>
 
     <repositories>
@@ -66,12 +67,22 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>com.hrrm.famoney.domain.accounts.impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>com.hrrm.famoney.application.service.accounts</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>com.hrrm.famoney.infrastructure.logging</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>com.hrrm.famoney.infrastructure.wrappers</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -177,15 +188,27 @@
 
             <!-- JUnit -->
             <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.12</version>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
+                <version>${junit.jupiter.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.platform</groupId>
+                <artifactId>junit-platform-launcher</artifactId>
+                <version>1.5.2</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>2.23.4</version>
+                <version>3.1.0</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-core</artifactId>
+                <version>2.0.4</version>
                 <scope>test</scope>
             </dependency>
 
@@ -204,6 +227,11 @@
                 <groupId>javax.validation</groupId>
                 <artifactId>validation-api</artifactId>
                 <version>2.0.1.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.validation</groupId>
+                <artifactId>validation-api</artifactId>
+                <version>1.1.0.Final</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.aries.spec</groupId>
@@ -305,7 +333,7 @@
             <dependency>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-core</artifactId>
-                <version>5.2.4</version>
+                <version>6.0.8</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.servicemix.specs</groupId>
@@ -468,6 +496,12 @@
                 <version>2.0.10</version>
             </dependency>
             <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-models</artifactId>
+                <version>2.1.0</version>
+            </dependency>
+
+            <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>27.0.1-jre</version>
@@ -489,7 +523,7 @@
             <dependency>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>4.1.3</version>
+                <version>3.3.4</version>
             </dependency>
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
@@ -637,9 +671,9 @@
                 <plugin>
                     <groupId>org.openapitools</groupId>
                     <artifactId>openapi-generator-maven-plugin</artifactId>
-                    <version>4.1.3</version>
+                    <version>3.3.4</version>
                     <configuration>
-                        <generatorName>typescript-angular</generatorName>
+                        <generatorName>custom-typescript-angular</generatorName>
                         <generateSupportingFiles>true</generateSupportingFiles>
                         <supportingFilesToGenerate>models.ts,api.ts,index.ts,api.module.ts,configuration.ts,variables.ts,encoder.ts</supportingFilesToGenerate>
                         <additionalProperties>
@@ -649,10 +683,16 @@
                             <additionalProperty>modelSuffix=Dto</additionalProperty>
                             <additionalProperty>modelFileSuffix=.dto</additionalProperty>
                             <additionalProperty>fileNaming=kebab-case</additionalProperty>
-                            <additionalProperty>supportsMultipleInheritance=true</additionalProperty>
-                            <additionalProperty>supportsInheritance=true</additionalProperty>
+                            <additionalProperty>useInheritance=true</additionalProperty>
                         </additionalProperties>
                     </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.hrrm.openapi</groupId>
+                            <artifactId>code-gen</artifactId>
+                            <version>0.0.1-SNAPSHOT</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>io.swagger.core.v3</groupId>
@@ -723,6 +763,22 @@
                                         <versionRange>[2.0.6,)</versionRange>
                                         <goals>
                                             <goal>resolve</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <execute>
+                                            <runOnIncremental>false</runOnIncremental>
+                                            <runOnConfiguration>false</runOnConfiguration>
+                                        </execute>
+                                    </action>
+                                </pluginExecution>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>biz.aQute.bnd</groupId>
+                                        <artifactId>bnd-indexer-maven-plugin</artifactId>
+                                        <versionRange>[4.3.1,)</versionRange>
+                                        <goals>
+                                            <goal>index</goal>
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
@@ -810,5 +866,7 @@
         <module>com.hrrm.famoney.presentation.web.ui</module>
         <module>com.hrrm.famoney.application.api.accounts</module>
         <module>com.hrrm.famoney.application.service.accounts</module>
+        <module>com.hrrm.famoney.application.api.accounts.impl</module>
+        <module>com.hrrm.famoney.infrastructure.wrappers</module>
     </modules>
 </project>

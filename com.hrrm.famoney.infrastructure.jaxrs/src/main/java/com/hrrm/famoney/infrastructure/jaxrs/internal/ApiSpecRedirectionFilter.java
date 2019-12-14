@@ -30,12 +30,12 @@ public class ApiSpecRedirectionFilter implements Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response,
-            FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
-        if (StringUtils.isEmpty(httpRequest.getPathInfo()) || "/".equals(
-                httpRequest.getPathInfo())) {
+        if (StringUtils.isEmpty(httpRequest.getPathInfo()) || "/".equals(httpRequest
+            .getPathInfo())) {
             httpResponse.sendRedirect(httpRequest.getContextPath()
                     + "/spec/");
         } else {

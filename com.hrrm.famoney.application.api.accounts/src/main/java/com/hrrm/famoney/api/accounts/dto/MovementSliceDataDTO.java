@@ -1,17 +1,26 @@
 package com.hrrm.famoney.api.accounts.dto;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(name = "MovementSliceData", subTypes = { MovementSliceDTO.class })
 public interface MovementSliceDataDTO {
 
-    LocalDateTime getDate();
+    @Schema(required = true)
+    LocalDate getDate();
 
-    Integer getCount();
+    @Schema(required = true)
+    Integer getMovementCount();
 
-    BigDecimal getSum();
+    @Schema(required = true)
+    BigDecimal getMovementSum();
+
+    @Schema(required = true)
+    Integer getBookingCount();
+
+    @Schema(required = true)
+    BigDecimal getBookingSum();
 
 }

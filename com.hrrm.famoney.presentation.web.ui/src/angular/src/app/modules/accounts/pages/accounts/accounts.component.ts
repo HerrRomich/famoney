@@ -6,6 +6,7 @@ import { AccountsService } from './accounts.service';
 import { AccountTagsPopupComponent } from './components/account-tags-popup.component';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { Overlay, CdkOverlayOrigin } from '@angular/cdk/overlay';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-accounts',
@@ -13,18 +14,20 @@ import { Overlay, CdkOverlayOrigin } from '@angular/cdk/overlay';
   styleUrls: ['./accounts.component.scss']
 })
 export class AccountsComponent implements OnInit, AfterViewInit {
-  public accounts: Observable<Array<AccountDto>>;
-  public accountTags: Observable<string[]>;
+  public accounts$: Observable<Array<AccountDto>>;
+  public accountTags$: Observable<string[]>;
 
   @ViewChild('accountTagsPopupButton', { static: true }) accountTagsPopupButton: CdkOverlayOrigin;
 
   accountTagsPopupPortal: ComponentPortal<AccountTagsPopupComponent>;
 
-  constructor(private acountsService: AccountsService, private overlay: Overlay) {}
+  constructor(private acountsService: AccountsService, private overlay: Overlay, private route: ActivatedRoute) {}
 
   ngOnInit() {
-    this.accounts = this.acountsService.getAccounts();
-    this.accountTags = this.acountsService.getTags();
+    this.accounts$ = this.acountsService.getAccounts().pipe(tap(accounts => {
+      accounts.findIndex(accountDto => accountDto.id === this.route.snapshot.params['accountId']);
+    }));
+    this.accountTags$ = this.acountsService.getTags();
   }
 
   ngAfterViewInit() {

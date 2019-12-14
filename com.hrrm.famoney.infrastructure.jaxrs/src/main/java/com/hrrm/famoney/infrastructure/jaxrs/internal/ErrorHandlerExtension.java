@@ -11,6 +11,7 @@ import org.osgi.service.jaxrs.whiteboard.propertytypes.JSONRequired;
 import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsExtension;
 
 import com.hrrm.famoney.infrastructure.jaxrs.ApiException;
+import com.hrrm.famoney.infrastructure.jaxrs.impl.ApiErrorDTOImpl;
 
 @Component(service = { ExceptionMapper.class })
 @JaxrsExtension

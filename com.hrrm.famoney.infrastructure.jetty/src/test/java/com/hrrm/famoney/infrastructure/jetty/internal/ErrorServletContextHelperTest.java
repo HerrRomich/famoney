@@ -1,13 +1,13 @@
 package com.hrrm.famoney.infrastructure.jetty.internal;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ErrorServletContextHelperTest {
 
     private ErrorServletContextHelper errorServletContextHelperUnderTest;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         errorServletContextHelperUnderTest = new ErrorServletContextHelper();
     }

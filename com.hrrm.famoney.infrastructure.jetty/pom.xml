@@ -12,7 +12,7 @@
     <artifactId>com.hrrm.famoney.infrastructure.jetty</artifactId>
     <name>FaMoney Jetty-Settings</name>
     <description>Settings of Jetty Server</description>
-    
+
 
     <dependencies>
         <dependency>
@@ -37,8 +37,8 @@
         </dependency>
 
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>

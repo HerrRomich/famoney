@@ -15,7 +15,6 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.jpa.EntityManagerFactoryBuilder;
 import org.osgi.service.transaction.control.TransactionControl;
 import org.osgi.service.transaction.control.jpa.JPAEntityManagerProvider;
@@ -33,7 +32,7 @@ public class EntityMnagerProvider {
     @Reference(name = "emfb")
     private EntityManagerFactoryBuilder emfb;
 
-    @Reference(name = "migration_hook", cardinality = ReferenceCardinality.OPTIONAL)
+    @Reference(name = "migration_hook"/* , cardinality = ReferenceCardinality.OPTIONAL */)
     private PreHook migrationHook;
 
     @Reference
@@ -42,8 +41,7 @@ public class EntityMnagerProvider {
     private ServiceRegistration<JPAEntityManagerProvider> entityManagerProviderRegistration;
 
     @Activate
-    public void activate(BundleContext context, Map<String, Object> properties)
-            throws SQLException {
+    public void activate(BundleContext context, Map<String, Object> properties) throws SQLException {
         if (migrationHook != null) {
             migrationHook.prepare(ds);
         }
@@ -51,24 +49,22 @@ public class EntityMnagerProvider {
         Map<String, Object> jpaProperties = new HashMap<>();
         jpaProperties.put("javax.persistence.nonJtaDataSource", ds);
         Map<String, Object> resourceProviderProperties = new HashMap<>();
-        resourceProviderProperties.put("osgi.connection.pooling.enabled",
-                false);
-        final var entityManagerProvider = jpaPproviderFactory.getProviderFor(
-                emfb, jpaProperties, resourceProviderProperties);
+        resourceProviderProperties.put("osgi.connection.pooling.enabled", false);
+        final var entityManagerProvider = jpaPproviderFactory.getProviderFor(emfb, jpaProperties,
+                                                                             resourceProviderProperties);
         Dictionary<String, String> props = new Hashtable<>();
         final var name = properties.get("name")
             .toString();
         if (name != null) {
             props.put("name", name);
         }
-        entityManagerProviderRegistration = context.registerService(
-                JPAEntityManagerProvider.class, entityManagerProvider, props);
+        entityManagerProviderRegistration = context.registerService(JPAEntityManagerProvider.class,
+                                                                    entityManagerProvider, props);
     }
 
     @Deactivate
     public void deactivate(BundleContext context) {
-        final var entityManagerProvider = context.getService(
-                entityManagerProviderRegistration.getReference());
+        final var entityManagerProvider = context.getService(entityManagerProviderRegistration.getReference());
         jpaPproviderFactory.releaseProvider(entityManagerProvider);
         entityManagerProviderRegistration.unregister();
     }

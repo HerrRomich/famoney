@@ -15,18 +15,19 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class StartPageRedirectFilterTest {
 
-    private static final String INDEX_HTML   = "/index.html";
+    private static final String INDEX_HTML = "/index.html";
     private static final String CONTEXT_PATH = "/context-path";
-    StartPageRedirectFilter     startPageRedirectFilterUnderTest;
+    StartPageRedirectFilter startPageRedirectFilterUnderTest;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        startPageRedirectFilterUnderTest = new StartPageRedirectFilter() {};
+        startPageRedirectFilterUnderTest = new StartPageRedirectFilter() {
+        };
     }
 
     @Test
@@ -40,7 +41,7 @@ public class StartPageRedirectFilterTest {
         startPageRedirectFilterUnderTest.doFilter(request, response, chain);
 
         verify(response).sendRedirect(CONTEXT_PATH
-            + "/");
+                + "/");
         verify(chain, never()).doFilter(request, response);
     }
 

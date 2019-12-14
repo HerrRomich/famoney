@@ -28,9 +28,8 @@ public class MovementSliceRepositoryImpl extends AccountsDomainRepositoryImpl<Mo
 
     @Override
     public List<MovementSlice> getMovementSlicesByAccountId(@NotNull Integer accountId) {
-        return getTxControl().required(
-            () -> getAllByAccountIdQuery().setParameter(ACCOUNT_ID_PARAMETER_NAME, accountId)
-                .getResultList());
+        return getTxControl().required(() -> getAllByAccountIdQuery().setParameter(ACCOUNT_ID_PARAMETER_NAME, accountId)
+            .getResultList());
     }
 
     private TypedQuery<MovementSlice> getAllByAccountIdQuery() {
@@ -44,11 +43,8 @@ public class MovementSliceRepositoryImpl extends AccountsDomainRepositoryImpl<Mo
         final var criteriaQuery = cb.createQuery(MovementSlice.class);
         final var root = criteriaQuery.from(MovementSlice.class);
         final var accountIdParameter = cb.parameter(Integer.class, ACCOUNT_ID_PARAMETER_NAME);
-        criteriaQuery.where(
-            cb.equal(
-                root.get(MovementSlice_.account)
-                    .get(Account_.id),
-                accountIdParameter));
+        criteriaQuery.where(cb.equal(root.get(MovementSlice_.account)
+            .get(Account_.id), accountIdParameter));
         return getEntityManager().createQuery(criteriaQuery);
     }
 
@@ -59,15 +55,16 @@ public class MovementSliceRepositoryImpl extends AccountsDomainRepositoryImpl<Mo
 
     @Override
     public Optional<MovementSlice> findFirstByAccountIdAfterDate(@NotNull Integer accountId,
-        @NotNull LocalDateTime dateFrom) {
-        return getTxControl().required(() -> getFirstMovementSliceByAccountIdAfterDate(accountId));
+            @NotNull LocalDateTime dateFrom) {
+        return getTxControl().required(() -> getFirstMovementSliceByAccountIdAfterDate(accountId, dateFrom));
     }
 
-    private Optional<MovementSlice> getFirstMovementSliceByAccountIdAfterDate(Integer accountId) {
+    private Optional<MovementSlice> getFirstMovementSliceByAccountIdAfterDate(@NotNull Integer accountId,
+            @NotNull LocalDateTime dateFrom) {
         try {
-            return Optional.of(
-                getFirstByAccountIdAfterDateQuery().setParameter(ACCOUNT_ID_PARAMETER_NAME, accountId)
-                    .getSingleResult());
+            return Optional.of(getFirstByAccountIdAfterDateQuery().setParameter(ACCOUNT_ID_PARAMETER_NAME, accountId)
+                .setParameter(FROM_DATE_PARAMETER_NAME, dateFrom)
+                .getSingleResult());
         } catch (NoResultException e) {
             return Optional.empty();
         }
@@ -88,10 +85,8 @@ public class MovementSliceRepositoryImpl extends AccountsDomainRepositoryImpl<Mo
         Path<Account> accountPath = root.get(MovementSlice_.account);
         Path<Integer> accountIdPath = accountPath.get(Account_.id);
         Path<LocalDateTime> accountSliceDatePath = root.get(MovementSlice_.date);
-        criteriaQuery.where(
-            cb.and(
-                cb.equal(accountIdPath, accountIdParameter),
-                cb.greaterThan(accountSliceDatePath, fromDateParameter)));
+        criteriaQuery.where(cb.and(cb.equal(accountIdPath, accountIdParameter), cb.greaterThan(accountSliceDatePath,
+                fromDateParameter)));
         return getEntityManager().createQuery(criteriaQuery)
             .setFirstResult(1);
     }

@@ -1,6 +1,7 @@
 package com.hrrm.famoney.application.service.accounts.internal;
 
 import java.text.MessageFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -38,14 +39,51 @@ public class AccountMovementServiceImpl implements AccountMovementService {
     }
 
     @Override
-    public List<Movement> findAllMovementsBySliceId(@NotNull Integer accountId,
-        @NotNull Integer sliceId) throws MovementSliceNotFound {
-        logger.debug("Searching for all movements in account inside specified slice.");
-        logger.trace(
-            "Searching for all movements in account with id: {} inside specified slice with id: {}.",
-            accountId, sliceId);
-        LocalDateTime dateFrom;
-        if (sliceId == MovementSlice.FIRST_SLICE_ID) {
+    public List<Movement> findAllMovementsBySliceIdOverDate(@NotNull Integer accountId,
+            @NotNull Integer sliceId) throws MovementSliceNotFound {
+        logger.debug("Searching for all movements in account with id: {} " +
+                "inside specified slice with id: {}.", accountId, sliceId);
+        var dateFrom = getSliceDateFrom(accountId, sliceId);
+        var dateTo = movementSliceRepository.findFirstByAccountIdAfterDate(accountId, dateFrom)
+            .map(MovementSlice::getDate)
+            .orElse(MovementSlice.LAST_SLICE_DATE)
+            .atTime(0, 0);
+        List<Movement> movementsByAccountIdBetweenDates = movementRepository
+            .findByAccountIdBetweenDates(accountId, dateFrom, dateTo);
+        logger.debug("Successfully found {} movements in account with id: {} " +
+                "inside specified slice with id: {}.", movementsByAccountIdBetweenDates.size(),
+                accountId, sliceId);
+        logger.trace("Successfully found {} movements in account with id: {} " +
+                "inside specified slice with id: {}\r\n{}.", accountId, sliceId,
+                movementsByAccountIdBetweenDates);
+        return movementsByAccountIdBetweenDates;
+    }
+
+    @Override
+    public List<Movement> findAllMovementsBySliceIdOverBookingDate(@NotNull Integer accountId,
+            @NotNull Integer sliceId) throws MovementSliceNotFound {
+        logger.debug("Searching for all movements in account with id: {} " +
+                "inside specified slice with id: {}.", accountId, sliceId);
+        var dateFrom = getSliceDateFrom(accountId, sliceId);
+        var dateTo = movementSliceRepository.findFirstByAccountIdAfterDate(accountId, dateFrom)
+            .map(MovementSlice::getDate)
+            .orElse(MovementSlice.LAST_SLICE_DATE)
+            .atTime(0, 0);
+        List<Movement> movementsByAccountIdBetweenDates = movementRepository
+            .findByAccountIdBetweenBookingDates(accountId, dateFrom, dateTo);
+        logger.debug("Successfully found {} movements in account with id: {} " +
+                "inside specified slice with id: {}.", movementsByAccountIdBetweenDates.size(),
+                accountId, sliceId);
+        logger.trace(l -> l.trace("Successfully found {} movements in account with id: {} " +
+                "inside specified slice with id: {}\r\n{}.", accountId, sliceId,
+                movementsByAccountIdBetweenDates));
+        return movementsByAccountIdBetweenDates;
+    }
+
+    private LocalDateTime getSliceDateFrom(Integer accountId, Integer sliceId)
+            throws MovementSliceNotFound {
+        LocalDate dateFrom;
+        if (MovementSlice.FIRST_SLICE_ID.equals(sliceId)) {
             dateFrom = MovementSlice.FIRST_SLICE_DATE;
         } else {
             dateFrom = movementSliceRepository.find(sliceId)
@@ -53,13 +91,10 @@ public class AccountMovementServiceImpl implements AccountMovementService {
                     .getId()))
                 .map(MovementSlice::getDate)
                 .orElseThrow(() -> new MovementSliceNotFound(MessageFormat.format(
-                    "Movement slice with id: {0} is not found in account with id: {1}.", sliceId,
-                    accountId)));
+                        "Movement slice with id: {0} is not found in account with id: {1}.",
+                        sliceId, accountId)));
         }
-        var dateTo = movementSliceRepository.findFirstByAccountIdAfterDate(accountId, dateFrom)
-            .map(MovementSlice::getDate)
-            .orElse(MovementSlice.LAST_SLICE_DATE);
-        return movementRepository.findByAccountIdBetweenDates(accountId, dateFrom, dateTo);
+        return dateFrom.atTime(0, 0);
     }
 
 }

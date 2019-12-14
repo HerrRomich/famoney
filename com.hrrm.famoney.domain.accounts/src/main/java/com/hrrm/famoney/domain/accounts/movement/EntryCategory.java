@@ -11,8 +11,19 @@ import javax.persistence.Table;
 
 import com.hrrm.famoney.domain.accounts.AccountsDomainEntity;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.Accessors;
+
 @Entity
 @Table(schema = AccountsDomainEntity.ACCOUNTS_SCHEMA_NAME, name = "entry_category")
+@Accessors(chain = true)
+@Getter
+@Setter
+@ToString(callSuper = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 public class EntryCategory extends AccountsDomainEntity {
 
     @Column(name = "name")
@@ -24,13 +35,5 @@ public class EntryCategory extends AccountsDomainEntity {
 
     @OneToMany(mappedBy = "parent")
     private Set<EntryCategory> children;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
 }

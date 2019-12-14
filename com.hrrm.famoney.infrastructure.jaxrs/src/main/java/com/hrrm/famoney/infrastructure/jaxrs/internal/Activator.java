@@ -9,6 +9,7 @@ import static org.apache.aries.component.dsl.OSGi.register;
 
 import java.util.Dictionary;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Objects;
@@ -30,14 +31,14 @@ public class Activator implements BundleActivator {
 
     public static final String CONFIG_PID = "org.apache.aries.jax.rs.jackson";
 
-    public static OSGi<Dictionary<String, ?>> CONFIGURATION = all(configurations(CONFIG_PID),
+    public static final OSGi<Dictionary<String, ?>> CONFIGURATION = all(configurations(CONFIG_PID),
         coalesce(configuration(CONFIG_PID), just(Hashtable::new))).filter(c -> !Objects.equals(c
             .get("enabled"), "false"));
 
     @Override
     public void start(BundleContext context) throws Exception {
-        _result = CONFIGURATION.flatMap(properties -> register(new String[] {
-                MessageBodyReader.class.getName(), MessageBodyWriter.class.getName() },
+        result = CONFIGURATION.flatMap(properties -> register(new String[] { MessageBodyReader.class
+            .getName(), MessageBodyWriter.class.getName() },
             new JsonProviderPrototypeServiceFactory(properties), getRegistrationProperties(
                 properties)))
             .run(context);
@@ -45,30 +46,23 @@ public class Activator implements BundleActivator {
 
     @Override
     public void stop(BundleContext context) throws Exception {
-        _result.close();
+        result.close();
     }
 
-    private OSGiResult _result;
+    private OSGiResult result;
 
-    @SuppressWarnings("serial")
     private Map<String, ?> getRegistrationProperties(Dictionary<String, ?> properties) {
-
-        Hashtable<String, Object> serviceProps = new Hashtable<String, Object>() {
-            {
-                put(JaxrsWhiteboardConstants.JAX_RS_EXTENSION, true);
-                put(JaxrsWhiteboardConstants.JAX_RS_MEDIA_TYPE, MediaType.APPLICATION_JSON);
-                putIfAbsent(JaxrsWhiteboardConstants.JAX_RS_NAME, "jaxb-json");
-                put(Constants.SERVICE_RANKING, Integer.MIN_VALUE);
-                // Note that these are useful information, and bind us to the Jackson JAXB API
-                // which is otherwise only optionally required
-                put("jackson.jaxb.version", new com.fasterxml.jackson.module.jaxb.PackageVersion()
-                    .version()
-                    .toString());
-                put("jackson.jaxrs.json.version",
-                    new com.fasterxml.jackson.jaxrs.json.PackageVersion().version()
-                        .toString());
-            }
-        };
+        Map<String, Object> serviceProps = new HashMap<>();
+        serviceProps.put(JaxrsWhiteboardConstants.JAX_RS_EXTENSION, true);
+        serviceProps.put(JaxrsWhiteboardConstants.JAX_RS_MEDIA_TYPE, MediaType.APPLICATION_JSON);
+        serviceProps.putIfAbsent(JaxrsWhiteboardConstants.JAX_RS_NAME, "jaxb-json");
+        serviceProps.put(Constants.SERVICE_RANKING, Integer.MIN_VALUE);
+        serviceProps.put("jackson.jaxb.version",
+            new com.fasterxml.jackson.module.jaxb.PackageVersion().version()
+                .toString());
+        serviceProps.put("jackson.jaxrs.json.version",
+            new com.fasterxml.jackson.jaxrs.json.PackageVersion().version()
+                .toString());
 
         Enumeration<String> keys = properties.keys();
 

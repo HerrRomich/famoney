@@ -7,12 +7,16 @@
     matTooltip="{{ getAccountTags() }}"
     matTooltipClass="wrapped-tooltip"
   >
-    <mat-icon svgIcon="menu-down" matBadge="{{ getAccountTagsCount() }}" [matBadgeHidden]="getAccountTagsCount() === 0"></mat-icon>
+    <mat-icon
+      svgIcon="menu-down"
+      matBadge="{{ getAccountTagsCount() }}"
+      [matBadgeHidden]="getAccountTagsCount() === 0"
+    ></mat-icon>
   </button>
   <div fxFlex></div>
   <app-router-tab fxFlex="0 1 auto" class="accounts-tab-group">
     <app-router-tab-item
-      *ngFor="let account of accounts | async"
+      *ngFor="let account of accounts$ | async"
       [routerLink]="account.id"
       routerLinkActive
       #rlaRef="routerLinkActive"
@@ -28,4 +32,6 @@
     <button mat-menu-item>Удалить</button>
   </mat-menu>
 </div>
-<router-outlet></router-outlet>
+<div fxLayout="column" fxFlex>
+  <router-outlet></router-outlet>
+</div>

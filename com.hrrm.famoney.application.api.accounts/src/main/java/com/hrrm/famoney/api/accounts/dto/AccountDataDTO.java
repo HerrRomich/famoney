@@ -14,8 +14,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @ImmutableDtoStyle
 public interface AccountDataDTO {
 
+    @Schema(required = true)
     String getName();
 
+    @Schema(required = true)
     LocalDateTime getOpenDate();
 
     Set<String> getTags();

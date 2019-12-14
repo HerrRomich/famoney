@@ -9,7 +9,7 @@ import org.immutables.value.Value;
 
 @Target({ ElementType.PACKAGE, ElementType.TYPE })
 @Retention(RetentionPolicy.CLASS)
-@Value.Style(packageGenerated = "*.internal", typeImmutable = "*Impl", overshadowImplementation = true)
+@Value.Style(packageGenerated = "*.impl", typeImmutable = "*Impl", overshadowImplementation = true)
 public @interface ImmutableDtoStyle {
 
 }

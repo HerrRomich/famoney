@@ -11,15 +11,15 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 
 public class ErrorServletTest {
 
     private ErrorServlet errorServletUnderTest;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         errorServletUnderTest = new ErrorServlet();
     }
@@ -35,8 +35,10 @@ public class ErrorServletTest {
 
         InOrder inOrder = inOrder(resp, respPrintWriter);
 
-        inOrder.verify(resp).setStatus(404);
-        inOrder.verify(resp).flushBuffer();
+        inOrder.verify(resp)
+            .setStatus(404);
+        inOrder.verify(resp)
+            .flushBuffer();
         inOrder.verifyNoMoreInteractions();
     }
 

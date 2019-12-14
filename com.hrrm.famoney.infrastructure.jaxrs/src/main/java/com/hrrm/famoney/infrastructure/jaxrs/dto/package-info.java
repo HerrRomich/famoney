@@ -1,0 +1,1 @@
+package com.hrrm.famoney.infrastructure.jaxrs.dto;

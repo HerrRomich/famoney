@@ -8,3 +8,4 @@ Bundle-Version: 1.0.0.${tstamp}
 
 Private-Package: com.hrrm.infrastructure.web.swagger.ui.internal
 Export-Package: com.hrrm.infrastructure.web.swagger.ui
+Import-Package: *
