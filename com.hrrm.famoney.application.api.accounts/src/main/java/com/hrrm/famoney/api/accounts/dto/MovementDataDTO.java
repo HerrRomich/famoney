@@ -17,6 +17,8 @@ public interface MovementDataDTO {
     @Schema(required = true)
     public LocalDateTime getDate();
 
+    public LocalDateTime getBookingDate();
+
     @Schema(required = true)
     public BigDecimal getAmount();
 

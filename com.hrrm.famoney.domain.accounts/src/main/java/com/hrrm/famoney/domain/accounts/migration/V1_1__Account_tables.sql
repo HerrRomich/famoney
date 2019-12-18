@@ -3,6 +3,8 @@ create or replace table account(
   budget_id int not null comment 'Budget ID. Groups users.',
   name varchar(250) not null comment 'Name of an account group.',
   open_date timestamp not null comment 'Date of account opening.',
+  movement_count int not null comment 'Count of all account movements.',
+  movement_sum decimal(13, 2) not null comment 'Sum of all movements in account.',
   constraint unique account_budget_name_uq (budget_id, name)
 );
 

@@ -19,8 +19,6 @@ import com.hrrm.famoney.api.accounts.dto.AccountDTO;
 import com.hrrm.famoney.api.accounts.dto.AccountDataDTO;
 import com.hrrm.famoney.api.accounts.dto.MovementDTO;
 import com.hrrm.famoney.api.accounts.dto.MovementOrder;
-import com.hrrm.famoney.api.accounts.dto.MovementSliceWithMovementsDTO;
-import com.hrrm.famoney.api.accounts.dto.MovementSlicesInfoDTO;
 import com.hrrm.famoney.infrastructure.jaxrs.ApiErrorDTO;
 
 import io.swagger.v3.oas.annotations.Parameter;
@@ -49,18 +47,14 @@ public interface AccountsApi {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponse(description = "A list of all accounts")
-    AccountDataDTO changeAccount(@PathParam("accountId") Integer accountI,
+    AccountDataDTO changeAccount(@PathParam("accountId") Integer accountId,
             AccountDataDTO accountData);
 
     @GET
-    @Path("{accountId}/movement-slices")
+    @Path("{accountId}")
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiResponse(description = "A list of slices of account movements of specified account")
-    @ApiResponse(responseCode = "404", description = "No account was found for specified id.",
-        content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(
-            implementation = ApiErrorDTO.class)))
-    MovementSlicesInfoDTO getMovementSlicesByAccountId(@Parameter(name = "accountId",
-        in = ParameterIn.PATH) @NotNull @PathParam("accountId") Integer accountId);
+    @ApiResponse(description = "A detailed account info.")
+    AccountDTO getAccount(@PathParam("accountId") Integer accountId);
 
     @GET
     @Path("{accountId}/movements")
@@ -70,22 +64,11 @@ public interface AccountsApi {
         content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(
             implementation = ApiErrorDTO.class)))
     List<MovementDTO> getMovements(@Parameter(name = "accountId", in = ParameterIn.PATH,
-        description = "Identifier of account, for which the movements will be searched.") @NotNull @PathParam("accountId") Integer accountId);
-
-    @GET
-    @Path("{accountId}/movement-slices/{sliceId}/movements")
-    @Produces(MediaType.APPLICATION_JSON)
-    @ApiResponse(description = "A list of movements by a specified slice ")
-    @ApiResponse(responseCode = "404", description = "No account was found for specified id.",
-        content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(
-            implementation = ApiErrorDTO.class)))
-    @ApiResponse(responseCode = "404",
-        description = "No slice was found in a specified account for specified id.",
-        content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(
-            implementation = ApiErrorDTO.class)))
-    MovementSliceWithMovementsDTO getMovementsBySliceId(@Parameter(name = "accountId",
-        in = ParameterIn.PATH) @NotNull @PathParam("accountId") Integer accountId, @Parameter(
-            name = "sliceId", in = ParameterIn.PATH) @NotNull @PathParam("sliceId") Integer sliceId,
+        description = "Identifier of account, for which the movements will be searched.") @NotNull @PathParam("accountId") Integer accountId,
+            @Parameter(name = "offset", in = ParameterIn.QUERY,
+                description = "Offset in the ordered list of movements. If omited, then from first movement.") @QueryParam("offset") Integer offset,
+            @Parameter(name = "limit", in = ParameterIn.QUERY,
+                description = "Count of movements starting from offset. If omitted, then all from offset.") @QueryParam("limit") Integer limit,
             @Parameter(name = "order", in = ParameterIn.QUERY, schema = @Schema(
                 implementation = MovementOrder.class,
                 defaultValue = "movement")) @QueryParam("order") @DefaultValue("MOVEMENT_DATE") MovementOrder order);

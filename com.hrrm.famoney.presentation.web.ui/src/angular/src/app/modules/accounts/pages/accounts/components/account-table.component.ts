@@ -2,23 +2,25 @@ import { Component, OnInit } from "@angular/core";
 import {
   Observable,
   combineLatest,
-  forkJoin,
-  Subject,
-  Subscription
+  Subscription,
+  iif,
+  of,
+  Subject
 } from "rxjs";
 import { MovementDto, AccountsApiService } from "@famoney-apis/accounts";
-import { CollectionViewer, DataSource } from "@angular/cdk/collections";
+import {
+  CollectionViewer,
+  DataSource,
+  ListRange
+} from "@angular/cdk/collections";
 import { ActivatedRoute, Router } from "@angular/router";
-import { map, switchMap, tap } from "rxjs/operators";
+import { map, switchMap, tap, mergeMap } from "rxjs/operators";
+import { isDefined } from "@angular/compiler/src/util";
 
-interface MovementWithSum extends MovementDto {
-  sum: number;
-}
-
-class MovementDataSource extends DataSource<MovementWithSum> {
-  private _data: MovementWithSum[];
-  private data$ = new Subject<MovementWithSum[]>();
-  dataSubscription: Subscription;
+class MovementDataSource extends DataSource<MovementDto> {
+  private _data: MovementDto[];
+  private data$: Subject<MovementDto[]> = new Subject();
+  private dataSubscription: Subscription;
 
   constructor(
     private accountsApiService: AccountsApiService,
@@ -27,76 +29,36 @@ class MovementDataSource extends DataSource<MovementWithSum> {
     super();
   }
 
-  connect(collectionViewer: CollectionViewer): Observable<MovementWithSum[]> {
-    const movementSlicesInfo$ = this.accountId$.pipe(
-      switchMap(accountId =>
-        this.accountsApiService.getMovementSlicesByAccountId(accountId).pipe(
-          tap(movementSlicesInfo => {
-            this._data = new Array<MovementWithSum>(
-              movementSlicesInfo.movementCount
-            );
-            this.data$.next(this._data);
-          })
-        )
-      )
+  connect(collectionViewer: CollectionViewer): Observable<MovementDto[]> {
+    const account$ = this.accountId$.pipe(
+      switchMap(accountId => this.accountsApiService.getAccount(accountId)),
+      tap(account => {
+        this._data = new Array<MovementDto>(account.movementCount);
+        this.data$.next(this._data);
+      })
     );
     this.dataSubscription = combineLatest([
-      movementSlicesInfo$,
+      account$,
       collectionViewer.viewChange
     ])
       .pipe(
-        map(([movementSlicesInfo, range]) => {
-          return movementSlicesInfo.movementSlices.reduce(
-            (prev, curr) => {
-              const bottom = prev.count;
-              const top = prev.count + curr.movementCount;
-              if (bottom <= range.end && top >= range.start) {
-                prev.movementSliceIds.push(curr.id);
-              }
-              prev.start = Math.min(prev.start, bottom);
-              prev.end = Math.max(prev.end, top);
-              return prev;
+        mergeMap(([account, range]) =>
+          iif(
+            () => {
+              const slice = this._data.slice(range.start, range.end);
+              return slice.length === slice.filter(Boolean).length;
             },
-            Object.assign(
-              {
-                accountId: movementSlicesInfo.accountId,
-                count: 0,
-                movementSliceIds: [] as number[]
-              },
-              range
-            )
-          );
-        }),
-        switchMap(movementSlices =>
-          forkJoin(
-            movementSlices.movementSliceIds.map(movementSliceId =>
-              this.accountsApiService.getMovementsBySliceId(
-                movementSlices.accountId,
-                movementSliceId
+            of(this._data),
+            this.accountsApiService
+              .getMovements(account.id, range.start, range.end - range.start)
+              .pipe(
+                map(movements =>
+                  this._data.splice(range.start, movements.length, ...movements)
+                )
               )
-            )
-          ).pipe(
-            map(movementSlicesWithMovements =>
-              movementSlicesWithMovements.reduce((prev, curr) => {
-                const movementsWithSum = curr.movements.map(
-                  movement =>
-                    Object.assign(
-                      {
-                        sum: curr.bookingSum + movement.amount
-                      } as MovementWithSum,
-                      movement
-                    ) as MovementWithSum
-                );
-                prev.push(...movementsWithSum);
-                return prev;
-              }, new Array<MovementWithSum>())
-            ),
-            tap(movementsWithSum => {
-              this._data.splice(movementSlices.start, movementsWithSum.length, ...movementsWithSum);
-              this.data$.next(this._data);
-            })
           )
-        )
+        ),
+        tap(movements => this.data$.next(this._data))
       )
       .subscribe();
     return this.data$;

@@ -1,5 +1,6 @@
 package com.hrrm.famoney.domain.accounts;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -34,8 +35,14 @@ public class Account extends AccountsDomainEntity {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Column(name = "tag")
-    @CollectionTable(schema = AccountsDomainEntity.ACCOUNTS_SCHEMA_NAME, name = "account_tag", joinColumns = {
-            @JoinColumn(name = "account_id") })
+    @CollectionTable(schema = AccountsDomainEntity.ACCOUNTS_SCHEMA_NAME, name = "account_tag",
+        joinColumns = { @JoinColumn(name = "account_id") })
     private Set<String> tags;
+
+    @Column(name = "movement_count")
+    private Integer movementCount;
+
+    @Column(name = "movement_sum")
+    private BigDecimal movementSum;
 
 }

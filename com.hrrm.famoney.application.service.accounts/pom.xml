@@ -17,6 +17,11 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>com.hrrm.famoney.domain.accounts</artifactId>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>com.hrrm.famoney.infrastructure.wrappers</artifactId>
+        </dependency>
+
 
         <dependency>
             <groupId>org.osgi</groupId>

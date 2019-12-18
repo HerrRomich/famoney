@@ -1,5 +1,6 @@
 package com.hrrm.famoney.domain.accounts.migration;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -31,7 +32,22 @@ public class V2_2__Initial_movements extends BaseJavaMigration {
             "                     ?,\r\n" +
             "                     ?,\r\n" +
             "                     ?)";
-    private static final String FIND_ACCOUNTID_BY_NAME = "" + "select a.id from account a\n\r" + "where a.name = ?";
+    private static final String FIND_ACCOUNTID_BY_NAME = "" +
+            "select a.id from account a\n\r" +
+            "where a.name = ?";
+
+    private static final String GET_ALL_ACCOUNT_MOVEMENT_SUM_AND_COUNT = "" +
+            "select count(*)\r\n" +
+            "     , sum(amount)\r\n" +
+            "     , account_id\r\n" +
+            "  from movement\r\n" +
+            " group by account_id";
+
+    private static final String UPDATE_ACCOUNT_MOVEMENT_SUM_AND_COUNT = "" +
+            "update account a\r\n" +
+            "  set a.movement_count = ?,\r\n" +
+            "      a.movement_sum = ?\r\n" +
+            " where a.id = ?";
 
     @Override
     public void migrate(Context context) throws Exception {
@@ -47,9 +63,11 @@ public class V2_2__Initial_movements extends BaseJavaMigration {
             accounts.forEach((accountName, accountValue) -> {
                 final var accountMovements = accountValue.asJsonArray();
                 final var accountId = findAccountId(findAccountIdByNameStmt, accountName);
-                accountMovements.forEach(movementValue -> insertMovement(insertMovementStmt, accountId, movementValue));
+                accountMovements.forEach(movementValue -> insertMovement(insertMovementStmt,
+                        accountId, movementValue));
             });
         }
+        updateAccountMovemntsCountAndSum(context.getConnection());
     }
 
     private void insertMovement(final PreparedStatement insertMovementStmt, final int accountId,
@@ -59,11 +77,13 @@ public class V2_2__Initial_movements extends BaseJavaMigration {
             insertMovementStmt.setInt(1, accountId);
             insertMovementStmt.setString(2, "entry");
             final var dateAttribute = movement.getJsonString("date");
-            var date = DateTimeFormatter.ISO_DATE_TIME.parse(dateAttribute.getString(), LocalDateTime::from);
+            var date = DateTimeFormatter.ISO_DATE_TIME.parse(dateAttribute.getString(),
+                    LocalDateTime::from);
             insertMovementStmt.setTimestamp(3, Timestamp.valueOf(date));
-            final var bookingDateAttribute = Optional.ofNullable(movement.getJsonString("bookingDate"));
-            final var bookingDate = bookingDateAttribute.map(attr -> DateTimeFormatter.ISO_DATE_TIME.parse(attr
-                .getString(), LocalDateTime::from))
+            final var bookingDateAttribute = Optional.ofNullable(movement.getJsonString(
+                    "bookingDate"));
+            final var bookingDate = bookingDateAttribute.map(attr -> DateTimeFormatter.ISO_DATE_TIME
+                .parse(attr.getString(), LocalDateTime::from))
                 .orElse(date);
             insertMovementStmt.setTimestamp(4, Timestamp.valueOf(bookingDate));
             insertMovementStmt.setBigDecimal(5, movement.getJsonNumber("amount")
@@ -84,13 +104,32 @@ public class V2_2__Initial_movements extends BaseJavaMigration {
         }
     }
 
-    private int getAccountId(final PreparedStatement findAccountIdByNameStmt, String accountName) throws SQLException {
+    private int getAccountId(final PreparedStatement findAccountIdByNameStmt, String accountName)
+            throws SQLException {
         try (final var accountIds = findAccountIdByNameStmt.getResultSet()) {
             if (!accountIds.first()) {
-                throw new MigrationException(MessageFormat.format("Account is not found by name: {0}", accountName));
+                throw new MigrationException(MessageFormat.format(
+                        "Account is not found by name: {0}", accountName));
             }
             return accountIds.getInt(1);
         }
+    }
+
+    private void updateAccountMovemntsCountAndSum(Connection conn) throws SQLException {
+        try (final var getAllAccountsMovementsCountAndSumStmt = conn.prepareStatement(
+                GET_ALL_ACCOUNT_MOVEMENT_SUM_AND_COUNT);
+                final var updateAccountMovementsCountAndSumStmt = conn.prepareStatement(
+                        UPDATE_ACCOUNT_MOVEMENT_SUM_AND_COUNT);
+                final var countsAndSums = getAllAccountsMovementsCountAndSumStmt.executeQuery()) {
+            while (countsAndSums.next()) {
+                updateAccountMovementsCountAndSumStmt.setInt(1, countsAndSums.getInt(1));
+                updateAccountMovementsCountAndSumStmt.setBigDecimal(2, countsAndSums.getBigDecimal(
+                        2));
+                updateAccountMovementsCountAndSumStmt.setInt(3, countsAndSums.getInt(3));
+                updateAccountMovementsCountAndSumStmt.executeUpdate();
+            }
+        }
+
     }
 
 }

@@ -1,5 +1,7 @@
 package com.hrrm.famoney.api.accounts.dto;
 
+import java.math.BigDecimal;
+
 import org.immutables.value.Value;
 
 import com.hrrm.famoney.infrastructure.jaxrs.DTO;
@@ -12,5 +14,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Value.Immutable
 @ImmutableDtoStyle
 public interface MovementDTO extends DTO, IdDTO, MovementDataDTO {
+
+    @Schema(required = true)
+    public BigDecimal getSum();
 
 }
