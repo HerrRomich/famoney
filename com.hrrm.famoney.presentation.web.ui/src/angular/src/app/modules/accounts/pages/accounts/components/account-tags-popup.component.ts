@@ -20,23 +20,23 @@ export class AccountTagsPopupComponent implements OnInit {
 
   constructor(public accountsService: AccountsService) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.accountTags = combineLatest([
       this.accountsService.getTags(),
       this.tagsCtrl.valueChanges.pipe(
         startWith(null as string),
-        map(filterValue => (filterValue ? (<string>filterValue).toLowerCase() : ''))
+        map(filterValue => (filterValue ? (filterValue as string).toLowerCase() : ''))
       )
     ]).pipe(map(([tagsList, filterValue]) => tagsList.filter(tag => tag.toLowerCase().includes(filterValue))));
   }
 
-  selectedTag(event: MatAutocompleteSelectedEvent) {
+  selectTag(event: MatAutocompleteSelectedEvent): void {
     this.accountsService.addTag(event.option.viewValue);
     this.tagsInput.nativeElement.value = '';
     this.tagsCtrl.setValue(null);
   }
 
-  addTag(event: MatChipInputEvent) {
+  addTag(event: MatChipInputEvent): void {
     if (this.matAutocomplete.isOpen) {
       return;
     }
@@ -54,11 +54,11 @@ export class AccountTagsPopupComponent implements OnInit {
     this.tagsCtrl.setValue(null);
   }
 
-  removeTag(tag: string) {
+  removeTag(tag: string): void {
     this.accountsService.removeTag(tag);
   }
 
-  clearTags() {
+  clearTags(): void {
     this.accountsService.clearTags();
   }
 }

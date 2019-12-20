@@ -1,5 +1,36 @@
+@import '~@angular/material/theming';
+@import 'styles';
+
 :host {
+  position: relative;
   flex-direction: column;
   display: flex;
   flex: 1 1 auto;
+}
+
+.account-entry:hover {
+  background-color: mat-color($my-app-accent, 50);
+  font-weight: 600;
+}
+
+div.positive-amount {
+  color:  green;
+}
+
+div.negative-amount {
+  color:  red;
+}
+
+eco-fab-speed-dial {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+}
+
+eco-fab-speed-dial-trigger.hidden:hover {
+  opacity: 1;
+}
+
+eco-fab-speed-dial-trigger.hidden:not(:hover) {
+  opacity: .35;
 }

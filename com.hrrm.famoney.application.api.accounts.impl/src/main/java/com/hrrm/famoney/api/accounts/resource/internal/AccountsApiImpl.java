@@ -46,6 +46,7 @@ import com.hrrm.famoney.domain.accounts.movement.repository.MovementRepository;
 import com.hrrm.famoney.domain.accounts.movement.repository.MovementSliceRepository;
 import com.hrrm.famoney.domain.accounts.repository.AccountRepository;
 import com.hrrm.famoney.infrastructure.jaxrs.ApiError;
+import com.hrrm.famoney.infrastructure.jaxrs.ApiException;
 
 import io.swagger.v3.oas.annotations.Hidden;
 
@@ -172,7 +173,7 @@ public class AccountsApiImpl implements AccountsApi {
                 return accountData;
             });
         } catch (ScopedWorkException ex) {
-            throw ex.as(AccountNotFoundException.class);
+            throw ex.as(ApiException.class);
         }
     }
 
@@ -181,6 +182,7 @@ public class AccountsApiImpl implements AccountsApi {
         logger.debug("Getting account info with ID: {}", accountId);
         final var account = getAccountByIdOrThrowNotFound(accountId,
                 AccountApiError.NO_ACCOUNT_ON_GET_ACCOUNT);
+        logger.debug("Got account info with ID: {}", account.getId());
         return mapAccountToAccountDTO(account);
     }
 
@@ -219,35 +221,41 @@ public class AccountsApiImpl implements AccountsApi {
                 " ordered by {}", accountId, offsetOptional.map(Object::toString)
                     .orElse("\"from beginning\""), limitOptional.map(Object::toString)
                         .orElse("\"all\""), orderedByText);
-        getAccountByIdOrThrowNotFound(accountId,
-                AccountApiError.NO_ACCOUNT_ON_GET_ALL_ACCOUNT_MOVEMENTS);
-        final var movementSliceOptional = offsetOptional.flatMap(
-                findLastByAccountBeforeOffsetByDate);
-        final var dateFrom = movementSliceOptional.map(MovementSlice::getDate)
-            .orElse(MovementSlice.FIRST_SLICE_DATE)
-            .atTime(0, 0);
-        final var offsetFromSlice = offsetOptional.orElse(0) -
-                movementSliceOptional.map(getCount)
-                    .orElse(0);
-        final var limitFromSliceOptional = limitOptional.map(limitVal -> limitVal +
-                offsetFromSlice);
-        List<Movement> movements = findMovementsByAccountIdAfterDate.apply(dateFrom,
-                limitFromSliceOptional);
-        var sum = Stream.concat(movementSliceOptional.map(getSum)
-            .stream(), movements.stream()
-                .limit(offsetFromSlice)
-                .map(Movement::getAmount))
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
-        final var movementDTOCollector = new MovementDTOCollector(sum);
-        movements.stream()
-            .skip(offsetFromSlice)
-            .forEachOrdered(movementDTOCollector::addNextMovement);
-        final var movementDTOs = movementDTOCollector.getMovements();
-        logger.debug(l -> l.debug("Got {} movemnts of account with ID: {}", movementDTOs.size(),
-                accountId));
-        logger.trace(l -> l.trace("Got movemnts of account with ID: {}. {}", accountId,
-                movementDTOs));
-        return movementDTOs;
+        try {
+            final var movementDTOs = txControl.supports(() -> {
+                getAccountByIdOrThrowNotFound(accountId,
+                        AccountApiError.NO_ACCOUNT_ON_GET_ALL_ACCOUNT_MOVEMENTS);
+                final var movementSliceOptional = offsetOptional.flatMap(
+                        findLastByAccountBeforeOffsetByDate);
+                final var dateFrom = movementSliceOptional.map(MovementSlice::getDate)
+                    .orElse(MovementSlice.FIRST_SLICE_DATE)
+                    .atTime(0, 0);
+                final var offsetFromSlice = offsetOptional.orElse(0) -
+                        movementSliceOptional.map(getCount)
+                            .orElse(0);
+                final var limitFromSliceOptional = limitOptional.map(limitVal -> limitVal +
+                        offsetFromSlice);
+                List<Movement> movements = findMovementsByAccountIdAfterDate.apply(dateFrom,
+                        limitFromSliceOptional);
+                var sum = Stream.concat(movementSliceOptional.map(getSum)
+                    .stream(), movements.stream()
+                        .limit(offsetFromSlice)
+                        .map(Movement::getAmount))
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+                final var movementDTOCollector = new MovementDTOCollector(sum);
+                movements.stream()
+                    .skip(offsetFromSlice)
+                    .forEachOrdered(movementDTOCollector::addNextMovement);
+                return movementDTOCollector.getMovements();
+            });
+            logger.debug(l -> l.debug("Got {} movemnts of account with ID: {}", movementDTOs.size(),
+                    accountId));
+            logger.trace(l -> l.trace("Got movemnts of account with ID: {}. {}", accountId,
+                    movementDTOs));
+            return movementDTOs;
+        } catch (ScopedWorkException e) {
+            throw e.as(ApiException.class);
+        }
     }
 
     private Account getAccountByIdOrThrowNotFound(@NotNull Integer accountId, ApiError error) {

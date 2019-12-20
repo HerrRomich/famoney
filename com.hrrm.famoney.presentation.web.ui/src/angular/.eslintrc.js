@@ -4,6 +4,11 @@ module.exports = {
         "node": true
     },
     "parser": "@typescript-eslint/parser",
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended"
+    ],
     "parserOptions": {
         "project": "tsconfig.json",
         "sourceType": "module"
@@ -15,15 +20,15 @@ module.exports = {
     "rules": {
         "@typescript-eslint/class-name-casing": "error",
         "@typescript-eslint/consistent-type-definitions": "error",
+        "@typescript-eslint/explicit-function-return-type": "off",
         "@typescript-eslint/explicit-member-accessibility": [
             "off",
             {
                 "accessibility": "explicit"
             }
         ],
-        "@typescript-eslint/indent": "error",
+        "@typescript-eslint/indent": ["error", 2],
         "@typescript-eslint/member-delimiter-style": [
-            "error",
             "error",
             {
                 "multiline": {
@@ -42,7 +47,7 @@ module.exports = {
         "@typescript-eslint/no-inferrable-types": "error",
         "@typescript-eslint/no-misused-new": "error",
         "@typescript-eslint/no-non-null-assertion": "error",
-        "@typescript-eslint/no-use-before-declare": "error",
+        "@typescript-eslint/no-use-before-define": "error",
         "@typescript-eslint/prefer-function-type": "error",
         "@typescript-eslint/quotes": [
             "error",
@@ -68,7 +73,6 @@ module.exports = {
         "guard-for-in": "error",
         "id-blacklist": "off",
         "id-match": "off",
-        "import/no-deprecated": "warn",
         "max-len": [
             "error",
             {
@@ -141,7 +145,6 @@ module.exports = {
                     "no-input-rename": true,
                     "no-output-on-prefix": true,
                     "no-output-rename": true,
-                    "no-redundant-jsdoc": true,
                     "one-line": [
                         true,
                         "check-open-brace",

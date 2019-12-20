@@ -93,7 +93,7 @@ public class MovementSliceRepositoryImpl extends AccountsDomainRepositoryImpl<Mo
         criteriaQuery.where(cb.and(cb.equal(accountIdPath, accountIdParameter), cb.greaterThan(
                 accountSliceDatePath, fromDateParameter)));
         return getEntityManager().createQuery(criteriaQuery)
-            .setFirstResult(1);
+            .setMaxResults(1);
     }
 
     @Override
@@ -153,11 +153,11 @@ public class MovementSliceRepositoryImpl extends AccountsDomainRepositoryImpl<Mo
         final var accountIdPath = accountPath.get(AccountsDomainEntity_.id);
         final var accountSliceMovementCountPath = root.get(countAttribute);
         final var accountSliceDatePath = root.get(MovementSlice_.date);
-        criteriaQuery.where(cb.and(cb.equal(accountIdPath, accountIdParameter), cb.greaterThan(
-                accountSliceMovementCountPath, countParameter)))
-            .orderBy(cb.asc(accountSliceDatePath));
+        criteriaQuery.where(cb.and(cb.equal(accountIdPath, accountIdParameter), cb
+            .lessThanOrEqualTo(accountSliceMovementCountPath, countParameter)))
+            .orderBy(cb.desc(accountSliceDatePath));
         return getEntityManager().createQuery(criteriaQuery)
-            .setFirstResult(1);
+            .setMaxResults(1);
     }
 
 }

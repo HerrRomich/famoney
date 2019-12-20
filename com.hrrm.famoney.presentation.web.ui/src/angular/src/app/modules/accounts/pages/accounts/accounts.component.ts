@@ -9,56 +9,56 @@ import { Overlay, CdkOverlayOrigin } from '@angular/cdk/overlay';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
-  selector: 'app-accounts',
-  templateUrl: './accounts.component.html',
-  styleUrls: ['./accounts.component.scss']
+    selector: 'app-accounts',
+    templateUrl: './accounts.component.html',
+    styleUrls: ['./accounts.component.scss']
 })
 export class AccountsComponent implements OnInit, AfterViewInit {
-  public accounts$: Observable<Array<AccountDto>>;
-  public accountTags$: Observable<string[]>;
+    public accounts$: Observable<Array<AccountDto>>;
+    public accountTags$: Observable<string[]>;
 
-  @ViewChild('accountTagsPopupButton', { static: true }) accountTagsPopupButton: CdkOverlayOrigin;
+    @ViewChild('accountTagsPopupButton', { static: true }) accountTagsPopupButton: CdkOverlayOrigin;
 
-  accountTagsPopupPortal: ComponentPortal<AccountTagsPopupComponent>;
+    accountTagsPopupPortal: ComponentPortal<AccountTagsPopupComponent>;
 
-  constructor(private acountsService: AccountsService, private overlay: Overlay, private route: ActivatedRoute) {}
+    constructor(private acountsService: AccountsService, private overlay: Overlay, private route: ActivatedRoute) {}
 
-  ngOnInit() {
-    this.accounts$ = this.acountsService.getAccounts().pipe(tap(accounts => {
-      accounts.findIndex(accountDto => accountDto.id === this.route.snapshot.params['accountId']);
-    }));
-    this.accountTags$ = this.acountsService.getTags();
-  }
+    ngOnInit(): void {
+        this.accounts$ = this.acountsService.getAccounts().pipe(tap(accounts => {
+            accounts.findIndex(accountDto => accountDto.id === this.route.snapshot.params['accountId']);
+        }));
+        this.accountTags$ = this.acountsService.getTags();
+    }
 
-  ngAfterViewInit() {
-    this.accountTagsPopupPortal = new ComponentPortal(AccountTagsPopupComponent);
-  }
+    ngAfterViewInit(): void {
+        this.accountTagsPopupPortal = new ComponentPortal(AccountTagsPopupComponent);
+    }
 
-  openAccountTagsPopup() {
-    const position = this.overlay
-      .position()
-      .flexibleConnectedTo(this.accountTagsPopupButton.elementRef)
-      .withPositions([{ originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top' }])
-      .withFlexibleDimensions(true)
-      .withGrowAfterOpen(true);
-    const accountTagsPopup = this.overlay.create({
-      disposeOnNavigation: true,
-      positionStrategy: position,
-      hasBackdrop: true,
-      panelClass: 'fm-tags-panel',
-      backdropClass: 'cdk-overlay-dark-backdrop'
-    });
-    accountTagsPopup.attach(this.accountTagsPopupPortal);
-    accountTagsPopup.backdropClick().subscribe(_ => accountTagsPopup.detach());
-  }
+    openAccountTagsPopup(): void {
+        const position = this.overlay
+            .position()
+            .flexibleConnectedTo(this.accountTagsPopupButton.elementRef)
+            .withPositions([{ originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top' }])
+            .withFlexibleDimensions(true)
+            .withGrowAfterOpen(true);
+        const accountTagsPopup = this.overlay.create({
+            disposeOnNavigation: true,
+            positionStrategy: position,
+            hasBackdrop: true,
+            panelClass: 'fm-tags-panel',
+            backdropClass: 'cdk-overlay-dark-backdrop'
+        });
+        accountTagsPopup.attach(this.accountTagsPopupPortal);
+        accountTagsPopup.backdropClick().subscribe(_ => accountTagsPopup.detach());
+    }
 
-  getAccountTagsCount() {
-    return this.acountsService.selectedAccountTags.value.size;
-  }
+    getAccountTagsCount(): number {
+        return this.acountsService.selectedAccountTags.value.size;
+    }
 
-  getAccountTags() {
-    return Array.from(this.acountsService.selectedAccountTags.value)
-      .map(tag => '- ' + tag)
-      .join('\n');
-  }
+    getAccountTags(): string {
+        return Array.from(this.acountsService.selectedAccountTags.value)
+            .map(tag => '- ' + tag)
+            .join('\n');
+    }
 }

@@ -1,24 +1,38 @@
-<cdk-virtual-scroll-viewport itemSize="50" fxLayout="column" fxFlex>
+<eco-fab-speed-dial [fixed]="true" [open]="false" (mouseenter)="triggerSpeedDial()" (mouseleave)="stopSpeedDial()" #fabSpeedDial>
+  <eco-fab-speed-dial-trigger [className]="fabSpeedDial.open ? 'shown' : 'hidden'">
+    <button mat-fab (click)="addEntry()">
+      <mat-icon>add</mat-icon>
+    </button>
+  </eco-fab-speed-dial-trigger>
+  <eco-fab-speed-dial-actions>
+    <button mat-mini-fab (click)="addList()">
+      <mat-icon>playlist_add</mat-icon>
+    </button>
+    <button mat-mini-fab (click)="addTransfer()">
+      <mat-icon>swap_horiz</mat-icon>
+    </button>
+    <button mat-mini-fab (click)="addReturn()">
+      <mat-icon>redo</mat-icon>
+    </button>
+  </eco-fab-speed-dial-actions>
+</eco-fab-speed-dial>
+<cdk-virtual-scroll-viewport fxLayout="column" fxFlex #virtualScrollViewport>
   <mat-list dense>
     <ng-container *cdkVirtualFor="let movement of movementSlicesDataSource; let last = last">
-      <mat-list-item>
+      <mat-list-item class="account-entry">
         <div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="12px" fxFlex>
           <div flex="0 0 50px">{{ movement?.date | date: "dd.MM.yyyy" }}</div>
           <div fxFlex></div>
-          <div fxFlex="0 0 80px" fxLayoutAlign="end start">
-            <div *ngIf="movement?.amount < 0">
-              {{ movement?.amount | number: '1.2-2' }}
-            </div>
+          <div fxFlex="0 0 80px" fxLayoutAlign="end start"
+            [className]="movement?.amount > 0 ? 'positive-amount' : 'negative-amount'">
+            {{ movement?.amount | number: "1.2-2" }}
           </div>
           <div fxFlex="0 0 80px" fxLayoutAlign="end start">
-            <div *ngIf="movement?.amount > 0">
-              {{ movement?.amount | number: '1.2-2' }}
-            </div>
+            {{ movement?.sum | number: "1.2-2" }}
           </div>
-          <div fxFlex="0 0 80px" fxLayoutAlign="end start">{{ movement?.sum | number: '1.2-2' }}</div>
         </div>
+        <mat-divider *ngIf="!last"></mat-divider>
       </mat-list-item>
-      <mat-divider *ngIf="!last" ></mat-divider   >
     </ng-container>
   </mat-list>
 </cdk-virtual-scroll-viewport>

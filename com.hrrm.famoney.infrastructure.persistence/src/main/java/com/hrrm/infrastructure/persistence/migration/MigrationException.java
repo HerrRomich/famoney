@@ -10,4 +10,8 @@ public class MigrationException extends RuntimeException {
         super(cause);
     }
 
+    public MigrationException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
 }

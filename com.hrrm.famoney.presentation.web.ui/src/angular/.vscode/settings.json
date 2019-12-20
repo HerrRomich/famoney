@@ -1,5 +1,5 @@
 {
-    "prettier.proseWrap": "always",
-    "prettier.printWidth": 140,
-    "prettier.singleQuote": true
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  }
 }
