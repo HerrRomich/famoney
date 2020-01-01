@@ -18,7 +18,7 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 @Entity
-@Table(schema = AccountsDomainEntity.ACCOUNTS_SCHEMA_NAME, name = "entry_category")
+@Table(schema = AccountsDomainEntity.SCHEMA_NAME, name = "entry_category")
 @Accessors(chain = true)
 @Getter
 @Setter

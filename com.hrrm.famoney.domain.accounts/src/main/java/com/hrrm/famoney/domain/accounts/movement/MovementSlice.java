@@ -19,7 +19,7 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 @Entity
-@Table(schema = AccountsDomainEntity.ACCOUNTS_SCHEMA_NAME, name = "movement_slice")
+@Table(schema = AccountsDomainEntity.SCHEMA_NAME, name = "movement_slice")
 @Accessors(chain = true)
 @Getter
 @Setter

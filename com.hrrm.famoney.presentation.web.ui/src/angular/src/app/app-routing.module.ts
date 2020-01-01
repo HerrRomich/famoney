@@ -4,29 +4,29 @@ import { Routes, RouterModule } from '@angular/router';
 const routes: Routes = [
   {
     path: '',
-    redirectTo: '/accounts',
+    redirectTo: '/accounts/',
     pathMatch: 'full'
   },
   {
     path: 'accounts',
-    loadChildren: './modules/accounts/accounts.module#AccountsModule'
+    loadChildren: () => import('./modules/accounts/accounts.module').then(m => m.AccountsModule)
   },
   {
     path: 'budget',
-    loadChildren: './modules/budget/budget.module#BudgetModule'
+    loadChildren: () => import('./modules/budget/budget.module').then(m => m.BudgetModule)
   },
   {
     path: 'calendar',
-    loadChildren: './modules/calendar/calendar.module#CalendarModule'
+    loadChildren: () => import('./modules/calendar/calendar.module').then(m => m.CalendarModule)
   },
   {
     path: 'reports',
-    loadChildren: './modules/reports/reports.module#ReportsModule'
+    loadChildren: () => import('./modules/reports/reports.module').then(m => m.ReportsModule)
   }
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes, { useHash: true, enableTracing: false })],
+  imports: [RouterModule.forRoot(routes, { useHash: true, enableTracing: true })],
   exports: [RouterModule]
 })
 export class AppRoutingModule {}

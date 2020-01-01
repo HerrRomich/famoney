@@ -3,7 +3,7 @@ package com.hrrm.famoney.infrastructure.jaxrs.mapper;
 import java.util.function.Supplier;
 
 import com.hrrm.famoney.infrastructure.jaxrs.DTO;
-import com.hrrm.infrastructure.persistence.DomainEntity;
+import com.hrrm.famoney.infrastructure.persistence.DomainEntity;
 
 public interface EntityToDTOMapper<T extends DomainEntity<?>, P extends DTO> {
 

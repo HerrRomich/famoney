@@ -8,7 +8,7 @@ import org.osgi.service.transaction.control.jpa.JPAEntityManagerProvider;
 
 import com.hrrm.famoney.domain.accounts.AccountsDomainEntity;
 import com.hrrm.famoney.domain.accounts.repository.AccountsDomainRepository;
-import com.hrrm.infrastructure.persistence.JpaRepositoryImpl;
+import com.hrrm.famoney.infrastructure.persistence.JpaRepositoryImpl;
 
 public abstract class AccountsDomainRepositoryImpl<T extends AccountsDomainEntity> extends
         JpaRepositoryImpl<T, Integer> implements AccountsDomainRepository<T> {

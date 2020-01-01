@@ -1,5 +1,6 @@
 package com.hrrm.famoney.domain.accounts.movement.repository.internal;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -86,10 +87,10 @@ public class MovementSliceRepositoryImpl extends AccountsDomainRepositoryImpl<Mo
         final var criteriaQuery = cb.createQuery(MovementSlice.class);
         final var root = criteriaQuery.from(MovementSlice.class);
         final var accountIdParameter = cb.parameter(Integer.class, ACCOUNT_ID_PARAMETER_NAME);
-        final var fromDateParameter = cb.parameter(LocalDateTime.class, FROM_DATE_PARAMETER_NAME);
+        final var fromDateParameter = cb.parameter(LocalDate.class, FROM_DATE_PARAMETER_NAME);
         Path<Account> accountPath = root.get(MovementSlice_.account);
         Path<Integer> accountIdPath = accountPath.get(AccountsDomainEntity_.id);
-        Path<LocalDateTime> accountSliceDatePath = root.get(MovementSlice_.date);
+        Path<LocalDate> accountSliceDatePath = root.get(MovementSlice_.date);
         criteriaQuery.where(cb.and(cb.equal(accountIdPath, accountIdParameter), cb.greaterThan(
                 accountSliceDatePath, fromDateParameter)));
         return getEntityManager().createQuery(criteriaQuery)

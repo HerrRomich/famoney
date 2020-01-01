@@ -1,12 +1,19 @@
 {
 	":configurator:resource-version": 1,
-	"com.hrrm.famoney.entity-manager-provider~accounts": {
-		"url": "jdbc:mariadb://localhost:3306/famoney",
-		"user": "root",
-		"data_source": "famoney",
-		"password": "welcome1",
-		"migration_hook.target": "(name=accounts)",
-		"emfb.target": "(osgi.unit.name=accounts)",
+	"org.ops4j.datasource~famoney.accounts": {
+		"url": "famoney.accounts(url)",
+		"osgi.jdbc.driver.name": "famoney.accounts(osgi.jdbc.driver.name)",
+		"pool": "dbcp2",
+		"xa": "true",
+		"user": "famoney.accounts(user)",
+		"password": "famoney.accounts(password)",
+		"ops4j.preHook": "famoney.accounts",
+		"dataSourceName": "famoney.accounts",
+		"dataSourceType": "XADataSource"
+	},
+	"com.hrrm.famoney.infrastructure.persistence.EntityMnagerProvider~famoney.accounts": {
+		"data_source.target": "(dataSourceName=famoney.accounts)",
+		"emfb.target": "(osgi.unit.name=famoney.accounts)",
 		"name": "accounts"
 	}
 }

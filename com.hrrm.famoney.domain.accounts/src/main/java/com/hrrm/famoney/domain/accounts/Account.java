@@ -19,7 +19,7 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 @Entity
-@Table(schema = AccountsDomainEntity.ACCOUNTS_SCHEMA_NAME, name = "account")
+@Table(schema = AccountsDomainEntity.SCHEMA_NAME, name = "account")
 @Accessors(chain = true)
 @Getter
 @Setter
@@ -35,7 +35,7 @@ public class Account extends AccountsDomainEntity {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Column(name = "tag")
-    @CollectionTable(schema = AccountsDomainEntity.ACCOUNTS_SCHEMA_NAME, name = "account_tag",
+    @CollectionTable(schema = AccountsDomainEntity.SCHEMA_NAME, name = "account_tag",
         joinColumns = { @JoinColumn(name = "account_id") })
     private Set<String> tags;
 

@@ -22,7 +22,7 @@ import javax.json.stream.JsonParser;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 
-import com.hrrm.infrastructure.persistence.migration.MigrationException;
+import com.hrrm.famoney.infrastructure.persistence.migration.MigrationException;
 
 public class V2_2__Initial_movements extends BaseJavaMigration {
 

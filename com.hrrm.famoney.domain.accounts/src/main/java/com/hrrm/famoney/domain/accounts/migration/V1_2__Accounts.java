@@ -17,7 +17,7 @@ import javax.json.stream.JsonParser;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 
-import com.hrrm.infrastructure.persistence.migration.MigrationException;
+import com.hrrm.famoney.infrastructure.persistence.migration.MigrationException;
 
 public class V1_2__Accounts extends BaseJavaMigration {
     private static final String INSERT_INTO_ACCOUNT_STATEMENT = "" +

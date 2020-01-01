@@ -16,3 +16,4 @@ import com.hrrm.famoney.infrastructure.jetty.WebResource;
 public class UiResources implements WebResource {
 
 }
+ 

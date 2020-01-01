@@ -21,6 +21,7 @@ import com.hrrm.famoney.api.accounts.dto.MovementDTO;
 import com.hrrm.famoney.api.accounts.dto.MovementOrder;
 import com.hrrm.famoney.infrastructure.jaxrs.ApiErrorDTO;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -34,43 +35,49 @@ public interface AccountsApi {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @Operation(description = "Gets a list of accounts filtered by tags.")
     @ApiResponse(description = "A list of all accounts")
     List<AccountDTO> getAllAccounts(@Parameter(name = "tags",
         description = "List of tags to filter accounts. If empty, all accounts will be provided") @QueryParam("tags") Set<String> tags);
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
+    @Operation(description = "Adds a new account.")
     void addAccount(AccountDataDTO accountData);
 
     @PUT
-    @Path("{accountId}")
+    @Path("{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiResponse(description = "A list of all accounts")
-    AccountDataDTO changeAccount(@PathParam("accountId") Integer accountId,
-            AccountDataDTO accountData);
+    @Operation(description = "Changes a specified account.")
+    @ApiResponse(description = "A changed account.")
+    @ApiResponse(responseCode = "404", description = "No account was found for specified id.", content = @Content(
+        mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ApiErrorDTO.class)))
+    AccountDataDTO changeAccount(@PathParam("id") Integer id, AccountDataDTO accountData);
 
     @GET
-    @Path("{accountId}")
+    @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
+    @Operation(description = "Gets a detailed account info.")
     @ApiResponse(description = "A detailed account info.")
-    AccountDTO getAccount(@PathParam("accountId") Integer accountId);
+    @ApiResponse(responseCode = "404", description = "No account was found for specified id.", content = @Content(
+        mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ApiErrorDTO.class)))
+    AccountDTO getAccount(@PathParam("id") Integer id);
 
     @GET
-    @Path("{accountId}/movements")
+    @Path("{id}/movements")
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiResponse(description = "A list of account movements of specified account")
-    @ApiResponse(responseCode = "404", description = "No account was found for specified id.",
-        content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(
-            implementation = ApiErrorDTO.class)))
-    List<MovementDTO> getMovements(@Parameter(name = "accountId", in = ParameterIn.PATH,
-        description = "Identifier of account, for which the movements will be searched.") @NotNull @PathParam("accountId") Integer accountId,
+    @Operation(description = "Gets a sorted list of account movements.")
+    @ApiResponse(description = "A list of account movements of specified account.")
+    @ApiResponse(responseCode = "404", description = "No account was found for specified id.", content = @Content(
+        mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ApiErrorDTO.class)))
+    List<MovementDTO> getMovements(@Parameter(name = "id", in = ParameterIn.PATH,
+        description = "Identifier of account, for which the movements will be searched.") @NotNull @PathParam("id") Integer id,
             @Parameter(name = "offset", in = ParameterIn.QUERY,
                 description = "Offset in the ordered list of movements. If omited, then from first movement.") @QueryParam("offset") Integer offset,
             @Parameter(name = "limit", in = ParameterIn.QUERY,
                 description = "Count of movements starting from offset. If omitted, then all from offset.") @QueryParam("limit") Integer limit,
-            @Parameter(name = "order", in = ParameterIn.QUERY, schema = @Schema(
-                implementation = MovementOrder.class,
+            @Parameter(name = "order", in = ParameterIn.QUERY, schema = @Schema(implementation = MovementOrder.class,
                 defaultValue = "movement")) @QueryParam("order") @DefaultValue("MOVEMENT_DATE") MovementOrder order);
 
 }

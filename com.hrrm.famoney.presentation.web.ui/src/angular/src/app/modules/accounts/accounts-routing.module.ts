@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { AccountsComponent } from './pages/accounts/accounts.component';
 import { AccountTableComponent } from './pages/accounts/components/account-table.component';
+import { AccountsGuard } from './pages/accounts/accounts.guard';
 
 const routes: Routes = [
   {
@@ -9,8 +10,14 @@ const routes: Routes = [
     component: AccountsComponent,
     children: [
       {
+        path: '',
+        redirectTo: '0',
+        pathMatch: 'full',
+      },
+      {
         path: ':accountId',
-        component: AccountTableComponent
+        component: AccountTableComponent,
+        canActivate: [AccountsGuard]
       }
     ]
   }

@@ -1,7 +1,7 @@
 package com.hrrm.famoney.infrastructure.jaxrs.mapper;
 
 import com.hrrm.famoney.infrastructure.jaxrs.DTO;
-import com.hrrm.infrastructure.persistence.DomainEntity;
+import com.hrrm.famoney.infrastructure.persistence.DomainEntity;
 
 public abstract class AbstractEntityToDTOMapper<T extends DomainEntity<?>, P extends DTO>
     implements EntityToDTOMapper<T, P> {

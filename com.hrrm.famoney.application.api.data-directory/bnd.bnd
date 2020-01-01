@@ -1,0 +1,9 @@
+Bundle-Version: 1.0.0.${tstamp}
+	
+
+
+Export-Package: \
+	com.hrrm.famoney.application.api.datadirectory,\
+	com.hrrm.famoney.application.api.datadirectory.dto,\
+	com.hrrm.famoney.application.api.datadirectory.dto.impl,\
+	com.hrrm.famoney.application.api.datadirectory.resources

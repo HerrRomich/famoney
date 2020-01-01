@@ -67,6 +67,11 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>com.hrrm.famoney.domain.data-directory</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>com.hrrm.famoney.domain.accounts.impl</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -93,6 +98,11 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>com.hrrm.famoney.application.api.accounts</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>com.hrrm.famoney.application.api.data-directory</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -185,7 +195,12 @@
                 <artifactId>org.apache.felix.converter</artifactId>
                 <version>1.0.8</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.fileinstall</artifactId>
+                <version>3.6.4</version>
+            </dependency>
+            
             <!-- JUnit -->
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
@@ -229,11 +244,6 @@
                 <version>2.0.1.Final</version>
             </dependency>
             <dependency>
-                <groupId>javax.validation</groupId>
-                <artifactId>validation-api</artifactId>
-                <version>1.1.0.Final</version>
-            </dependency>
-            <dependency>
                 <groupId>org.apache.aries.spec</groupId>
                 <artifactId>org.apache.aries.javax.jax.rs-api</artifactId>
                 <version>1.0.4</version>
@@ -252,6 +262,11 @@
                 <groupId>javax.annotation</groupId>
                 <artifactId>javax.annotation-api</artifactId>
                 <version>1.3.2</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.activation</groupId>
+                <artifactId>javax.activation-api</artifactId>
+                <version>1.2.0</version>
             </dependency>
 
             <dependency>
@@ -307,12 +322,12 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.aries.tx-control</groupId>
-                <artifactId>tx-control-service-local</artifactId>
+                <artifactId>tx-control-service-xa</artifactId>
                 <version>${org.apache.aries.tx-control.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.aries.tx-control</groupId>
-                <artifactId>tx-control-provider-jpa-local</artifactId>
+                <artifactId>tx-control-provider-jpa-xa</artifactId>
                 <version>${org.apache.aries.tx-control.version}</version>
             </dependency>
             <dependency>
@@ -697,7 +712,7 @@
                 <plugin>
                     <groupId>io.swagger.core.v3</groupId>
                     <artifactId>swagger-maven-plugin</artifactId>
-                    <version>2.0.10</version>
+                    <version>2.1.0</version>
                     <configuration>
                         <outputFormat>JSON</outputFormat>
                         <prettyPrint>true</prettyPrint>
@@ -862,11 +877,14 @@
         <module>com.hrrm.famoney.infrastructure.jaxrs</module>
         <module>com.hrrm.famoney.infrastructure.persistence</module>
         <module>com.hrrm.famoney.domain.accounts</module>
+        <module>com.hrrm.famoney.domain.data-directory</module>
         <module>com.hrrm.famoney.infrastructure.logging</module>
         <module>com.hrrm.famoney.presentation.web.ui</module>
         <module>com.hrrm.famoney.application.api.accounts</module>
-        <module>com.hrrm.famoney.application.service.accounts</module>
         <module>com.hrrm.famoney.application.api.accounts.impl</module>
+        <module>com.hrrm.famoney.application.service.accounts</module>
         <module>com.hrrm.famoney.infrastructure.wrappers</module>
+        <module>com.hrrm.famoney.application.api.data-directory</module>
+        <module>com.hrrm.famoney.application.api.data-directory.impl</module>
     </modules>
 </project>

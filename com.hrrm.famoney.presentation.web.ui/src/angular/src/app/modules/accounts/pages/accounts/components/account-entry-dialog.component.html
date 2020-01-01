@@ -1,0 +1,66 @@
+<div fxLayout="column">
+  <div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="12px">
+    <mat-form-field #entryDateField fxFlex="50" floatLabel="always">
+      <mat-label>Дата записи</mat-label>
+      <input
+        matInput
+        [matDatepicker]="entryDatePicker"
+        placeholder="{{ entryDatePlaceholder | date: 'dd.MM.yyyy' }}"
+        required
+        autocomplete="off"
+        mask="00.00.0000"
+      />
+      <mat-datepicker-toggle
+        matSuffix
+        [for]="entryDatePicker"
+      ></mat-datepicker-toggle>
+      <mat-datepicker #entryDatePicker></mat-datepicker>
+    </mat-form-field>
+    <mat-form-field #bookingDateField fxFlex="50" floatLabel="always">
+      <mat-label>Дата учета</mat-label>
+      <input
+        matInput
+        [matDatepicker]="bookingDatePicker"
+        placeholder="{{ bookingDatePlaceholder | date: 'dd.MM.yyyy' }}"
+        autocomplete="off"
+        mask="00.00.0000"
+      />
+      <mat-datepicker-toggle
+        matSuffix
+        [for]="bookingDatePicker"
+      ></mat-datepicker-toggle>
+      <mat-datepicker #bookingDatePicker></mat-datepicker>
+    </mat-form-field>
+  </div>
+  <div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="12px">
+    <mat-form-field fxFlex floatLabel="always">
+      <mat-label>Категория</mat-label>
+      <input matInput required placeholder="Категория" 
+      [matAutocomplete]="categoryAutocomplete">
+<mat-autocomplete #categoryAutocomplete>
+ <mat-optgroup *ngFor="let category of entryCategories">
+   <mat-option *ngFor="let option of group.containerProfileList" [value]="option"
+               class="container-configuration-auto-complete-padding">
+     <div fxLayout="column">
+       <div class="text-overflow">{{option.fullName}}</div>
+       <div class="text-overflow container-configuration-auto-complete-small-font">
+         {{option.version.versionString}}
+       </div>
+     </div>
+   </mat-option>
+ </mat-optgroup>
+</mat-autocomplete>
+</mat-form-field>
+  </div>
+  <div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="12px">
+    <mat-form-field fxFlex="50" floatLabel="always">
+      <mat-label>Сумма</mat-label>
+      <input
+        matInput
+        [placeholder]="0.0"
+        autocomplete="off"
+        mask="separator.2"
+      />
+    </mat-form-field>
+  </div>
+</div>

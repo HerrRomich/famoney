@@ -1,5 +1,5 @@
 Bundle-Version: 1.0.0.${tstamp}
-Private-Package: com.hrrm.infrastructure.persistence.internal
+Private-Package: com.hrrm.famoney.infrastructure.persistence.internal
 Export-Package: \
-	com.hrrm.infrastructure.persistence,\
-	com.hrrm.infrastructure.persistence.migration
+	com.hrrm.famoney.infrastructure.persistence,\
+	com.hrrm.famoney.infrastructure.persistence.migration

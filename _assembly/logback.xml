@@ -20,8 +20,8 @@
     <logger name="Events.Service.org.fum" level="DEBUG"/>
 
     <logger name="com.hrrm.famoney" level="INFO"/>
-    <logger name="org.eclipse.persistence" level="TRACE"/>
-    <logger name="com.hrrm.famoney.api.accounts.resource" level="TRACE"/>
+    <logger name="org.eclipse.persistence" level="INFO"/>
+    <logger name="com.hrrm.famoney.api.accounts.resource" level="INFO"/>
 
     <root level="INFO">
         <appender-ref ref="STDOUT" />

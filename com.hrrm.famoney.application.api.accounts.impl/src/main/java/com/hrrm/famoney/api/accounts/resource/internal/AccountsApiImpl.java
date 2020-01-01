@@ -161,10 +161,10 @@ public class AccountsApiImpl implements AccountsApi {
     }
 
     @Override
-    public AccountDataDTO changeAccount(Integer accountId, AccountDataDTO accountData) {
+    public AccountDataDTO changeAccount(Integer id, AccountDataDTO accountData) {
         try {
             return txControl.required(() -> {
-                var account = getAccountByIdOrThrowNotFound(accountId,
+                var account = getAccountByIdOrThrowNotFound(id,
                         AccountApiError.NO_ACCOUNT_BY_CHANGE);
                 account.setName(accountData.getName())
                     .setOpenDate(accountData.getOpenDate())
@@ -178,16 +178,16 @@ public class AccountsApiImpl implements AccountsApi {
     }
 
     @Override
-    public AccountDTO getAccount(Integer accountId) {
-        logger.debug("Getting account info with ID: {}", accountId);
-        final var account = getAccountByIdOrThrowNotFound(accountId,
+    public AccountDTO getAccount(Integer id) {
+        logger.debug("Getting account info with ID: {}", id);
+        final var account = getAccountByIdOrThrowNotFound(id,
                 AccountApiError.NO_ACCOUNT_ON_GET_ACCOUNT);
         logger.debug("Got account info with ID: {}", account.getId());
         return mapAccountToAccountDTO(account);
     }
 
     @Override
-    public List<MovementDTO> getMovements(@NotNull Integer accountId, Integer offset, Integer limit,
+    public List<MovementDTO> getMovements(@NotNull Integer id, Integer offset, Integer limit,
             MovementOrder order) {
         final var offsetOptional = Optional.ofNullable(offset);
         final var limitOptional = Optional.ofNullable(limit);
@@ -199,31 +199,31 @@ public class AccountsApiImpl implements AccountsApi {
         if (order == MovementOrder.BOOKING_DATE) {
             orderedByText = "booking date";
             findLastByAccountBeforeOffsetByDate = offsetVal -> movementSliceRepository
-                .findLastByAccountBeforeOffsetByBookingDate(accountId, offsetVal);
+                .findLastByAccountBeforeOffsetByBookingDate(id, offsetVal);
             findMovementsByAccountIdAfterDate = (dateFrom,
                     limitFromSliceOptional) -> movementRepository
-                        .findMovementsByAccountIdAfterBookingDate(accountId, dateFrom,
+                        .findMovementsByAccountIdAfterBookingDate(id, dateFrom,
                                 limitFromSliceOptional);
             getCount = MovementSlice::getBookingCount;
             getSum = MovementSlice::getBookingSum;
         } else {
             orderedByText = "movement date";
             findLastByAccountBeforeOffsetByDate = offsetVal -> movementSliceRepository
-                .findLastByAccountBeforeOffsetByMovementDate(accountId, offsetVal);
+                .findLastByAccountBeforeOffsetByMovementDate(id, offsetVal);
             findMovementsByAccountIdAfterDate = (dateFrom,
                     limitFromSliceOptional) -> movementRepository
-                        .findMovementsByAccountIdAfterMovementDate(accountId, dateFrom,
+                        .findMovementsByAccountIdAfterMovementDate(id, dateFrom,
                                 limitFromSliceOptional);
             getCount = MovementSlice::getMovementCount;
             getSum = MovementSlice::getMovementSum;
         }
         logger.debug("Getting all movemnts of account with id: {}, offset: {} and count: {}," +
-                " ordered by {}", accountId, offsetOptional.map(Object::toString)
+                " ordered by {}", id, offsetOptional.map(Object::toString)
                     .orElse("\"from beginning\""), limitOptional.map(Object::toString)
                         .orElse("\"all\""), orderedByText);
         try {
             final var movementDTOs = txControl.supports(() -> {
-                getAccountByIdOrThrowNotFound(accountId,
+                getAccountByIdOrThrowNotFound(id,
                         AccountApiError.NO_ACCOUNT_ON_GET_ALL_ACCOUNT_MOVEMENTS);
                 final var movementSliceOptional = offsetOptional.flatMap(
                         findLastByAccountBeforeOffsetByDate);
@@ -249,8 +249,8 @@ public class AccountsApiImpl implements AccountsApi {
                 return movementDTOCollector.getMovements();
             });
             logger.debug(l -> l.debug("Got {} movemnts of account with ID: {}", movementDTOs.size(),
-                    accountId));
-            logger.trace(l -> l.trace("Got movemnts of account with ID: {}. {}", accountId,
+                    id));
+            logger.trace(l -> l.trace("Got movemnts of account with ID: {}. {}", id,
                     movementDTOs));
             return movementDTOs;
         } catch (ScopedWorkException e) {

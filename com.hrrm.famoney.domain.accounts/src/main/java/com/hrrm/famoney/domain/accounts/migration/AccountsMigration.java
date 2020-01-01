@@ -14,7 +14,7 @@ import org.osgi.service.component.annotations.Component;
 
 import com.hrrm.famoney.domain.accounts.AccountsDomainEntity;
 
-@Component(service = PreHook.class, property = { "name=accounts" })
+@Component(service = PreHook.class, property = { "name=famoney.accounts" })
 public class AccountsMigration implements PreHook {
 
     private BundleContext context;
@@ -38,7 +38,7 @@ public class AccountsMigration implements PreHook {
         final Flyway flyway = Flyway.configure(classLoader)
             .dataSource(ds)
             .locations(locationArray)
-            .schemas(AccountsDomainEntity.ACCOUNTS_SCHEMA_NAME)
+            .schemas(AccountsDomainEntity.SCHEMA_NAME)
             .load();
         flyway.migrate();
     }

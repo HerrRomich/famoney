@@ -23,7 +23,7 @@ import lombok.experimental.Accessors;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@Table(schema = AccountsDomainEntity.ACCOUNTS_SCHEMA_NAME, name = "movement")
+@Table(schema = AccountsDomainEntity.SCHEMA_NAME, name = "movement")
 @DiscriminatorColumn(name = "type")
 @Accessors(chain = true)
 @Getter

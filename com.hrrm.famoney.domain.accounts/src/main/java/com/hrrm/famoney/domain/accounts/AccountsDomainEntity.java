@@ -4,7 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
-import com.hrrm.infrastructure.persistence.DomainEntity;
+import com.hrrm.famoney.infrastructure.persistence.DomainEntity;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -14,7 +14,7 @@ import lombok.Getter;
 @Getter
 public abstract class AccountsDomainEntity implements DomainEntity<Integer> {
 
-    public static final String ACCOUNTS_SCHEMA_NAME = "famoney_accounts";
+    public static final String SCHEMA_NAME = "accounts";
 
     @Id
     @Column(name = "id")

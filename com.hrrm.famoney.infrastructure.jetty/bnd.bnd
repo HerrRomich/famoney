@@ -1,7 +1,7 @@
 Bundle-Version: 1.0.0.${tstamp}
-Export-Package: com.hrrm.infrastructure.jetty
+Export-Package: com.hrrm.famoney.infrastructure.jetty
 
 -includeresource: \
     etc=src/main/resources/etc, \
     OSGI-INF=src/main/resources/OSGI-INF
-Private-Package: com.hrrm.infrastructure.jetty.internal
+-privatepackage: com.hrrm.famoney.infrastructure.jetty.internal

@@ -28,7 +28,7 @@
       "windows": {
         "command": ".\\node_modules\\.bin\\ng"
       },
-      "args": ["build", "--watch", "--configuration=production"],
+      "args": ["build", "--configuration=production"],
       "group": "build",
       "presentation": {
         "echo": true,

@@ -20,6 +20,6 @@ import com.hrrm.famoney.infrastructure.jaxrs.ApiSpecification;
         + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME
         + "=com.hrrm.famoney.api)")
 @JSONRequired
-public class AccountsApplication extends Application implements AccountsApiSpecification {
+public class AccountsApplication extends AccountsApiSpecification {
 
 }

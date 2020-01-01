@@ -8,7 +8,7 @@ import { HttpClientModule } from '@angular/common/http';
 
 export function accountsApiConfigFactory(): AccountsApiConfiguration {
   const params: AccountsApiConfigurationParameters = {
-    basePath: 'famoney/api/accounts'
+    basePath: '/famoney/api/accounts'
   };
   return new AccountsApiConfiguration(params);
 }
