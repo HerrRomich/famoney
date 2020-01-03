@@ -1,6 +1,6 @@
 create or replace table entry_category(
   id int not null auto_increment primary key,
-  category_type varchar2(50) not null comment 'Category discrimantor: expense, incom).'
+  category_type varchar(50) not null comment 'Category discrimantor: expense, income).',
   budget_id int not null comment 'Budget ID. Groups users.',
   name varchar(250) not null comment 'Name of an entry category.',
   parent_id int comment 'Reference to a parent category',

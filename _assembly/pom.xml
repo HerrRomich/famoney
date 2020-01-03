@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>_assembly</artifactId>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
 
     <dependencies>
         <dependency>
@@ -33,10 +33,6 @@
                         <bndrun>famoney.bndrun</bndrun>
                     </bndruns>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>biz.aQute.bnd</groupId>
-                <artifactId>bnd-indexer-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

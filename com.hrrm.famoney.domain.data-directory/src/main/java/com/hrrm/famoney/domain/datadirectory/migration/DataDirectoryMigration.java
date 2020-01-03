@@ -1,4 +1,4 @@
-package com.hrrm.famoney.domain.datadictionary.migration;
+package com.hrrm.famoney.domain.datadirectory.migration;
 
 import java.sql.SQLException;
 
@@ -12,10 +12,10 @@ import org.osgi.framework.wiring.BundleWiring;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 
-import com.hrrm.famoney.domain.datadictionary.DataDictionaryDomainEntity;
+import com.hrrm.famoney.domain.datadirectory.DataDictionaryDomainEntity;
 
-@Component(service = PreHook.class, property = { "name=data-dictionary" })
-public class DataDictionaryMigration implements PreHook {
+@Component(service = PreHook.class, property = { "name=famoney.data-directory" })
+public class DataDirectoryMigration implements PreHook {
 
     private BundleContext context;
 

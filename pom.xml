@@ -128,7 +128,12 @@
             <dependency>
                 <groupId>org.eclipse.platform</groupId>
                 <artifactId>org.eclipse.osgi</artifactId>
-                <version>3.13.300</version>
+                <version>3.15.100</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.framework</artifactId>
+                <version>6.0.3</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.felix</groupId>
@@ -200,7 +205,7 @@
                 <artifactId>org.apache.felix.fileinstall</artifactId>
                 <version>3.6.4</version>
             </dependency>
-            
+
             <!-- JUnit -->
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
@@ -791,7 +796,7 @@
                                     <pluginExecutionFilter>
                                         <groupId>biz.aQute.bnd</groupId>
                                         <artifactId>bnd-indexer-maven-plugin</artifactId>
-                                        <versionRange>[4.3.1,)</versionRange>
+                                        <versionRange>[4.0.0,)</versionRange>
                                         <goals>
                                             <goal>index</goal>
                                         </goals>

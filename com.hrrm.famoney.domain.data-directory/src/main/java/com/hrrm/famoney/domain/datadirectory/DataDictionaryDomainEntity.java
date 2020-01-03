@@ -1,4 +1,4 @@
-package com.hrrm.famoney.domain.datadictionary;
+package com.hrrm.famoney.domain.datadirectory;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
@@ -14,7 +14,7 @@ import lombok.Getter;
 @Getter
 public abstract class DataDictionaryDomainEntity implements DomainEntity<Integer> {
 
-    public static final String SCHEMA_NAME = "data-dictionary";
+    public static final String SCHEMA_NAME = "data_directory";
 
     @Id
     @Column(name = "id")

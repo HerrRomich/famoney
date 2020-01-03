@@ -1,19 +1,8 @@
 {
 	":configurator:resource-version": 1,
-	"org.ops4j.datasource~famoney-data-directory": {
-		"url": "jdbc:mariadb://localhost:3306/accounts",
-		"osgi.jdbc.driver.name": "mariadb",
-		"pool": "dbcp2",
-		"aries.xa.exceptionSorter": "none",
-		"xa": "false",
-		"user": "data-directory",
-		"password": "welcome1",
-		"dataSourceName": "famoney-data-directory"
-	},
-	"com.hrrm.famoney.entity-manager-provider~famoney-accounts": {
-		"data_source.target": "(name=famoney-data-directory)",
-		"migration_hook.target": "(name=famoney-data-directory)",
-		"emfb.target": "(osgi.unit.name=famoney-accounts)",
-		"name": "accounts"
+	"com.hrrm.famoney.infrastructure.persistence.EntityMnagerProvider~famoney.data-directory": {
+		"data_source.target": "(dataSourceName=famoney.data-directory)",
+		"emfb.target": "(osgi.unit.name=famoney.data-directory)",
+		"name": "data-directory"
 	}
 }

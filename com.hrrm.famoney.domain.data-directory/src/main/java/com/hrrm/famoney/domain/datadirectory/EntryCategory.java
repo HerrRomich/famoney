@@ -1,4 +1,4 @@
-package com.hrrm.famoney.domain.datadictionary;
+package com.hrrm.famoney.domain.datadirectory;
 
 import java.util.List;
 

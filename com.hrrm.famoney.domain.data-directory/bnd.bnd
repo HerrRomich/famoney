@@ -7,4 +7,4 @@ Bundle-Version: 1.0.0.${tstamp}
 Meta-Persistence: META-INF/persistence.xml
 
 -dsannotations-options: inherit
-Export-Package: com.hrrm.famoney.domain.datadictionary
+Export-Package: com.hrrm.famoney.domain.datadirectory

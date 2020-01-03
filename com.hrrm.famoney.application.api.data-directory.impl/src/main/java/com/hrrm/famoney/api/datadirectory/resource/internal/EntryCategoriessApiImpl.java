@@ -8,6 +8,7 @@ import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import com.hrrm.famoney.application.api.datadirectory.dto.EntryCategoriesDTO;
 import com.hrrm.famoney.application.api.datadirectory.dto.EntryCategoryDataDTO;
 import com.hrrm.famoney.application.api.datadirectory.resources.EntryCategoriesApi;
+import com.hrrm.famoney.domain.datadirectory.IncomeCategory;
 
 import io.swagger.v3.oas.annotations.Hidden;
 
@@ -19,6 +20,7 @@ public class EntryCategoriessApiImpl implements EntryCategoriesApi {
 
     @Override
     public EntryCategoriesDTO getEntryCategories() {
+        IncomeCategory ic = new IncomeCategory();
         // TODO Auto-generated method stub
         // return null;
         throw new UnsupportedOperationException();
