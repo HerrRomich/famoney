@@ -1,13 +1,16 @@
-<eco-fab-speed-dial [fixed]="true" [open]="false" (mouseenter)="triggerSpeedDial()" (mouseleave)="stopSpeedDial()" #fabSpeedDial>
-  <eco-fab-speed-dial-trigger [className]="fabSpeedDialActions.miniFabVisible  ? 'shown' : 'hidden'">
+<eco-fab-speed-dial
+  [fixed]="true"
+  [open]="false"
+  (mouseenter)="triggerSpeedDial()"
+  (mouseleave)="stopSpeedDial()"
+  #fabSpeedDial
+>
+  <eco-fab-speed-dial-trigger [className]="fabSpeedDialActions.miniFabVisible ? 'shown' : 'hidden'">
     <button mat-fab (click)="addEntry()">
       <mat-icon>add</mat-icon>
     </button>
   </eco-fab-speed-dial-trigger>
   <eco-fab-speed-dial-actions #fabSpeedDialActions>
-    <button mat-mini-fab (click)="addList()">
-      <mat-icon>playlist_add</mat-icon>
-    </button>
     <button mat-mini-fab (click)="addTransfer()">
       <mat-icon>swap_horiz</mat-icon>
     </button>
@@ -18,18 +21,32 @@
 </eco-fab-speed-dial>
 <cdk-virtual-scroll-viewport fxLayout="column" fxFlex #virtualScrollViewport>
   <mat-list dense>
-    <ng-container *cdkVirtualFor="let movement of movementSlicesDataSource; let last = last">
+    <mat-list-item class="account-entry sticky">
+      <div fxLayout="row" fxLayoutAlign="start start" fxFlex>
+        <div flex="0 0 50px">Дата учета</div>
+        <div fxFlex></div>
+        <div fxFlex="0 0 80px" fxLayoutAlign="end start">Сумма</div>
+        <div fxFlex="0 0 80px" fxLayoutAlign="end start">Остаток</div>
+      </div>
+      <mat-divider></mat-divider>
+    </mat-list-item>
+    <ng-container *cdkVirtualFor="let movement of movementDataSource; let last = last">
       <mat-list-item class="account-entry">
-        <div *ngIf="!movement" fxLayout="row" fxLayoutAlign="center start" fxFlex>Caching...</div>
+        <div *ngIf="!movement" fxLayout="row" fxLayoutAlign="center start" fxFlex>
+          Caching...
+        </div>
         <div *ngIf="movement" fxLayout="row" fxLayoutAlign="start start" fxFlex>
-          <div flex="0 0 50px">{{ movement?.date | date: "dd.MM.yyyy" }}</div>
+          <div flex="0 0 50px">{{ movement?.date | date: 'dd.MM.yyyy' }}</div>
           <div fxFlex></div>
-          <div fxFlex="0 0 80px" fxLayoutAlign="end start"
-            [className]="movement?.amount > 0 ? 'positive-amount' : 'negative-amount'">
-            {{ movement?.amount | number: "1.2-2" }}
+          <div
+            fxFlex="0 0 80px"
+            fxLayoutAlign="end start"
+            [className]="movement?.amount > 0 ? 'positive-amount' : 'negative-amount'"
+          >
+            {{ movement?.amount | number: '1.2-2' }}
           </div>
           <div fxFlex="0 0 80px" fxLayoutAlign="end start">
-            {{ movement?.sum | number: "1.2-2" }}
+            {{ movement?.sum | number: '1.2-2' }}
           </div>
         </div>
         <mat-divider *ngIf="!last"></mat-divider>

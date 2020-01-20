@@ -1,66 +1,135 @@
-<div fxLayout="column">
+<h1 mat-dialog-title>Доход/Расход</h1>
+<div mat-dialog-content fxLayout="column" [formGroup]="entry">
   <div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="12px">
-    <mat-form-field #entryDateField fxFlex="50" floatLabel="always">
-      <mat-label>Дата записи</mat-label>
-      <input
-        matInput
-        [matDatepicker]="entryDatePicker"
-        placeholder="{{ entryDatePlaceholder | date: 'dd.MM.yyyy' }}"
-        required
-        autocomplete="off"
-        mask="00.00.0000"
-      />
-      <mat-datepicker-toggle
-        matSuffix
-        [for]="entryDatePicker"
-      ></mat-datepicker-toggle>
-      <mat-datepicker #entryDatePicker></mat-datepicker>
-    </mat-form-field>
-    <mat-form-field #bookingDateField fxFlex="50" floatLabel="always">
-      <mat-label>Дата учета</mat-label>
-      <input
-        matInput
-        [matDatepicker]="bookingDatePicker"
-        placeholder="{{ bookingDatePlaceholder | date: 'dd.MM.yyyy' }}"
-        autocomplete="off"
-        mask="00.00.0000"
-      />
-      <mat-datepicker-toggle
-        matSuffix
-        [for]="bookingDatePicker"
-      ></mat-datepicker-toggle>
-      <mat-datepicker #bookingDatePicker></mat-datepicker>
-    </mat-form-field>
+    <div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="12px" fxFlex>
+      <mat-form-field floatLabel="always" fxFlex class="entry-date-form-field">
+        <mat-label>Дата записи</mat-label>
+        <input matInput [matDatepicker]="entryDatePicker" required autocomplete="off" formControlName="entryDate" />
+        <mat-datepicker-toggle matSuffix [for]="entryDatePicker"></mat-datepicker-toggle>
+        <mat-datepicker #entryDatePicker></mat-datepicker>
+      </mat-form-field>
+      <mat-form-field
+        *ngIf="extendedDateToggleGroup.value == 'extended-date'"
+        floatLabel="always"
+        fxFlex="33"
+        class="entry-date-form-field"
+      >
+        <mat-label>Дата учета</mat-label>
+        <input
+          matInput
+          [matDatepicker]="bookingDatePicker"
+          autocomplete="off"
+          formControlName="bookingDate"
+          [placeholder]="getEntryDate('L')"
+        />
+        <mat-datepicker-toggle matSuffix [for]="bookingDatePicker"></mat-datepicker-toggle>
+        <mat-datepicker #bookingDatePicker></mat-datepicker>
+      </mat-form-field>
+      <mat-form-field
+        *ngIf="extendedDateToggleGroup.value == 'extended-date'"
+        floatLabel="always"
+        fxFlex="33"
+        class="entry-date-form-field"
+      >
+        <mat-label>Учетный месяц</mat-label>
+        <input
+          matInput
+          [appMonthpicker]="budgetMonthPicker"
+          autocomplete="off"
+          formControlName="budgetMonth"
+          [placeholder]="getEntryDate('MMM YYYY')"
+        />
+        <mat-datepicker-toggle matSuffix [for]="budgetMonthPicker"></mat-datepicker-toggle>
+        <app-monthpicker #budgetMonthPicker></app-monthpicker>
+      </mat-form-field>
+    </div>
+    <mat-button-toggle-group #extendedDateToggleGroup="matButtonToggleGroup">
+      <mat-button-toggle fxFlex="14px" class="narrow-toggle-button" value="extended-date">
+        <mat-icon
+          >{{extendedDateToggleGroup.value == 'extended-date' ? 'keyboard_arrow_left' :
+          'keyboard_arrow_right'}}</mat-icon
+        >
+      </mat-button-toggle>
+    </mat-button-toggle-group>
   </div>
-  <div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="12px">
-    <mat-form-field fxFlex floatLabel="always">
-      <mat-label>Категория</mat-label>
-      <input matInput required placeholder="Категория" 
-      [matAutocomplete]="categoryAutocomplete">
-<mat-autocomplete #categoryAutocomplete>
- <mat-optgroup *ngFor="let category of entryCategories">
-   <mat-option *ngFor="let option of group.containerProfileList" [value]="option"
-               class="container-configuration-auto-complete-padding">
-     <div fxLayout="column">
-       <div class="text-overflow">{{option.fullName}}</div>
-       <div class="text-overflow container-configuration-auto-complete-small-font">
-         {{option.version.versionString}}
-       </div>
-     </div>
-   </mat-option>
- </mat-optgroup>
-</mat-autocomplete>
-</mat-form-field>
+  <div *ngIf="extendedCategoryToggleGroup.value === 'extended-category'" fxLayout="column">
+    <div fxLayout="column" class="entry-container">
+      <div fxLayout="column" class="entry-item-list">
+        <div
+          fxLayout="row"
+          fxLayoutAlign="start start"
+          class="mat-elevation-z2 entry-item"
+          appFocusHighlight="entry-item-highlighted"
+        >
+          <app-entry-item fxFlex></app-entry-item>
+          <button mat-button mat-icon-button class="small-button">
+            <mat-icon>clear</mat-icon>
+          </button>
+        </div>
+        <div
+          fxLayout="row"
+          fxLayoutAlign="start start"
+          class="mat-elevation-z2 entry-item"
+          appFocusHighlight="entry-item-highlighted"
+        >
+          <app-entry-item fxFlex></app-entry-item>
+          <button mat-button mat-icon-button class="small-button">
+            <mat-icon>clear</mat-icon>
+          </button>
+        </div>
+        <div
+          fxLayout="row"
+          fxLayoutAlign="start start"
+          class="mat-elevation-z2 entry-item"
+          appFocusHighlight="entry-item-highlighted"
+        >
+          <app-entry-item fxFlex></app-entry-item>
+          <button mat-button mat-icon-button class="small-button">
+            <mat-icon>clear</mat-icon>
+          </button>
+        </div>
+        <div
+          fxLayout="row"
+          fxLayoutAlign="start start"
+          class="mat-elevation-z2 entry-item"
+          appFocusHighlight="entry-item-highlighted"
+        >
+          <app-entry-item fxFlex></app-entry-item>
+          <button mat-button mat-icon-button class="small-button">
+            <mat-icon>clear</mat-icon>
+          </button>
+        </div>
+        <div
+          fxLayout="row"
+          fxLayoutAlign="start start"
+          class="mat-elevation-z2 entry-item"
+          appFocusHighlight="entry-item-highlighted"
+        >
+          <app-entry-item fxFlex></app-entry-item>
+          <button mat-button mat-icon-button class="small-button">
+            <mat-icon>clear</mat-icon>
+          </button>
+        </div>
+      </div>
+      <button mat-mini-fab class="add-category-button">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+    <div fxLayout="row">
+      <div fxFlex></div>
+      <div class="mat-body-strong mat-body-2">30.00€</div>
+    </div>
   </div>
-  <div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="12px">
-    <mat-form-field fxFlex="50" floatLabel="always">
-      <mat-label>Сумма</mat-label>
-      <input
-        matInput
-        [placeholder]="0.0"
-        autocomplete="off"
-        mask="separator.2"
-      />
-    </mat-form-field>
-  </div>
+  <app-entry-item *ngIf="extendedCategoryToggleGroup.value !== 'extended-category'"></app-entry-item>
+  <mat-button-toggle-group #extendedCategoryToggleGroup="matButtonToggleGroup">
+    <mat-button-toggle value="extended-category" class="thin-toggle-button">
+      <mat-icon>{{extendedCategoryToggleGroup.value == 'extended-category' ? 'keyboard_arrow_up' :
+        'keyboard_arrow_down'}}</mat-icon>
+    </mat-button-toggle>
+  </mat-button-toggle-group>
+</div>
+<div mat-dialog-actions fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="12px">
+  <div fxFlex></div>
+  <button mat-stroked-button mat-dialog-close>Отменить</button>
+  <button mat-stroked-button mat-dialog-close color="primary">Сохранить</button>
 </div>

@@ -13,8 +13,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @ImmutableDtoStyle
 public interface EntryCategoriesDTO {
     
-    List<IncomeCategoryDTO> getIncomeCategories();
+    List<IncomeCategoryDTO> getIncomes();
     
-    List<ExpenseCategoryDTO> getExpenseCategories();
+    List<ExpenseCategoryDTO> getExpenses();
 
 }

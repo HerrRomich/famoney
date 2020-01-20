@@ -1,11 +1,11 @@
-package com.hrrm.famoney.function;
+package com.hrrm.famoney.function.throwing;
 
 import java.util.Optional;
 import java.util.function.IntFunction;
 
-import com.hrrm.famoney.function.exception.WrappedException;
+import com.hrrm.famoney.function.throwing.exception.WrappedException;
 
-import static com.hrrm.famoney.function.SneakyThrowUtil.sneakyThrow;
+import static com.hrrm.famoney.function.throwing.SneakyThrowUtil.sneakyThrow;
 import static java.util.Objects.requireNonNull;
 
 /**

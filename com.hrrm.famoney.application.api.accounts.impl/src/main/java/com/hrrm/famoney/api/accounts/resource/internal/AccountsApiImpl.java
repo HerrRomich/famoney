@@ -94,10 +94,8 @@ public class AccountsApiImpl implements AccountsApi {
 
     @Activate
     public AccountsApiImpl(@Reference(service = LoggerFactory.class) Logger logger,
-            @Reference AccountRepository accountRepository,
-            @Reference MovementRepository movementRepository,
-            @Reference MovementSliceRepository movementSliceRepository,
-            @Reference TransactionControl txControl) {
+            @Reference AccountRepository accountRepository, @Reference MovementRepository movementRepository,
+            @Reference MovementSliceRepository movementSliceRepository, @Reference TransactionControl txControl) {
         super();
         this.logger = logger;
         this.accountRepository = accountRepository;
@@ -164,8 +162,7 @@ public class AccountsApiImpl implements AccountsApi {
     public AccountDataDTO changeAccount(Integer id, AccountDataDTO accountData) {
         try {
             return txControl.required(() -> {
-                var account = getAccountByIdOrThrowNotFound(id,
-                        AccountApiError.NO_ACCOUNT_BY_CHANGE);
+                var account = getAccountByIdOrThrowNotFound(id, AccountApiError.NO_ACCOUNT_BY_CHANGE);
                 account.setName(accountData.getName())
                     .setOpenDate(accountData.getOpenDate())
                     .setTags(accountData.getTags());
@@ -180,15 +177,13 @@ public class AccountsApiImpl implements AccountsApi {
     @Override
     public AccountDTO getAccount(Integer id) {
         logger.debug("Getting account info with ID: {}", id);
-        final var account = getAccountByIdOrThrowNotFound(id,
-                AccountApiError.NO_ACCOUNT_ON_GET_ACCOUNT);
+        final var account = getAccountByIdOrThrowNotFound(id, AccountApiError.NO_ACCOUNT_ON_GET_ACCOUNT);
         logger.debug("Got account info with ID: {}", account.getId());
         return mapAccountToAccountDTO(account);
     }
 
     @Override
-    public List<MovementDTO> getMovements(@NotNull Integer id, Integer offset, Integer limit,
-            MovementOrder order) {
+    public List<MovementDTO> getMovements(@NotNull Integer id, Integer offset, Integer limit, MovementOrder order) {
         final var offsetOptional = Optional.ofNullable(offset);
         final var limitOptional = Optional.ofNullable(limit);
         String orderedByText;
@@ -200,43 +195,35 @@ public class AccountsApiImpl implements AccountsApi {
             orderedByText = "booking date";
             findLastByAccountBeforeOffsetByDate = offsetVal -> movementSliceRepository
                 .findLastByAccountBeforeOffsetByBookingDate(id, offsetVal);
-            findMovementsByAccountIdAfterDate = (dateFrom,
-                    limitFromSliceOptional) -> movementRepository
-                        .findMovementsByAccountIdAfterBookingDate(id, dateFrom,
-                                limitFromSliceOptional);
+            findMovementsByAccountIdAfterDate = (dateFrom, limitFromSliceOptional) -> movementRepository
+                .findMovementsByAccountIdAfterBookingDate(id, dateFrom, limitFromSliceOptional);
             getCount = MovementSlice::getBookingCount;
             getSum = MovementSlice::getBookingSum;
         } else {
             orderedByText = "movement date";
             findLastByAccountBeforeOffsetByDate = offsetVal -> movementSliceRepository
                 .findLastByAccountBeforeOffsetByMovementDate(id, offsetVal);
-            findMovementsByAccountIdAfterDate = (dateFrom,
-                    limitFromSliceOptional) -> movementRepository
-                        .findMovementsByAccountIdAfterMovementDate(id, dateFrom,
-                                limitFromSliceOptional);
+            findMovementsByAccountIdAfterDate = (dateFrom, limitFromSliceOptional) -> movementRepository
+                .findMovementsByAccountIdAfterMovementDate(id, dateFrom, limitFromSliceOptional);
             getCount = MovementSlice::getMovementCount;
             getSum = MovementSlice::getMovementSum;
         }
-        logger.debug("Getting all movemnts of account with id: {}, offset: {} and count: {}," +
-                " ordered by {}", id, offsetOptional.map(Object::toString)
-                    .orElse("\"from beginning\""), limitOptional.map(Object::toString)
-                        .orElse("\"all\""), orderedByText);
+        logger.debug("Getting all movemnts of account with id: {}, offset: {} and count: {}," + " ordered by {}", id,
+            offsetOptional.map(Object::toString)
+                .orElse("\"from beginning\""), limitOptional.map(Object::toString)
+                    .orElse("\"all\""), orderedByText);
         try {
             final var movementDTOs = txControl.supports(() -> {
-                getAccountByIdOrThrowNotFound(id,
-                        AccountApiError.NO_ACCOUNT_ON_GET_ALL_ACCOUNT_MOVEMENTS);
-                final var movementSliceOptional = offsetOptional.flatMap(
-                        findLastByAccountBeforeOffsetByDate);
+                getAccountByIdOrThrowNotFound(id, AccountApiError.NO_ACCOUNT_ON_GET_ALL_ACCOUNT_MOVEMENTS);
+                final var movementSliceOptional = offsetOptional.flatMap(findLastByAccountBeforeOffsetByDate);
                 final var dateFrom = movementSliceOptional.map(MovementSlice::getDate)
                     .orElse(MovementSlice.FIRST_SLICE_DATE)
                     .atTime(0, 0);
                 final var offsetFromSlice = offsetOptional.orElse(0) -
                         movementSliceOptional.map(getCount)
                             .orElse(0);
-                final var limitFromSliceOptional = limitOptional.map(limitVal -> limitVal +
-                        offsetFromSlice);
-                List<Movement> movements = findMovementsByAccountIdAfterDate.apply(dateFrom,
-                        limitFromSliceOptional);
+                final var limitFromSliceOptional = limitOptional.map(limitVal -> limitVal + offsetFromSlice);
+                List<Movement> movements = findMovementsByAccountIdAfterDate.apply(dateFrom, limitFromSliceOptional);
                 var sum = Stream.concat(movementSliceOptional.map(getSum)
                     .stream(), movements.stream()
                         .limit(offsetFromSlice)
@@ -248,10 +235,8 @@ public class AccountsApiImpl implements AccountsApi {
                     .forEachOrdered(movementDTOCollector::addNextMovement);
                 return movementDTOCollector.getMovements();
             });
-            logger.debug(l -> l.debug("Got {} movemnts of account with ID: {}", movementDTOs.size(),
-                    id));
-            logger.trace(l -> l.trace("Got movemnts of account with ID: {}. {}", id,
-                    movementDTOs));
+            logger.debug(l -> l.debug("Got {} movemnts of account with ID: {}", movementDTOs.size(), id));
+            logger.trace(l -> l.trace("Got movemnts of account with ID: {}. {}", id, movementDTOs));
             return movementDTOs;
         } catch (ScopedWorkException e) {
             throw e.as(ApiException.class);
@@ -261,8 +246,7 @@ public class AccountsApiImpl implements AccountsApi {
     private Account getAccountByIdOrThrowNotFound(@NotNull Integer accountId, ApiError error) {
         return accountRepository.find(accountId)
             .orElseThrow(() -> {
-                final var errorMessage = MessageFormat.format(NO_ACCOUNT_IS_FOUND_MESSAGE,
-                        accountId);
+                final var errorMessage = MessageFormat.format(NO_ACCOUNT_IS_FOUND_MESSAGE, accountId);
                 final var exception = new AccountNotFoundException(error, errorMessage);
                 logger.warn(errorMessage);
                 logger.trace(errorMessage, exception);

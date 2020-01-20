@@ -13,10 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hrrm.famoney.function.exception;
+package com.hrrm.famoney.function.throwing;
 
-public class WrappedException extends RuntimeException {
-    public WrappedException(Throwable cause) {
-        super(cause.getMessage(), cause);
+final class SneakyThrowUtil {
+
+    private SneakyThrowUtil() {
+    }
+
+    static <T extends Exception, R> R sneakyThrow(Exception t) throws T {
+        throw (T) t;
     }
 }

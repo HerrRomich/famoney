@@ -1,6 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { MatFormField } from '@angular/material';
-import { QueryBindingType } from '@angular/compiler/src/core';
+import { Component, OnInit, Optional, Inject } from '@angular/core';
+import { FormGroup, FormControl } from '@angular/forms';
+import * as moment from 'moment';
+import { MAT_DATE_LOCALE } from '@angular/material';
 
 @Component({
   selector: 'app-account-entry-dialog',
@@ -8,17 +9,23 @@ import { QueryBindingType } from '@angular/compiler/src/core';
   styleUrls: ['account-entry-dialog.component.scss']
 })
 export class AccountEntryDialogComponent implements OnInit {
-
-  @ViewChild('entryDateField', {static: true}) entryDateField: MatFormField;
-
-  entryDatePlaceholder: Date;
-
-  bookingDatePlaceholder: Date;
+  entry = new FormGroup({
+    entryDate: new FormControl(moment()),
+    bookingDate: new FormControl(),
+    budgetMonth: new FormControl()
+  });
 
   entryCategories: any;
 
+  constructor(@Optional() @Inject(MAT_DATE_LOCALE) private dateLocale: string) {}
+
   ngOnInit() {
-    this.entryDatePlaceholder = new Date();
-    this.bookingDatePlaceholder = this.entryDatePlaceholder;
+  }
+
+  getEntryDate(format: string) {
+    const entryDate = this.entry.get('entryDate');
+    if (entryDate && entryDate.value && moment.isMoment(entryDate.value)) {
+      return entryDate.value.locale(this.dateLocale).format(format);
+    }
   }
 }

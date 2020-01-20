@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hrrm.famoney.function;
+package com.hrrm.famoney.function.throwing;
 
 import java.util.Objects;
 import java.util.function.Predicate;
 
-import com.hrrm.famoney.function.exception.WrappedException;
+import com.hrrm.famoney.function.throwing.exception.WrappedException;
 
 import static java.util.Objects.requireNonNull;
 

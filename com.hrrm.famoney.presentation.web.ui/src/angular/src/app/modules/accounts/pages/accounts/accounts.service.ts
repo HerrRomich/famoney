@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject, combineLatest } from 'rxjs';
+import { Observable, BehaviorSubject, combineLatest, empty, EMPTY } from 'rxjs';
 import { AccountDto, AccountsApiService } from '@famoney-apis/accounts';
-import { map, switchMap, shareReplay } from 'rxjs/operators';
+import { map, switchMap, shareReplay, retry, catchError } from 'rxjs/operators';
+import { NotificationsService } from 'angular2-notifications';
 
 const ACCOUNT_TAGS_STORAGE = 'ACCOUNT_TAGS_STORAGE';
 const ACCOUNT_ID_STORAGE = 'ACCOUNT_ID_STORAGE';
 
 @Injectable()
 export class AccountsService {
-
   private selectedAccountTags$: BehaviorSubject<Set<string>>;
 
   private accounts$: Observable<AccountDto[]>;
@@ -19,7 +19,7 @@ export class AccountsService {
     return this.selectedAccountTags$;
   }
 
-  constructor(private accountsApiService: AccountsApiService) {
+  constructor(private accountsApiService: AccountsApiService, private notificationsService: NotificationsService) {
     let tags: string[] = [];
     if (window.localStorage) {
       tags = JSON.parse(window.localStorage.getItem(ACCOUNT_TAGS_STORAGE));
@@ -40,7 +40,13 @@ export class AccountsService {
   getAccounts() {
     if (!this.accounts$) {
       this.accounts$ = this.selectedAccountTags$.pipe(
-        switchMap(tags => this.accountsApiService.getAllAccounts(Array.from(tags))),
+        switchMap(tags => this.accountsApiService.getAllAccounts(Array.from(tags)).pipe(
+          retry(3),
+          catchError(() => {
+            this.notificationsService.error('Error', 'Couldn\'t load list of accounts.');
+            return EMPTY;
+          })
+        )),
         shareReplay(1)
       );
     }
@@ -71,12 +77,14 @@ export class AccountsService {
     });
   }
 
-  private transformStringSet = (input: BehaviorSubject<Set<string>>, transformation: (input: Set<string>) => Set<string>) => {
+  private transformStringSet = (
+    input: BehaviorSubject<Set<string>>,
+    transformation: (input: Set<string>) => Set<string>
+  ) => {
     const newValue = transformation(input.value);
     if (window.localStorage) {
       window.localStorage.setItem(ACCOUNT_TAGS_STORAGE, JSON.stringify(Array.from(newValue)));
     }
     input.next(newValue);
   };
-
 }

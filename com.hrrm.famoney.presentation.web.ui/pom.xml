@@ -67,7 +67,8 @@
                 <configuration>
                     <filesets>
                         <fileset>
-                            <directory>src/angular/src/app/shared/apis</directory>
+                            <directory>src/angular/src/app/shared/apis/accounts</directory>
+                            <directory>src/angular/src/app/shared/apis/data-directory</directory>
                         </fileset>
                     </filesets>
                 </configuration>

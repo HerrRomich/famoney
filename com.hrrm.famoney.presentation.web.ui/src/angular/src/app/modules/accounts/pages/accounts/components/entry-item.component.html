@@ -1,0 +1,24 @@
+<div fxLayout="column" flex>
+  <div matLine fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="12px">
+    <mat-form-field fxFlex="80" floatLabel="always">
+      <mat-label>Категория</mat-label>
+      <input matInput required placeholder="Категория" [matAutocomplete]="categoryAutocomplete" />
+      <mat-autocomplete #categoryAutocomplete>
+          <mat-option
+            *ngFor="let category of entryCategories"
+            [value]="category"
+            class="container-configuration-auto-complete-padding"
+          >{{category}}
+          </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+    <mat-form-field fxFlex="20" floatLabel="always">
+      <mat-label>Сумма</mat-label>
+      <input class="number-input" matInput [placeholder]="0.0" autocomplete="off" mask="separator.2" />
+    </mat-form-field>
+  </div>
+  <mat-form-field matLine floatLabel="always">
+    <mat-label>Комментарий</mat-label>
+    <input matInput autocomplete="off" class="number-input" />
+  </mat-form-field>
+</div>

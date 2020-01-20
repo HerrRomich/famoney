@@ -1,29 +1,9 @@
-import {
-  Component,
-  OnInit,
-  ViewChild,
-  OnDestroy} from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { Observable, Subscription, iif, of, concat, timer } from 'rxjs';
-import {
-  MovementDto,
-  AccountsApiService,
-  AccountDto
-} from '@famoney-apis/accounts';
-import {
-  CollectionViewer,
-  DataSource,
-  ListRange
-} from '@angular/cdk/collections';
+import { MovementDto, AccountsApiService, AccountDto } from '@famoney-apis/accounts';
+import { CollectionViewer, DataSource, ListRange } from '@angular/cdk/collections';
 import { ActivatedRoute } from '@angular/router';
-import {
-  map,
-  switchMap,
-  tap,
-  mergeMap,
-  skipWhile,
-  takeWhile,
-  take
-} from 'rxjs/operators';
+import { map, switchMap, tap, mergeMap, skipWhile, takeWhile, take } from 'rxjs/operators';
 import {
   CdkVirtualScrollViewport,
   VIRTUAL_SCROLL_STRATEGY,
@@ -37,10 +17,7 @@ import { MatDialog } from '@angular/material';
 class MovementDataSource extends DataSource<MovementDto> {
   private _data: MovementDto[];
 
-  constructor(
-    private accountsApiService: AccountsApiService,
-    private account$: Observable<AccountDto>
-  ) {
+  constructor(private accountsApiService: AccountsApiService, private account$: Observable<AccountDto>) {
     super();
   }
 
@@ -50,10 +27,9 @@ class MovementDataSource extends DataSource<MovementDto> {
         this._data = new Array<MovementDto>(account.movementCount);
       }),
       switchMap(account =>
-        concat(
-          of({ start: 0, end: 0 } as ListRange),
-          collectionViewer.viewChange
-        ).pipe(map(range => [account, range] as [AccountDto, ListRange]))
+        concat(of({ start: 0, end: 0 } as ListRange), collectionViewer.viewChange).pipe(
+          map(range => [account, range] as [AccountDto, ListRange])
+        )
       ),
       map(([account, range]) => {
         // Range.start = Math.max(range.start - 40, 0);
@@ -77,14 +53,12 @@ class MovementDataSource extends DataSource<MovementDto> {
       mergeMap(([account, range]) =>
         iif(
           () => range.end > range.start,
-          this.accountsApiService
-            .getMovements(account.id, range.start, range.end - range.start)
-            .pipe(
-              map(movements => {
-                this._data.splice(range.start, movements.length, ...movements);
-                return this._data;
-              })
-            ),
+          this.accountsApiService.getMovements(account.id, range.start, range.end - range.start).pipe(
+            map(movements => {
+              this._data.splice(range.start, movements.length, ...movements);
+              return this._data;
+            })
+          ),
           of(this._data)
         )
       )
@@ -115,11 +89,7 @@ export class AccountMovementsViertualScrollStrategy extends FixedSizeVirtualScro
       .pipe(
         skipWhile(() => this.viewport.getRenderedRange().start !== 0),
         tap(() => this.viewport.scrollToIndex(this.viewport.getDataLength())),
-        takeWhile(
-          () =>
-            this.viewport.getRenderedRange().end !==
-            this.viewport.getDataLength()
-        )
+        takeWhile(() => this.viewport.getRenderedRange().end !== this.viewport.getDataLength())
       )
       .subscribe();
   }
@@ -137,7 +107,7 @@ export class AccountMovementsViertualScrollStrategy extends FixedSizeVirtualScro
   ]
 })
 export class AccountTableComponent implements OnInit, OnDestroy {
-  movementSlicesDataSource: MovementDataSource;
+  movementDataSource: MovementDataSource;
 
   @ViewChild('fabSpeedDial', { static: true })
   fabSpeedDial: EcoFabSpeedDialComponent;
@@ -157,20 +127,18 @@ export class AccountTableComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.fabSpeedDialOpenChangeSubbscription = this.fabSpeedDial.openChange
-      .pipe(tap(opened => {
-        this.fabSpeedDial.fixed = !opened;
-        console.log('Fixed is ' + this.fabSpeedDial.fixed);
-      }))
+      .pipe(
+        tap(opened => {
+          this.fabSpeedDial.fixed = !opened;
+        })
+      )
       .subscribe();
 
     const account$ = this.route.paramMap.pipe(
       map(params => Number.parseInt(params.get('accountId'), 10)),
       switchMap(accountId => this.accountsApiService.getAccount(accountId))
     );
-    this.movementSlicesDataSource = new MovementDataSource(
-      this.accountsApiService,
-      account$
-    );
+    this.movementDataSource = new MovementDataSource(this.accountsApiService, account$);
   }
 
   ngOnDestroy() {
@@ -178,14 +146,10 @@ export class AccountTableComponent implements OnInit, OnDestroy {
   }
 
   triggerSpeedDial() {
-    if (
-      !this.speedDialTriggerSubscription ||
-      this.speedDialTriggerSubscription.closed
-    ) {
+    if (!this.speedDialTriggerSubscription || this.speedDialTriggerSubscription.closed) {
       this.speedDialTriggerSubscription = interval(fabSpeedDialDelayOnHover)
         .pipe(
           tap(() => {
-            console.log('Opened.');
             this.fabSpeedDial.open = true;
           }),
           take(1)
@@ -195,10 +159,7 @@ export class AccountTableComponent implements OnInit, OnDestroy {
   }
 
   stopSpeedDial() {
-    if (
-      this.speedDialTriggerSubscription &&
-      !this.speedDialTriggerSubscription.closed
-    ) {
+    if (this.speedDialTriggerSubscription && !this.speedDialTriggerSubscription.closed) {
       this.speedDialTriggerSubscription.unsubscribe();
     }
     this.speedDialTriggerSubscription = null;
@@ -206,11 +167,14 @@ export class AccountTableComponent implements OnInit, OnDestroy {
 
   addEntry() {
     this.stopSpeedDial();
-    this.accountEntryDialogComponent.open(AccountEntryDialogComponent);
-  }
-
-  addList() {
-    console.log('Add list.');
+    this.accountEntryDialogComponent.open(AccountEntryDialogComponent, {
+      width: '520px',
+      minWidth: '520px',
+      maxWidth: '520px',
+      panelClass: 'account-entry-dialog',
+      disableClose: true,
+      hasBackdrop: true
+    });
   }
 
   addTransfer() {
@@ -220,5 +184,4 @@ export class AccountTableComponent implements OnInit, OnDestroy {
   addRefund() {
     console.log('Add refund.');
   }
-
 }

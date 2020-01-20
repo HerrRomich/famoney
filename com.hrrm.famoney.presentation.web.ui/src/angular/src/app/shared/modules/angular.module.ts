@@ -3,7 +3,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ScrollingModule } from '@angular/cdk/scrolling';
-import { NgxMaskModule } from 'ngx-mask';
+import { HttpClientModule } from '@angular/common/http';
+import { FocusHighlightDirective } from '../directives/focus-highlight.directive';
 
 const ANGULAR_MODULES = [
   FormsModule,
@@ -11,11 +12,12 @@ const ANGULAR_MODULES = [
   RouterModule,
   ReactiveFormsModule,
   ScrollingModule,
-  NgxMaskModule,
+  HttpClientModule
 ];
 
 @NgModule({
+  declarations: [FocusHighlightDirective],
   imports: ANGULAR_MODULES,
-  exports: ANGULAR_MODULES
+  exports: [...ANGULAR_MODULES, FocusHighlightDirective]
 })
 export class AngularModule {}

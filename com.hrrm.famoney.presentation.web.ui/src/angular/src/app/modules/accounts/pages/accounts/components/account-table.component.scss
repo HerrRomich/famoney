@@ -13,6 +13,13 @@
   font-weight: 600;
 }
 
+.account-entry.sticky {
+  position: sticky;
+  overflow: hidden;
+  top: 0;
+  widows: 100%;
+}
+
 div.positive-amount {
   color:  green;
 }
@@ -32,5 +39,5 @@ eco-fab-speed-dial-trigger.hidden:hover {
 }
 
 eco-fab-speed-dial-trigger.hidden:not(:hover) {
-  opacity: .35;
+  opacity: .45;
 }

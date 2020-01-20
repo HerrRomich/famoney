@@ -8,10 +8,9 @@
     matTooltipClass="wrapped-tooltip"
   >
     <mat-icon
-      svgIcon="menu-down"
       matBadge="{{ getAccountTagsCount() }}"
       [matBadgeHidden]="getAccountTagsCount() === 0"
-    ></mat-icon>
+    >filter_list</mat-icon>
   </button>
   <div fxFlex></div>
   <app-router-tab fxFlex="0 1 auto" class="accounts-tab-group">

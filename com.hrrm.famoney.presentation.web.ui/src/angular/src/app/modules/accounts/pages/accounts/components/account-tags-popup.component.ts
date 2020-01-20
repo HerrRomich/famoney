@@ -54,7 +54,7 @@ export class AccountTagsPopupComponent implements OnInit {
     this.tagsCtrl.setValue(null);
   }
 
-  removeTag(tag: string){
+  removeTag(tag: string) {
     this.accountsService.removeTag(tag);
   }
 
