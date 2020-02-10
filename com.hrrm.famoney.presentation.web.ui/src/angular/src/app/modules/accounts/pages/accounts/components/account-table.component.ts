@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy, Injectable } from '@angular/core';
 import { Observable, Subscription, iif, of, concat, timer } from 'rxjs';
 import { MovementDto, AccountsApiService, AccountDto } from '@famoney-apis/accounts';
 import { CollectionViewer, DataSource, ListRange } from '@angular/cdk/collections';
@@ -70,6 +70,7 @@ class MovementDataSource extends DataSource<MovementDto> {
 
 const fabSpeedDialDelayOnHover = 350;
 
+@Injectable()
 export class AccountMovementsViertualScrollStrategy extends FixedSizeVirtualScrollStrategy {
   private viewport: CdkVirtualScrollViewport;
 
