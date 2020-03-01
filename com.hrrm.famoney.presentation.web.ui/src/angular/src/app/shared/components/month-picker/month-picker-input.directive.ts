@@ -1,14 +1,7 @@
 import { Directive, Input, forwardRef } from '@angular/core';
-import {
-  MatDatepickerInput,
-  MAT_DATEPICKER_VALUE_ACCESSOR,
-  MAT_DATEPICKER_VALIDATORS,
-  MAT_INPUT_VALUE_ACCESSOR,
-  DateAdapter,
-  MAT_DATE_LOCALE,
-  MAT_DATE_FORMATS,
-  MatDatepicker
-} from '@angular/material';
+import { DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS } from '@angular/material/core';
+import { MatDatepickerInput, MAT_DATEPICKER_VALUE_ACCESSOR, MAT_DATEPICKER_VALIDATORS, MatDatepicker } from '@angular/material/datepicker';
+import { MAT_INPUT_VALUE_ACCESSOR } from '@angular/material/input';
 import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS } from '@angular/forms';
 

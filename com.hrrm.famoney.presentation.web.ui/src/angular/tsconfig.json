@@ -6,7 +6,8 @@
     "paths": {
       "@famoney-apis/*": ["src/app/shared/apis/*"],
       "@famoney-shared/*": ["src/app/shared/modules/*"],
-      "@famoney-components/*": ["src/app/shared/components/*"]
+      "@famoney-components/*": ["src/app/shared/components/*"],
+      "@famoney-modules/*": ["src/app/modules/*"],
     },
     "sourceMap": true,
     "declaration": false,

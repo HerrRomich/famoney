@@ -1,5 +1,8 @@
 import { NgModule } from '@angular/core';
-import { MatDatepickerModule, MatFormFieldModule, MatInputModule, MatButtonModule } from '@angular/material';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { MonthPickerComponent } from './month-picker/month-picker.component';
 import { MonthCalendarHeaderComponent } from './month-picker/month-calendar-header.component';
 import { FlexLayoutModule } from '@angular/flex-layout';

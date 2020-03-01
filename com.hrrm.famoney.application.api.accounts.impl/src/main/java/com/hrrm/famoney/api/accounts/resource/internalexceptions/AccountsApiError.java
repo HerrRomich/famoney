@@ -4,8 +4,9 @@ import com.hrrm.famoney.infrastructure.jaxrs.ApiError;
 
 public interface AccountsApiError extends ApiError {
 
-    default @Override String getPrefix() {
+    @Override
+    default String getPrefix() {
         return "accounts";
-    }
 
+    }
 }

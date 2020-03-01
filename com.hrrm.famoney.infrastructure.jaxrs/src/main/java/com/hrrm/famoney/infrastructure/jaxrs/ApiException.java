@@ -4,28 +4,32 @@ import javax.ws.rs.core.Response.Status;
 
 public class ApiException extends RuntimeException {
 
+    private static final String COMMON_ERROR_PREFIX = "common";
+
     private final String errorCode;
 
     private final String errorDescription;
 
     public ApiException(ApiError error, String description, Throwable cause) {
-        super(error.getMessage(), cause);
-        this.errorCode = getApiErrorCodePrefix()
-                + "-"
-                + error.getCode();
+        super(error.getMessage(),
+            cause);
+        this.errorCode = getApiErrorCodePrefix() + "-" + error.getCode();
         this.errorDescription = description;
     }
 
     public ApiException(ApiError error, String description) {
-        this(error, description, null);
+        this(error,
+            description,
+            null);
     }
 
     public ApiException(ApiError error) {
-        this(error, null);
+        this(error,
+            null);
     }
 
     public String getApiErrorCodePrefix() {
-        return "common";
+        return COMMON_ERROR_PREFIX;
     }
 
     public final String getErrorCode() {

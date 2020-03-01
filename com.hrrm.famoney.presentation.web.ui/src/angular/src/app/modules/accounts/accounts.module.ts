@@ -3,29 +3,26 @@ import { AccountsComponent } from './pages/accounts/accounts.component';
 import { AccountsRoutingModule } from './accounts-routing.module';
 import { AngularModule } from '@famoney-shared/angular.module';
 import { AccountTableComponent } from './pages/accounts/components/account-table.component';
-import { AccountsService } from './pages/accounts/accounts.service';
+import { AccountsService } from './/services/accounts.service';
 import { AccountTagsPopupComponent } from './pages/accounts/components/account-tags-popup.component';
 import { RouterTabModule } from 'src/app/shared/router-tab/router-tab.module';
 import { AccountEntryDialogComponent } from './pages/accounts/components/account-entry-dialog.component';
-import { AccountsGuard } from './pages/accounts/accounts.guard';
+import { AccountsGuard } from './services/accounts.guard';
 import { AccountsApiModule } from '@famoney-apis/accounts-api.module';
 import { OverlayModule } from '@angular/cdk/overlay';
-import {
-  MatIconModule,
-  MatBadgeModule,
-  MatMenuModule,
-  MatTooltipModule,
-  MatListModule,
-  MatChipsModule,
-  MatAutocompleteModule,
-  MatFormFieldModule,
-  MatDatepickerModule,
-  MatIconRegistry,
-  MatButtonModule,
-  MatDialogModule,
-  MatInputModule,
-  MatButtonToggleModule
-} from '@angular/material';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule, MatIconRegistry } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatListModule } from '@angular/material/list';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { EcoFabSpeedDialModule } from '@ecodev/fab-speed-dial';
 import { DomSanitizer } from '@angular/platform-browser';
 import { FlexLayoutModule } from '@angular/flex-layout';

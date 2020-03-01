@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { AccountsComponent } from './pages/accounts/accounts.component';
 import { AccountTableComponent } from './pages/accounts/components/account-table.component';
-import { AccountsGuard } from './pages/accounts/accounts.guard';
+import { AccountsGuard } from './services/accounts.guard';
 
 const routes: Routes = [
   {

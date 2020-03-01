@@ -1,0 +1,18 @@
+package com.hrrm.famoney.application.service.accounts.internal;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+import org.immutables.value.Value;
+
+@Target({
+        ElementType.PACKAGE,
+        ElementType.TYPE
+})
+@Retention(RetentionPolicy.CLASS)
+@Value.Style(packageGenerated = "*.impl", typeImmutable = "*Impl", overshadowImplementation = true)
+public @interface ImmutableDataObjectStyle {
+
+}

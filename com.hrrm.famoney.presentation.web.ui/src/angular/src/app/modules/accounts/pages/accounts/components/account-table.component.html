@@ -20,8 +20,8 @@
   </eco-fab-speed-dial-actions>
 </eco-fab-speed-dial>
 <cdk-virtual-scroll-viewport fxLayout="column" fxFlex #virtualScrollViewport>
-  <mat-list dense>
-    <mat-list-item class="account-entry sticky">
+  <mat-list  class="movements-list" dense>
+    <mat-list-item class="account-entry-header" [style.top]="inverseOfTranslation">
       <div fxLayout="row" fxLayoutAlign="start start" fxFlex>
         <div flex="0 0 50px">Дата учета</div>
         <div fxFlex></div>

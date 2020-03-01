@@ -4,7 +4,8 @@ import com.hrrm.famoney.infrastructure.jaxrs.ApiError;
 
 public interface DataDictionaryApiError extends ApiError {
 
-    default @Override String getPrefix() {
+    @Override
+    default String getPrefix() {
         return "data-dicrionary";
     }
 

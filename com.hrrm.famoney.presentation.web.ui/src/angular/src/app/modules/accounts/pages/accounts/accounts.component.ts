@@ -2,11 +2,11 @@ import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { AccountDto } from '@famoney-apis/accounts';
-import { AccountsService } from './accounts.service';
 import { AccountTagsPopupComponent } from './components/account-tags-popup.component';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { Overlay, CdkOverlayOrigin } from '@angular/cdk/overlay';
 import { ActivatedRoute } from '@angular/router';
+import { AccountsService } from '@famoney-modules/accounts/services/accounts.service';
 
 @Component({
   selector: 'app-accounts',

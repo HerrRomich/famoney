@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 
-import { MatCalendarHeader } from '@angular/material';
+import { MatCalendarHeader } from '@angular/material/datepicker';
 
 @Component({
   selector: 'app-month-calendar-header',

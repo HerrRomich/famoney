@@ -10,12 +10,14 @@ import com.hrrm.famoney.infrastructure.jaxrs.dto.IdDTO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(name = "Movement", allOf = { MovementDataDTO.class })
+@Schema(name = "Movement", allOf = {
+        MovementDataDTO.class
+})
 @Value.Immutable
 @ImmutableDtoStyle
 public interface MovementDTO extends DTO, IdDTO, MovementDataDTO {
 
     @Schema(required = true)
-    public BigDecimal getSum();
+    BigDecimal getSum();
 
 }

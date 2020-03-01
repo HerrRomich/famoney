@@ -12,8 +12,7 @@ import com.hrrm.famoney.domain.accounts.Account_;
 import com.hrrm.famoney.domain.accounts.repository.AccountRepository;
 
 @Component(service = AccountRepository.class, scope = ServiceScope.SINGLETON)
-public class AccountRepositoryImpl extends AccountsDomainRepositoryImpl<Account>
-        implements AccountRepository {
+public class AccountRepositoryImpl extends AccountsDomainRepositoryImpl<Account> implements AccountRepository {
 
     @Override
     protected Class<Account> getEntityClass() {
@@ -28,8 +27,7 @@ public class AccountRepositoryImpl extends AccountsDomainRepositoryImpl<Account>
     private TypedQuery<String> getAllTagsQuery() {
         final var queryName = Account.class.getName()
             .concat("#findAllTags");
-        return getNamedQueryOrAddNew(queryName, String.class,
-                this::createAllTagsQuery);
+        return getNamedQueryOrAddNew(queryName, String.class, this::createAllTagsQuery);
     }
 
     private TypedQuery<String> createAllTagsQuery() {

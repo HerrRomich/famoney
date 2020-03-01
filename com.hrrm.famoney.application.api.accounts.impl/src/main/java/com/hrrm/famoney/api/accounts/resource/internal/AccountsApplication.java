@@ -13,12 +13,13 @@ import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsName;
 import com.hrrm.famoney.api.accounts.AccountsApiSpecification;
 import com.hrrm.famoney.infrastructure.jaxrs.ApiSpecification;
 
-@Component(service = { Application.class, ApiSpecification.class }, scope = ServiceScope.SINGLETON)
+@Component(service = {
+        Application.class,
+        ApiSpecification.class
+}, scope = ServiceScope.SINGLETON)
 @JaxrsName("com.hrrm.famoney.application.api.accounts")
-@JaxrsApplicationBase(AccountsApplication.API_PATH)
-@HttpWhiteboardContextSelect("("
-        + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME
-        + "=com.hrrm.famoney.api)")
+@JaxrsApplicationBase(AccountsApiSpecification.API_PATH)
+@HttpWhiteboardContextSelect("(" + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME + "=com.hrrm.famoney.api)")
 @JSONRequired
 public class AccountsApplication extends AccountsApiSpecification {
 

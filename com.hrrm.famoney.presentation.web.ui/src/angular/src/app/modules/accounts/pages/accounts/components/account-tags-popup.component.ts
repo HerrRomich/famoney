@@ -1,10 +1,11 @@
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { AccountsService } from '../accounts.service';
 import { Observable, combineLatest } from 'rxjs';
 import { FormControl } from '@angular/forms';
-import { MatChipInputEvent, MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material';
+import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { MatChipInputEvent } from '@angular/material/chips';
 import { map, startWith } from 'rxjs/operators';
+import { AccountsService } from '@famoney-modules/accounts/services/accounts.service';
 
 @Component({
   selector: 'app-account-tags-popup',

@@ -6,15 +6,10 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SimpleNotificationsModule } from 'angular2-notifications';
 import { AngularModule } from '@famoney-shared/angular.module';
-import {
-  MatToolbarModule,
-  MatIconModule,
-  MatButtonModule,
-  MAT_DATE_LOCALE,
-  MatNativeDateModule,
-  DateAdapter,
-  MAT_DATE_FORMATS
-} from '@angular/material';
+import { MatButtonModule } from '@angular/material/button';
+import { MAT_DATE_LOCALE, MatNativeDateModule, DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
+import { MatIconModule } from '@angular/material/icon';
+import { MatToolbarModule } from '@angular/material/toolbar';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
 

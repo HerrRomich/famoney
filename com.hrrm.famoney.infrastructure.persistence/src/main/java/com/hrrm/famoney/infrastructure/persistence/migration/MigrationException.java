@@ -1,17 +1,18 @@
 package com.hrrm.famoney.infrastructure.persistence.migration;
 
-public class MigrationException extends RuntimeException {
+public class MigrationException extends Exception {
 
-    public MigrationException(String message) {
+    public MigrationException(final String message) {
         super(message);
     }
 
-    public MigrationException(Throwable cause) {
+    public MigrationException(final Throwable cause) {
         super(cause);
     }
 
-    public MigrationException(String message, Throwable cause) {
-        super(message, cause);
+    public MigrationException(final String message, final Throwable cause) {
+        super(message,
+            cause);
     }
 
 }

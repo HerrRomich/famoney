@@ -10,5 +10,5 @@ public enum MovementOrder {
     @JsonProperty("movement")
     MOVEMENT_DATE, @JsonProperty("booking")
     BOOKING_DATE;
-    
+
 }

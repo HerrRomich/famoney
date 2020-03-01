@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MonthCalendarHeaderComponent } from './month-calendar-header.component';
-import { DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS, MatDatepicker } from '@angular/material';
+import { DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS } from '@angular/material/core';
+import { MatDatepicker } from '@angular/material/datepicker';
 import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
 
 export const MY_FORMATS = {

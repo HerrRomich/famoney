@@ -1,6 +1,6 @@
 import { Component, ViewEncapsulation, AfterViewInit, OnDestroy, ViewChild, ContentChildren, QueryList, ViewChildren } from '@angular/core';
 
-import { MatTabGroup } from '@angular/material';
+import { MatTabGroup } from '@angular/material/tabs';
 
 import { Subscription } from 'rxjs';
 

@@ -13,9 +13,12 @@ import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsName;
 import com.hrrm.famoney.application.api.datadirectory.DataDirectoryApiSpecification;
 import com.hrrm.famoney.infrastructure.jaxrs.ApiSpecification;
 
-@Component(service = { Application.class, ApiSpecification.class }, scope = ServiceScope.SINGLETON)
+@Component(service = {
+        Application.class,
+        ApiSpecification.class
+}, scope = ServiceScope.SINGLETON)
 @JaxrsName("com.hrrm.famoney.application.api.data-dictionary")
-@JaxrsApplicationBase(DataDirectoryApplication.API_PATH)
+@JaxrsApplicationBase(DataDirectoryApiSpecification.API_PATH)
 @HttpWhiteboardContextSelect("(" + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME + "=com.hrrm.famoney.api)")
 @JSONRequired
 public class DataDirectoryApplication extends DataDirectoryApiSpecification {

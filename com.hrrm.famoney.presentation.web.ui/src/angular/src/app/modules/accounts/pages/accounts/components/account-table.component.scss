@@ -8,16 +8,21 @@
   flex: 1 1 auto;
 }
 
+mat-list.movements-list {
+  padding-top: 0;
+}
+
 .account-entry:hover {
   background-color: mat-color($my-app-accent, 50);
   font-weight: 600;
 }
 
-.account-entry.sticky {
+.account-entry-header {
   position: sticky;
-  overflow: hidden;
+  font-weight: 700;
+  z-index: 1;
   top: 0;
-  widows: 100%;
+  background-color: rgba(#ffffff, 1);
 }
 
 div.positive-amount {
