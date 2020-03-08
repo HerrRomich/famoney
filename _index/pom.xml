@@ -87,7 +87,17 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>com.hrrm.famoney.domain.accounts.migrations</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>com.hrrm.famoney.domain.data-directory</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>com.hrrm.famoney.domain.data-directory.migrations</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

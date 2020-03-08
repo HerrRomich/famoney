@@ -8,7 +8,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>com.hrrm.famoney.domain.data-directory</artifactId>
-    
+
     <name>Data Dictionary Domain Model</name>
     <description>Domain model for all data dictionaries</description>
 
@@ -51,7 +51,7 @@
             <groupId>org.apache.aries.jpa.javax.persistence</groupId>
             <artifactId>javax.persistence_2.1</artifactId>
         </dependency>
-        
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -87,21 +87,16 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.bsc.maven</groupId>
-                <artifactId>maven-processor-plugin</artifactId>
+                <groupId>com.ethlo.persistence.tools</groupId>
+                <artifactId>eclipselink-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>process</id>
-                        <goals>
-                            <goal>process</goal>
-                        </goals>
                         <phase>generate-sources</phase>
+                        <goals>
+                            <goal>modelgen</goal>
+                        </goals>
                         <configuration>
-                            <compilerArguments>-Aeclipselink.persistencexml=${basedir}/src/main/resources/META-INF/persistence.xml</compilerArguments>
-                            <processors>
-                                <processor>org.eclipse.persistence.internal.jpa.modelgen.CanonicalModelProcessor</processor>
-                            </processors>
-                            <outputDirectory>${project.build.directory}/generated</outputDirectory>
+                            <generatedSourcesDirectory>${project.build.directory}/generated-sources/model</generatedSourcesDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -119,7 +114,7 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <source>${project.build.directory}/generated</source>
+                                <source>${project.build.directory}/generated-sources/model</source>
                             </sources>
                         </configuration>
                     </execution>

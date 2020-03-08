@@ -8,9 +8,7 @@ Export-Package: \
 -includeresource: \
     META-INF=src/main/resources/META-INF, \
     OSGI-INF=src/main/resources/OSGI-INF
-Private-Package: \
-	com.hrrm.famoney.domain.accounts.migration,\
-	com.hrrm.famoney.domain.accounts.repository.internal
+Private-Package: com.hrrm.famoney.domain.accounts.repository.internal
 	
 Meta-Persistence: META-INF/persistence.xml
 

@@ -25,6 +25,7 @@
         <org.apache.aries.tx-control.version>1.0.1</org.apache.aries.tx-control.version>
         <org.immutables.version>2.8.3</org.immutables.version>
         <org.mapstruct.version>1.3.1.Final</org.mapstruct.version>
+        <eclipselink-maven-plugin.version>2.7.5.1</eclipselink-maven-plugin.version>
         <junit.jupiter.version>5.5.2</junit.jupiter.version>
     </properties>
 
@@ -62,12 +63,27 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>com.hrrm.famoney.infrastructure.persistence.migrations</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>com.hrrm.famoney.domain.accounts</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>com.hrrm.famoney.domain.accounts.migrations</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>com.hrrm.famoney.domain.data-directory</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>com.hrrm.famoney.domain.data-directory.migrations</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -358,7 +374,7 @@
             <dependency>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-core</artifactId>
-                <version>6.0.8</version>
+                <version>6.3.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.servicemix.specs</groupId>
@@ -763,16 +779,9 @@
                     <version>1.6.0</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.bsc.maven</groupId>
-                    <artifactId>maven-processor-plugin</artifactId>
-                    <version>3.3.3</version>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.eclipse.persistence</groupId>
-                            <artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>
-                            <version>${eclipselink.version}</version>
-                        </dependency>
-                    </dependencies>
+                    <groupId>com.ethlo.persistence.tools</groupId>
+                    <artifactId>eclipselink-maven-plugin</artifactId>
+                    <version>${eclipselink-maven-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.eclipse.m2e</groupId>
@@ -862,6 +871,22 @@
                                         </execute>
                                     </action>
                                 </pluginExecution>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>com.ethlo.persistence.tools</groupId>
+                                        <artifactId>eclipselink-maven-plugin</artifactId>
+                                        <versionRange>[2.7,)</versionRange>
+                                        <goals>
+                                            <goal>process</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <execute>
+                                            <runOnIncremental>false</runOnIncremental>
+                                            <runOnConfiguration>false</runOnConfiguration>
+                                        </execute>
+                                    </action>
+                                </pluginExecution>
                             </pluginExecutions>
                         </lifecycleMappingMetadata>
                     </configuration>
@@ -896,5 +921,12 @@
         <module>com.hrrm.famoney.infrastructure.wrappers</module>
         <module>com.hrrm.famoney.application.api.data-directory</module>
         <module>com.hrrm.famoney.application.api.data-directory.impl</module>
+        <module>com.hrrm.famoney.domain.accounts.migrations</module>
+        <module>
+            com.hrrm.famoney.infrastructure.persistence.migrations
+        </module>
+        <module>
+            com.hrrm.famoney.domain.data-directory.migrations
+        </module>
     </modules>
 </project>

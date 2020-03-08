@@ -117,7 +117,6 @@
 	org.eclipse.persistence.asm;version='[6.2.0,6.2.1)',\
 	org.eclipse.persistence.core;version='[2.6.8,2.6.9)',\
 	org.eclipse.persistence.jpa;version='[2.6.8,2.6.9)',\
-	org.flywaydb.core;version='[6.0.8,6.0.9)',\
 	org.jsr-305;version='[3.0.2,3.0.3)',\
 	org.mariadb.jdbc;version='[2.2.6,2.2.7)',\
 	org.objectweb.asm.all.debug;version='[5.0.3,5.0.4)',\
@@ -133,4 +132,9 @@
 	slf4j.simple;version='[1.7.25,1.7.26)',\
 	tx-control-provider-jpa-xa;version='[1.0.1,1.0.2)',\
 	tx-control-service-xa;version='[1.0.1,1.0.2)',\
-	com.hrrm.famoney.application.service.accounts;version='[1.0.0,1.0.1)'
+	com.hrrm.famoney.application.service.accounts;version='[1.0.0,1.0.1)',\
+	com.hrrm.famoney.domain.accounts.migrations;version='[1.0.0,1.0.1)',\
+	com.hrrm.famoney.infrastructure.persistence.migrations;version='[1.0.0,1.0.1)',\
+	com.hrrm.famoney.infrastructure.wrappers;version='[1.0.0,1.0.1)',\
+	com.hrrm.famoney.domain.data-directory.migrations;version='[1.0.0,1.0.1)',\
+	org.flywaydb.core;version='[6.3.0,6.3.1)'
