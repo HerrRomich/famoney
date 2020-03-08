@@ -6,7 +6,9 @@ import com.hrrm.famoney.infrastructure.jaxrs.ImmutableDtoStyle;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(name = "ExpenseCategoryData", subTypes = { ExpenseCategoryDTO.class })
+@Schema(name = "ExpenseCategoryData", subTypes = {
+        ExpenseCategoryDTO.class
+}, allOf = EntryCategoryDataDTO.class)
 @Value.Immutable
 @ImmutableDtoStyle
 public interface ExpenseCategoryDataDTO extends EntryCategoryDataDTO {

@@ -1,9 +1,8 @@
 package com.hrrm.famoney.domain.accounts.movement;
 
+import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -20,8 +19,7 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 public class Entry extends Movement {
 
-    @ManyToOne
-    @JoinColumn(name = "entry_category_id")
-    private EntryCategory entryCategory;
+    @Column(name = "entry_category_id")
+    private Integer entryCategoryId;
 
 }

@@ -3,9 +3,9 @@
     xmlns="http://java.sun.com/xml/ns/persistence"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://java.sun.com/xml/ns/persistence">
-    <persistence-unit name="data-directory">
+    <persistence-unit name="famoney.data-directory">
     	<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-        <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=famoney-data-directory)
+        <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=famoney.data-directory)
         </non-jta-data-source>
         <exclude-unlisted-classes>false</exclude-unlisted-classes>
         <property name="eclipselink.logging.logger"

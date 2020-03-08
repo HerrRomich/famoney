@@ -1,6 +1,5 @@
 package com.hrrm.famoney.infrastructure.persistence.internal;
 
-import java.sql.SQLException;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -22,40 +21,39 @@ import org.osgi.service.transaction.control.jpa.JPAEntityManagerProviderFactory;
 @Component(name = "com.hrrm.famoney.infrastructure.persistence.EntityMnagerProvider")
 public class EntityMnagerProvider {
 
-    @Reference
-    private JPAEntityManagerProviderFactory jpaPproviderFactory;
-
-    @Reference(name = "data_source")
-    private XADataSource ds;
-
-    @Reference(name = "emfb")
-    private EntityManagerFactoryBuilder emfb;
-
-    @Reference
-    private TransactionControl txControl;
-
-    private ServiceRegistration<JPAEntityManagerProvider> entityManagerProviderRegistration;
+    private final JPAEntityManagerProviderFactory jpaPproviderFactory;
+    private final ServiceRegistration<JPAEntityManagerProvider> entityManagerProviderRegistration;
 
     @Activate
-    public void activate(BundleContext context, Map<String, Object> properties) throws SQLException {
-        Map<String, Object> jpaProperties = new HashMap<>();
-        jpaProperties.put("javax.persistence.dataSource", ds);
-        Map<String, Object> resourceProviderProperties = new HashMap<>();
-        resourceProviderProperties.put("osgi.connection.pooling.enabled", false);
-        final var entityManagerProvider = jpaPproviderFactory.getProviderFor(emfb, jpaProperties,
-            resourceProviderProperties);
-        Dictionary<String, String> props = new Hashtable<>();
+    public EntityMnagerProvider(final BundleContext context, final Map<String, Object> properties,
+            @Reference final JPAEntityManagerProviderFactory jpaPproviderFactory, @Reference(
+                    name = "data_source") final XADataSource ds, @Reference(
+                            name = "emfb") final EntityManagerFactoryBuilder emfb,
+            @Reference final TransactionControl txControl) {
+        this.jpaPproviderFactory = jpaPproviderFactory;
+        final Map<String, Object> jpaProperties = new HashMap<>();
+        jpaProperties.put("javax.persistence.dataSource",
+                ds);
+        final Map<String, Object> resourceProviderProperties = new HashMap<>();
+        resourceProviderProperties.put("osgi.connection.pooling.enabled",
+                false);
+        final var entityManagerProvider = jpaPproviderFactory.getProviderFor(emfb,
+                jpaProperties,
+                resourceProviderProperties);
+        final Dictionary<String, String> props = new Hashtable<>();
         final var name = properties.get("name")
             .toString();
         if (name != null) {
-            props.put("name", name);
+            props.put("name",
+                    name);
         }
         entityManagerProviderRegistration = context.registerService(JPAEntityManagerProvider.class,
-            entityManagerProvider, props);
+                entityManagerProvider,
+                props);
     }
 
     @Deactivate
-    public void deactivate(BundleContext context) {
+    public void deactivate(final BundleContext context) {
         final var entityManagerProvider = context.getService(entityManagerProviderRegistration.getReference());
         jpaPproviderFactory.releaseProvider(entityManagerProvider);
         entityManagerProviderRegistration.unregister();
