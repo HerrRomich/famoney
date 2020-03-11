@@ -1,7 +1,0 @@
-"prettier": {
-  "singleQuote": true,
-  "printWidth": 140,
-  "semi": true,
-  "bracketSpacing": true,
-  "arrowParens": "always"
-}

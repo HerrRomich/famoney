@@ -9,9 +9,16 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.hrrm.famoney.infrastructure.jaxrs.dto.IdDTO;
 
 import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(name = "EntryCategory")
+@Schema(name = "EntryCategory", subTypes = {
+        ExpenseCategoryDTO.class,
+        IncomeCategoryDTO.class
+}, discriminatorProperty = "type", discriminatorMapping = {
+        @DiscriminatorMapping(schema = ExpenseCategoryDTO.class, value = "expense"),
+        @DiscriminatorMapping(schema = IncomeCategoryDTO.class, value = "income")
+})
 @JsonTypeInfo(property = "type", use = Id.NAME)
 @JsonSubTypes({
         @Type(name = "expense", value = ExpenseCategoryDTO.class),

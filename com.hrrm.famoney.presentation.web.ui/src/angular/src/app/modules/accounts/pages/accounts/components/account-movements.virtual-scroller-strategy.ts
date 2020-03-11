@@ -16,17 +16,14 @@ export class AccountMovementsViertualScrollStrategy extends FixedSizeVirtualScro
     this.accountSwitched = new Subject();
     this.dataLengeChangedProcessorSubscription = zip(this.dataChanged, this.accountSwitched)
       .pipe(
-        tap(([, movementCount]) => {
-          this.viewport.scrollToIndex(0);
-          console.log(movementCount);
-        }),
+        tap(() => this.viewport.scrollToIndex(0)),
         mergeMap(() =>
           timer(0, 50).pipe(
             skipWhile(() => this.viewport.getRenderedRange().start !== 0),
             tap(() => this.viewport.scrollToIndex(this.viewport.getDataLength())),
-            takeWhile(() => this.viewport.getRenderedRange().end !== this.viewport.getDataLength())
-          )
-        )
+            takeWhile(() => this.viewport.getRenderedRange().end !== this.viewport.getDataLength()),
+          ),
+        ),
       )
       .subscribe();
   }

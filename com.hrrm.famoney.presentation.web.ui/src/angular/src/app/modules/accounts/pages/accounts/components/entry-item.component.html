@@ -5,7 +5,7 @@
       <input matInput required placeholder="Категория" [matAutocomplete]="categoryAutocomplete" />
       <mat-autocomplete #categoryAutocomplete>
           <mat-option
-            *ngFor="let category of entryCategories"
+            *ngFor="let category of entryCategoriesService.entryCategories$ | async"
             [value]="category"
             class="container-configuration-auto-complete-padding"
           >{{category}}

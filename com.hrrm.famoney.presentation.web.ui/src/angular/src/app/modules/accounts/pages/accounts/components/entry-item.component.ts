@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
+import { EntryCategoryService } from '@famoney-shared/services/entry-category.service';
 
 @Component({
   selector: 'app-entry-item',
   templateUrl: 'entry-item.component.html',
-  styleUrls: ['entry-item.component.scss']
+  styleUrls: ['entry-item.component.scss'],
 })
 export class EntryItemComponent {
-  entryCategories = ['Категория1', 'Категория2'];
+  constructor(public entryCategoriesService: EntryCategoryService) {}
 }

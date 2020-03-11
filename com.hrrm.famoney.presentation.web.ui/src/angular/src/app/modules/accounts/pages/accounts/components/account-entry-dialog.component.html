@@ -123,8 +123,10 @@
   <app-entry-item *ngIf="extendedCategoryToggleGroup.value !== 'extended-category'"></app-entry-item>
   <mat-button-toggle-group #extendedCategoryToggleGroup="matButtonToggleGroup">
     <mat-button-toggle value="extended-category" class="thin-toggle-button">
-      <mat-icon>{{extendedCategoryToggleGroup.value == 'extended-category' ? 'keyboard_arrow_up' :
-        'keyboard_arrow_down'}}</mat-icon>
+      <mat-icon
+        >{{extendedCategoryToggleGroup.value == 'extended-category' ? 'keyboard_arrow_up' :
+        'keyboard_arrow_down'}}</mat-icon
+      >
     </mat-button-toggle>
   </mat-button-toggle-group>
 </div>

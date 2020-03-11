@@ -1,10 +1,15 @@
 import { DataSource, CollectionViewer, ListRange } from '@angular/cdk/collections';
 import { MovementDto, AccountsApiService, AccountDto } from '@famoney-apis/accounts';
-import { Observable, concat, of, iif } from 'rxjs';
-import { tap, switchMap, map, mergeMap } from 'rxjs/operators';
+import { Observable, concat, of } from 'rxjs';
+import { tap, switchMap, map, mergeMap, finalize, startWith } from 'rxjs/operators';
+import { MultiRange, multirange } from 'multi-integer-range';
+
+const PAGE_SIZE = 150;
+const PAGE_BUFFER = 50;
 
 export class MovementDataSource extends DataSource<MovementDto> {
   private _data: MovementDto[];
+  private _dataPages: MultiRange;
 
   constructor(private accountsApiService: AccountsApiService, private account$: Observable<AccountDto>) {
     super();
@@ -14,39 +19,35 @@ export class MovementDataSource extends DataSource<MovementDto> {
     return this.account$.pipe(
       tap(account => {
         this._data = new Array<MovementDto>(account.movementCount);
+        this._dataPages = multirange();
       }),
       switchMap(account =>
-        concat(of({ start: 0, end: 0 } as ListRange), collectionViewer.viewChange).pipe(
-          map(range => [account, range] as [AccountDto, ListRange])
-        )
-      ),
-      map(([account, range]) => {
-        let start = range.end;
-        for (let index = range.start; index < range.end; index++) {
-          if (!this._data[index]) {
-            start = index;
-            break;
-          }
-        }
-        let end = start;
-        for (let index = range.end - 1; index >= start; index--) {
-          if (!this._data[index]) {
-            end = index + 1;
-            break;
-          }
-        }
-        return [account, { start: start, end: end }] as [AccountDto, ListRange];
-      }),
-      mergeMap(([account, range]) =>
-        iif(
-          () => range.end > range.start,
-          this.accountsApiService.getMovements(account.id, range.start, range.end - range.start).pipe(
-            map(movements => {
-              this._data.splice(range.start, movements.length, ...movements);
-              return this._data;
-            })
-          ),
-          of(this._data)
+        collectionViewer.viewChange.pipe(
+          map(range => {
+            const pageStart = Math.floor((range.start - PAGE_BUFFER) / PAGE_SIZE);
+            const pageEnd = Math.floor((range.end + PAGE_BUFFER) / PAGE_SIZE);
+            return multirange([[pageStart, pageEnd]])
+              .intersect([[0, Math.floor(this._data.length / PAGE_SIZE)]])
+              .subtract(this._dataPages);
+          }),
+          mergeMap(requieredPages => {
+            if (requieredPages.length() > 0) {
+              const min = requieredPages.min();
+              const max = requieredPages.max();
+              const rangeStart = min * PAGE_SIZE;
+              const rangeEnd = (max + 1) * PAGE_SIZE;
+              return this.accountsApiService.getMovements(account.id, rangeStart, rangeEnd - rangeStart).pipe(
+                map(movements => {
+                  this._data.splice(rangeStart, movements.length, ...movements);
+                  this._dataPages = this._dataPages.append([[min, max]]);
+                  return this._data;
+                })
+              );
+            } else {
+              return of(this._data);
+            }
+          }, 3),
+          startWith(this._data)
         )
       )
     );
@@ -54,4 +55,3 @@ export class MovementDataSource extends DataSource<MovementDto> {
 
   disconnect(collectionViewer: CollectionViewer): void {}
 }
-

@@ -8,21 +8,19 @@ import { MovementDto } from '@famoney-apis/accounts';
 @Component({
   selector: 'app-account-entry-dialog',
   templateUrl: 'account-entry-dialog.component.html',
-  styleUrls: ['account-entry-dialog.component.scss']
+  styleUrls: ['account-entry-dialog.component.scss'],
 })
 export class AccountEntryDialogComponent implements OnInit {
   entry: FormGroup;
 
-  entryCategories: any;
-
   constructor(
     @Optional() @Inject(MAT_DATE_LOCALE) private dateLocale: string,
-    @Inject(MAT_DIALOG_DATA) accountEntry: MovementDto
+    @Inject(MAT_DIALOG_DATA) accountEntry: MovementDto,
   ) {
     this.entry = new FormGroup({
       entryDate: new FormControl(accountEntry.date),
       bookingDate: new FormControl(),
-      budgetMonth: new FormControl()
+      budgetMonth: new FormControl(),
     });
   }
 

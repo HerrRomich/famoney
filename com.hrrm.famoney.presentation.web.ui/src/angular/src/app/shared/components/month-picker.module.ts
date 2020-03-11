@@ -7,7 +7,6 @@ import { MonthPickerComponent } from './month-picker/month-picker.component';
 import { MonthCalendarHeaderComponent } from './month-picker/month-calendar-header.component';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { TextMaskModule } from 'angular2-text-mask';
 import { MonthpickerInputDirective } from './month-picker/month-picker-input.directive';
 
 @NgModule({
@@ -20,7 +19,6 @@ import { MonthpickerInputDirective } from './month-picker/month-picker-input.dir
     MatButtonModule,
     FlexLayoutModule,
     FormsModule,
-    TextMaskModule,
     ReactiveFormsModule
   ],
   exports: [

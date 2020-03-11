@@ -1,14 +1,14 @@
 import { NgModule } from '@angular/core';
 import { AccountsComponent } from './pages/accounts/accounts.component';
 import { AccountsRoutingModule } from './accounts-routing.module';
-import { AngularModule } from '@famoney-shared/angular.module';
+import { AngularModule } from '@famoney-shared/modules/angular.module';
 import { AccountTableComponent } from './pages/accounts/components/account-table.component';
 import { AccountsService } from './/services/accounts.service';
 import { AccountTagsPopupComponent } from './pages/accounts/components/account-tags-popup.component';
 import { RouterTabModule } from 'src/app/shared/router-tab/router-tab.module';
 import { AccountEntryDialogComponent } from './pages/accounts/components/account-entry-dialog.component';
 import { AccountsGuard } from './services/accounts.guard';
-import { AccountsApiModule } from '@famoney-apis/accounts-api.module';
+import { ApisModule } from '@famoney-shared/modules/apis.module';
 import { OverlayModule } from '@angular/cdk/overlay';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatBadgeModule } from '@angular/material/badge';
@@ -26,7 +26,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { EcoFabSpeedDialModule } from '@ecodev/fab-speed-dial';
 import { DomSanitizer } from '@angular/platform-browser';
 import { FlexLayoutModule } from '@angular/flex-layout';
-import { MonthPickerModule } from '@famoney-components/month-picker.module';
+import { MonthPickerModule } from '@famoney-shared/components/month-picker.module';
 import { EntryItemComponent } from './pages/accounts/components/entry-item.component';
 
 @NgModule({
@@ -35,7 +35,7 @@ import { EntryItemComponent } from './pages/accounts/components/entry-item.compo
     AccountTableComponent,
     AccountTagsPopupComponent,
     AccountEntryDialogComponent,
-    EntryItemComponent
+    EntryItemComponent,
   ],
   entryComponents: [AccountTagsPopupComponent, AccountEntryDialogComponent, EntryItemComponent],
   providers: [AccountsService, AccountsGuard],
@@ -58,16 +58,16 @@ import { EntryItemComponent } from './pages/accounts/components/entry-item.compo
     OverlayModule,
     FlexLayoutModule,
     RouterTabModule,
-    AccountsApiModule,
-    MonthPickerModule
+    ApisModule,
+    MonthPickerModule,
   ],
-  exports: [AccountsRoutingModule]
+  exports: [AccountsRoutingModule],
 })
 export class AccountsModule {
   constructor(private matIconRegistry: MatIconRegistry, private domSanitzer: DomSanitizer) {
     this.matIconRegistry.addSvgIcon(
       'menu-down',
-      this.domSanitzer.bypassSecurityTrustResourceUrl('assets/menu-down.svg')
+      this.domSanitzer.bypassSecurityTrustResourceUrl('assets/menu-down.svg'),
     );
   }
 }
