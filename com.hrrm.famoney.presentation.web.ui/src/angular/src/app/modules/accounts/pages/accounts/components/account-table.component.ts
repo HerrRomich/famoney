@@ -1,9 +1,8 @@
 import { Component, OnInit, ViewChild, OnDestroy, Inject } from '@angular/core';
-import { Observable, Subscription, iif, of, concat } from 'rxjs';
-import { MovementDto, AccountsApiService, AccountDto } from '@famoney-apis/accounts';
-import { CollectionViewer, DataSource, ListRange } from '@angular/cdk/collections';
+import { Subscription } from 'rxjs';
+import { MovementDto, AccountsApiService } from '@famoney-apis/accounts';
 import { ActivatedRoute } from '@angular/router';
-import { map, switchMap, tap, mergeMap, take } from 'rxjs/operators';
+import { map, switchMap, tap, take } from 'rxjs/operators';
 import { CdkVirtualScrollViewport, VIRTUAL_SCROLL_STRATEGY } from '@angular/cdk/scrolling';
 import { EcoFabSpeedDialActionsComponent, EcoFabSpeedDialComponent } from '@ecodev/fab-speed-dial';
 import { interval } from 'rxjs';

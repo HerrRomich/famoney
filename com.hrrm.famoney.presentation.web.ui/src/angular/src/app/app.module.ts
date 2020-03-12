@@ -12,6 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
+import { ApisModule } from '@famoney-shared/modules/apis.module';
 
 export const MY_FORMATS = {
   parse: {
@@ -38,6 +39,7 @@ export const MY_FORMATS = {
     MatNativeDateModule,
     FlexLayoutModule,
     SimpleNotificationsModule.forRoot(),
+    ApisModule
   ],
   providers: [
     { provide: MAT_DATE_LOCALE, useValue: 'ru-RU' },

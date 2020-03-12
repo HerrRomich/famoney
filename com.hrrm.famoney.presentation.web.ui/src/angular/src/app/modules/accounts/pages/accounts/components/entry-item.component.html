@@ -4,12 +4,24 @@
       <mat-label>Категория</mat-label>
       <input matInput required placeholder="Категория" [matAutocomplete]="categoryAutocomplete" />
       <mat-autocomplete #categoryAutocomplete>
-          <mat-option
-            *ngFor="let category of entryCategoriesService.entryCategories$ | async"
-            [value]="category"
-            class="container-configuration-auto-complete-padding"
-          >{{category}}
-          </mat-option>
+        <ng-container *ngIf="entryCategoriesService.entryCategories$ | async as entryCategories">
+          <mat-optgroup label="Доходы">
+            <mat-option
+              *ngFor="let category of entryCategories.incomes"
+              [value]="category.name"
+              class="container-configuration-auto-complete-padding"
+              >{{ category.name }}
+            </mat-option>
+          </mat-optgroup>
+          <mat-optgroup label="Расходы">
+            <mat-option
+              *ngFor="let category of entryCategories.expenses"
+              [value]="category.name"
+              class="container-configuration-auto-complete-padding"
+              >{{ category.name }}
+            </mat-option>
+          </mat-optgroup>
+        </ng-container>
       </mat-autocomplete>
     </mat-form-field>
     <mat-form-field fxFlex="20" floatLabel="always">

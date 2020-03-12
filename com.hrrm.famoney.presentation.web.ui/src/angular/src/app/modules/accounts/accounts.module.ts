@@ -58,7 +58,6 @@ import { EntryItemComponent } from './pages/accounts/components/entry-item.compo
     OverlayModule,
     FlexLayoutModule,
     RouterTabModule,
-    ApisModule,
     MonthPickerModule,
   ],
   exports: [AccountsRoutingModule],
