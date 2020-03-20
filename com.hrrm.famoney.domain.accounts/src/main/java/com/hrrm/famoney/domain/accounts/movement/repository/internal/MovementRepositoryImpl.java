@@ -8,8 +8,14 @@ import javax.persistence.TypedQuery;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.validation.constraints.NotNull;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
+import org.osgi.service.log.Logger;
+import org.osgi.service.log.LoggerFactory;
+import org.osgi.service.transaction.control.TransactionControl;
+import org.osgi.service.transaction.control.jpa.JPAEntityManagerProvider;
 
 import com.hrrm.famoney.domain.accounts.AccountsDomainEntity_;
 import com.hrrm.famoney.domain.accounts.movement.Movement;
@@ -33,6 +39,18 @@ public class MovementRepositoryImpl extends AccountsDomainRepositoryImpl<Movemen
     private static final String ACCOUNT_ID_PARAMETER_NAME = "accountId";
     private static final String DATE_FROM_PARAMETER_NAME = "dateFrom";
     private static final String DATE_TO_PARAMETER_NAME = "dateTo";
+
+    private Logger logger;
+
+    @Activate
+    public MovementRepositoryImpl(@Reference LoggerFactory loggerFactory, @Reference TransactionControl txControl,
+            @Reference(target = "(name=accounts)") JPAEntityManagerProvider entityManagerProvider) {
+        super(loggerFactory,
+            txControl,
+            entityManagerProvider);
+        this.logger = loggerFactory.getLogger(MovementRepositoryImpl.class,
+                Logger.class);
+    }
 
     @Override
     protected Class<Movement> getEntityClass() {

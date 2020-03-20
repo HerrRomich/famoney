@@ -3,6 +3,7 @@ package com.hrrm.famoney.application.api.datadirectory.dto;
 import org.immutables.value.Value;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.hrrm.famoney.application.api.datadirectory.dto.impl.ExpenseCategoryDTOImpl;
 import com.hrrm.famoney.infrastructure.jaxrs.ImmutableDtoStyle;
 import com.hrrm.famoney.infrastructure.jaxrs.dto.IdDTO;
 
@@ -15,5 +16,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Value.Immutable
 @ImmutableDtoStyle
 public interface ExpenseCategoryDTO extends IdDTO, ExpenseCategoryDataDTO, EntryCategoryDTO<ExpenseCategoryDTO> {
+
+    class Builder extends ExpenseCategoryDTOImpl.Builder implements EntryCategoryDTOBuilder<ExpenseCategoryDTO> {
+    }
 
 }

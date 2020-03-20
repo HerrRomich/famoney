@@ -5,19 +5,28 @@ import java.util.List;
 import javax.persistence.TypedQuery;
 import javax.persistence.metamodel.SingularAttribute;
 
+import org.osgi.service.log.LoggerFactory;
+import org.osgi.service.transaction.control.TransactionControl;
+import org.osgi.service.transaction.control.jpa.JPAEntityManagerProvider;
+
 import com.hrrm.famoney.domain.datadirectory.EntryCategory;
 import com.hrrm.famoney.domain.datadirectory.repository.EntryCategoryRepository;
 
 public abstract class EntryCategoryRepositoryImpl<T extends EntryCategory<T>> extends DataDirectoryRepositoryImpl<T>
         implements EntryCategoryRepository<T> {
 
+    public EntryCategoryRepositoryImpl(LoggerFactory loggerFactory, TransactionControl txControl,
+            JPAEntityManagerProvider entityManagerProvider) {
+        super(loggerFactory,
+            txControl,
+            entityManagerProvider);
+    }
+
     @Override
     public List<T> getTopLevelCategories() {
-        return getTxControl().required(() -> {
-            return getNamedQueryOrAddNew(getTopLevelCategoriesStatementName(),
-                    getEntityClass(),
-                    this::createTopLevelCategoriesQuery).getResultList();
-        });
+        return getTxControl().required(getNamedQueryOrAddNew(getTopLevelCategoriesStatementName(),
+                getEntityClass(),
+                this::createTopLevelCategoriesQuery)::getResultList);
     }
 
     protected abstract String getTopLevelCategoriesStatementName();

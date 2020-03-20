@@ -9,27 +9,38 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaQuery;
 
-import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.log.Logger;
 import org.osgi.service.log.LoggerFactory;
 import org.osgi.service.transaction.control.ScopedWorkException;
 import org.osgi.service.transaction.control.TransactionControl;
+import org.osgi.service.transaction.control.jpa.JPAEntityManagerProvider;
 
 public abstract class JpaRepositoryImpl<T extends DomainEntity<P>, P extends Serializable> implements
         JpaRepository<T, P> {
 
-    @Reference(service = LoggerFactory.class)
-    protected Logger logger;
+    private Logger logger;
 
-    @Reference
-    protected TransactionControl txControl;
+    private TransactionControl txControl;
+
+    private EntityManager entityManager;
+
+    protected final EntityManager getEntityManager() {
+        return entityManager;
+    }
 
     protected abstract Class<T> getEntityClass();
 
-    protected abstract EntityManager getEntityManager();
-
     protected final TransactionControl getTxControl() {
         return txControl;
+    }
+
+    public JpaRepositoryImpl(LoggerFactory loggerFactory, TransactionControl txControl,
+            JPAEntityManagerProvider entityManagerProvider) {
+        super();
+        this.logger = loggerFactory.getLogger(JpaRepositoryImpl.class,
+                Logger.class);
+        this.txControl = txControl;
+        entityManager = entityManagerProvider.getResource(getTxControl());
     }
 
     @Override
@@ -55,7 +66,6 @@ public abstract class JpaRepositoryImpl<T extends DomainEntity<P>, P extends Ser
     }
 
     private TypedQuery<T> getFindAllQuery() {
-        final var entityManager = getEntityManager();
         final var entityClass = getEntityClass();
         final var queryName = entityClass.getName()
             .concat("#findAll");
@@ -69,7 +79,6 @@ public abstract class JpaRepositoryImpl<T extends DomainEntity<P>, P extends Ser
 
     protected final <S> TypedQuery<S> getNamedQueryOrAddNew(final String queryName, final Class<S> resultClass,
             final Supplier<TypedQuery<S>> querySupplier) {
-        final var entityManager = getEntityManager();
         logger.debug("Trying to find a registered named query: {}",
                 queryName);
         try {

@@ -1,6 +1,8 @@
 package com.hrrm.famoney.api.datadirectory.resource.internal;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.osgi.service.component.annotations.Activate;
@@ -13,15 +15,15 @@ import org.osgi.service.log.Logger;
 import org.osgi.service.log.LoggerFactory;
 
 import com.hrrm.famoney.application.api.datadirectory.dto.EntryCategoriesDTO;
+import com.hrrm.famoney.application.api.datadirectory.dto.EntryCategoryDTO;
+import com.hrrm.famoney.application.api.datadirectory.dto.EntryCategoryDTOBuilder;
 import com.hrrm.famoney.application.api.datadirectory.dto.EntryCategoryDataDTO;
 import com.hrrm.famoney.application.api.datadirectory.dto.ExpenseCategoryDTO;
 import com.hrrm.famoney.application.api.datadirectory.dto.IncomeCategoryDTO;
 import com.hrrm.famoney.application.api.datadirectory.dto.impl.EntryCategoriesDTOImpl;
-import com.hrrm.famoney.application.api.datadirectory.dto.impl.ExpenseCategoryDTOImpl;
-import com.hrrm.famoney.application.api.datadirectory.dto.impl.IncomeCategoryDTOImpl;
 import com.hrrm.famoney.application.api.datadirectory.resources.EntryCategoriesApi;
+import com.hrrm.famoney.domain.datadirectory.EntryCategory;
 import com.hrrm.famoney.domain.datadirectory.ExpenseCategory;
-import com.hrrm.famoney.domain.datadirectory.IncomeCategory;
 import com.hrrm.famoney.domain.datadirectory.repository.ExpenseCategoryRepository;
 import com.hrrm.famoney.domain.datadirectory.repository.IncomeCategoryRepository;
 
@@ -49,42 +51,26 @@ public class EntryCategoriesApiImpl implements EntryCategoriesApi {
 
     @Override
     public EntryCategoriesDTO getEntryCategories() {
-        final List<ExpenseCategoryDTO> expenses = expenseCategoryRepository.getTopLevelCategories()
-            .stream()
-            .map(this::mapExpenseCategoryToDTO)
-            .collect(Collectors.toList());
-        final List<IncomeCategoryDTO> incomes = incomeCategoryRepository.getTopLevelCategories()
-            .stream()
-            .map(this::mapIncomeCategoryToDTO)
-            .collect(Collectors.toList());
         return EntryCategoriesDTOImpl.builder()
-            .expenses(expenses)
-            .incomes(incomes)
+            .expenses(this.<ExpenseCategory, ExpenseCategoryDTO>mapEntryCategoriesToDTO(expenseCategoryRepository
+                .getTopLevelCategories(),
+                    ExpenseCategoryDTO.Builder::new))
+            .incomes(mapEntryCategoriesToDTO(incomeCategoryRepository.getTopLevelCategories(),
+                    IncomeCategoryDTO.Builder::new))
             .build();
     }
 
-    private ExpenseCategoryDTO mapExpenseCategoryToDTO(final ExpenseCategory expenseCategory) {
-        return ExpenseCategoryDTOImpl.builder()
-            .id(expenseCategory.getId())
-            .name(expenseCategory.getName())
-            .addAllChildren(expenseCategory.getChildren()
-                .stream()
-                .map(this::mapExpenseCategoryToDTO)
-                .collect(Collectors.toList()))
-            .build();
-
-    }
-
-    private IncomeCategoryDTO mapIncomeCategoryToDTO(final IncomeCategory incomeCategory) {
-        return IncomeCategoryDTOImpl.builder()
-            .id(incomeCategory.getId())
-            .name(incomeCategory.getName())
-            .addAllChildren(incomeCategory.getChildren()
-                .stream()
-                .map(this::mapIncomeCategoryToDTO)
-                .collect(Collectors.toList()))
-            .build();
-
+    private <T extends EntryCategory<T>, P extends EntryCategoryDTO<P>> Iterable<P> mapEntryCategoriesToDTO(
+            final List<T> entryCategories, Supplier<? extends EntryCategoryDTOBuilder<P>> entityDTOBuilderSupplier) {
+        return entryCategories.stream()
+            .map(entryCategory -> entityDTOBuilderSupplier.get()
+                .id(entryCategory.getId())
+                .name(entryCategory.getName())
+                .addAllChildren(mapEntryCategoriesToDTO(entryCategory.getChildren(),
+                        entityDTOBuilderSupplier))
+                .build())
+            .sorted(Comparator.comparing(P::getName))
+            .collect(Collectors.toList());
     }
 
     @Override

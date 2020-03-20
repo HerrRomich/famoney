@@ -11,8 +11,13 @@ import javax.persistence.criteria.Path;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.validation.constraints.NotNull;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
+import org.osgi.service.log.LoggerFactory;
+import org.osgi.service.transaction.control.TransactionControl;
+import org.osgi.service.transaction.control.jpa.JPAEntityManagerProvider;
 
 import com.hrrm.famoney.domain.accounts.Account;
 import com.hrrm.famoney.domain.accounts.AccountsDomainEntity_;
@@ -22,13 +27,12 @@ import com.hrrm.famoney.domain.accounts.movement.repository.MovementSliceReposit
 import com.hrrm.famoney.domain.accounts.repository.internal.AccountsDomainRepositoryImpl;
 
 @Component(service = MovementSliceRepository.class, scope = ServiceScope.SINGLETON)
-public class MovementSliceRepositoryImpl extends AccountsDomainRepositoryImpl<MovementSlice>
-        implements MovementSliceRepository {
+public class MovementSliceRepositoryImpl extends AccountsDomainRepositoryImpl<MovementSlice> implements
+        MovementSliceRepository {
 
     private static final String GET_ALL_BY_ACCOUNT_ID_QUERY_NAME = MovementSlice.class.getName()
         .concat("#getAllByAccountId");
-    private static final String FIND_FIRST_BY_ACCOUNT_ID_AFTER_DATE_QUERY_NAME = MovementSlice.class
-        .getName()
+    private static final String FIND_FIRST_BY_ACCOUNT_ID_AFTER_DATE_QUERY_NAME = MovementSlice.class.getName()
         .concat("#findFirstByAccountIdAfterDate");
     private static final String FIND_LAST_BY_ACCOUNT_ID_BEFORE_OFFSET_BY_MOVEMENT_COUNT_QUERY_NAME = MovementSlice.class
         .getName()
@@ -41,12 +45,22 @@ public class MovementSliceRepositoryImpl extends AccountsDomainRepositoryImpl<Mo
     private static final String FROM_DATE_PARAMETER_NAME = "fromDate";
     private static final String COUNT_PARAMETER_NAME = "count";
 
+    @Activate
+    public MovementSliceRepositoryImpl(@Reference LoggerFactory loggerFactory, @Reference TransactionControl txControl,
+            @Reference(target = "(name=accounts)") JPAEntityManagerProvider entityManagerProvider) {
+        super(loggerFactory,
+            txControl,
+            entityManagerProvider);
+    }
+
     @Override
     public List<MovementSlice> getMovementSlicesByAccountId(@NotNull Integer accountId) {
         return getTxControl().required(() -> {
             var allByAccountIdQuery = getNamedQueryOrAddNew(GET_ALL_BY_ACCOUNT_ID_QUERY_NAME,
-                    MovementSlice.class, this::createGetAllByAccountIdQuery);
-            return allByAccountIdQuery.setParameter(ACCOUNT_ID_PARAMETER_NAME, accountId)
+                    MovementSlice.class,
+                    this::createGetAllByAccountIdQuery);
+            return allByAccountIdQuery.setParameter(ACCOUNT_ID_PARAMETER_NAME,
+                    accountId)
                 .getResultList();
         });
     }
@@ -55,9 +69,11 @@ public class MovementSliceRepositoryImpl extends AccountsDomainRepositoryImpl<Mo
         final var cb = getEntityManager().getCriteriaBuilder();
         final var criteriaQuery = cb.createQuery(MovementSlice.class);
         final var root = criteriaQuery.from(MovementSlice.class);
-        final var accountIdParameter = cb.parameter(Integer.class, ACCOUNT_ID_PARAMETER_NAME);
+        final var accountIdParameter = cb.parameter(Integer.class,
+                ACCOUNT_ID_PARAMETER_NAME);
         criteriaQuery.where(cb.equal(root.get(MovementSlice_.account)
-            .get(AccountsDomainEntity_.id), accountIdParameter));
+            .get(AccountsDomainEntity_.id),
+                accountIdParameter));
         return getEntityManager().createQuery(criteriaQuery);
     }
 
@@ -72,9 +88,12 @@ public class MovementSliceRepositoryImpl extends AccountsDomainRepositoryImpl<Mo
         return getTxControl().required(() -> {
             try {
                 var query = getNamedQueryOrAddNew(FIND_FIRST_BY_ACCOUNT_ID_AFTER_DATE_QUERY_NAME,
-                        MovementSlice.class, this::createFirstByAccountIdQuery);
-                return Optional.of(query.setParameter(ACCOUNT_ID_PARAMETER_NAME, accountId)
-                    .setParameter(FROM_DATE_PARAMETER_NAME, dateFrom)
+                        MovementSlice.class,
+                        this::createFirstByAccountIdQuery);
+                return Optional.of(query.setParameter(ACCOUNT_ID_PARAMETER_NAME,
+                        accountId)
+                    .setParameter(FROM_DATE_PARAMETER_NAME,
+                            dateFrom)
                     .getSingleResult());
             } catch (NoResultException e) {
                 return Optional.empty();
@@ -86,28 +105,33 @@ public class MovementSliceRepositoryImpl extends AccountsDomainRepositoryImpl<Mo
         final var cb = getEntityManager().getCriteriaBuilder();
         final var criteriaQuery = cb.createQuery(MovementSlice.class);
         final var root = criteriaQuery.from(MovementSlice.class);
-        final var accountIdParameter = cb.parameter(Integer.class, ACCOUNT_ID_PARAMETER_NAME);
-        final var fromDateParameter = cb.parameter(LocalDate.class, FROM_DATE_PARAMETER_NAME);
+        final var accountIdParameter = cb.parameter(Integer.class,
+                ACCOUNT_ID_PARAMETER_NAME);
+        final var fromDateParameter = cb.parameter(LocalDate.class,
+                FROM_DATE_PARAMETER_NAME);
         Path<Account> accountPath = root.get(MovementSlice_.account);
         Path<Integer> accountIdPath = accountPath.get(AccountsDomainEntity_.id);
         Path<LocalDate> accountSliceDatePath = root.get(MovementSlice_.date);
-        criteriaQuery.where(cb.and(cb.equal(accountIdPath, accountIdParameter), cb.greaterThan(
-                accountSliceDatePath, fromDateParameter)));
+        criteriaQuery.where(cb.and(cb.equal(accountIdPath,
+                accountIdParameter),
+                cb.greaterThan(accountSliceDatePath,
+                        fromDateParameter)));
         return getEntityManager().createQuery(criteriaQuery)
             .setMaxResults(1);
     }
 
     @Override
-    public Optional<MovementSlice> findLastByAccountBeforeOffsetByMovementDate(
-            @NotNull Integer accountId, @NotNull Integer offset) {
+    public Optional<MovementSlice> findLastByAccountBeforeOffsetByMovementDate(@NotNull Integer accountId,
+            @NotNull Integer offset) {
         return getTxControl().required(() -> {
             try {
-                var query = getNamedQueryOrAddNew(
-                        FIND_LAST_BY_ACCOUNT_ID_BEFORE_OFFSET_BY_MOVEMENT_COUNT_QUERY_NAME,
+                var query = getNamedQueryOrAddNew(FIND_LAST_BY_ACCOUNT_ID_BEFORE_OFFSET_BY_MOVEMENT_COUNT_QUERY_NAME,
                         MovementSlice.class,
                         this::createFindLastByAccountBeforeOffsetByMovementCountQuery);
-                return Optional.of(query.setParameter(ACCOUNT_ID_PARAMETER_NAME, accountId)
-                    .setParameter(COUNT_PARAMETER_NAME, offset)
+                return Optional.of(query.setParameter(ACCOUNT_ID_PARAMETER_NAME,
+                        accountId)
+                    .setParameter(COUNT_PARAMETER_NAME,
+                            offset)
                     .getSingleResult());
             } catch (NoResultException ex) {
                 return Optional.empty();
@@ -121,16 +145,17 @@ public class MovementSliceRepositoryImpl extends AccountsDomainRepositoryImpl<Mo
     }
 
     @Override
-    public Optional<MovementSlice> findLastByAccountBeforeOffsetByBookingDate(
-            @NotNull Integer accountId, @NotNull Integer offset) {
+    public Optional<MovementSlice> findLastByAccountBeforeOffsetByBookingDate(@NotNull Integer accountId,
+            @NotNull Integer offset) {
         return getTxControl().required(() -> {
             try {
-                var query = getNamedQueryOrAddNew(
-                        FIND_LAST_BY_ACCOUNT_ID_BEFORE_OFFSET_BY_BOOKING_COUNT_QUERY_NAME,
+                var query = getNamedQueryOrAddNew(FIND_LAST_BY_ACCOUNT_ID_BEFORE_OFFSET_BY_BOOKING_COUNT_QUERY_NAME,
                         MovementSlice.class,
                         this::createFindLastByAccountBeforeOffsetByBookingDateQuery);
-                return Optional.of(query.setParameter(ACCOUNT_ID_PARAMETER_NAME, accountId)
-                    .setParameter(COUNT_PARAMETER_NAME, offset)
+                return Optional.of(query.setParameter(ACCOUNT_ID_PARAMETER_NAME,
+                        accountId)
+                    .setParameter(COUNT_PARAMETER_NAME,
+                            offset)
                     .getSingleResult());
             } catch (NoResultException ex) {
                 return Optional.empty();
@@ -148,14 +173,18 @@ public class MovementSliceRepositoryImpl extends AccountsDomainRepositoryImpl<Mo
         final var cb = getEntityManager().getCriteriaBuilder();
         final var criteriaQuery = cb.createQuery(MovementSlice.class);
         final var root = criteriaQuery.from(MovementSlice.class);
-        final var accountIdParameter = cb.parameter(Integer.class, ACCOUNT_ID_PARAMETER_NAME);
-        final var countParameter = cb.parameter(Integer.class, COUNT_PARAMETER_NAME);
+        final var accountIdParameter = cb.parameter(Integer.class,
+                ACCOUNT_ID_PARAMETER_NAME);
+        final var countParameter = cb.parameter(Integer.class,
+                COUNT_PARAMETER_NAME);
         final var accountPath = root.get(MovementSlice_.account);
         final var accountIdPath = accountPath.get(AccountsDomainEntity_.id);
         final var accountSliceMovementCountPath = root.get(countAttribute);
         final var accountSliceDatePath = root.get(MovementSlice_.date);
-        criteriaQuery.where(cb.and(cb.equal(accountIdPath, accountIdParameter), cb
-            .lessThanOrEqualTo(accountSliceMovementCountPath, countParameter)))
+        criteriaQuery.where(cb.and(cb.equal(accountIdPath,
+                accountIdParameter),
+                cb.lessThanOrEqualTo(accountSliceMovementCountPath,
+                        countParameter)))
             .orderBy(cb.desc(accountSliceDatePath));
         return getEntityManager().createQuery(criteriaQuery)
             .setMaxResults(1);

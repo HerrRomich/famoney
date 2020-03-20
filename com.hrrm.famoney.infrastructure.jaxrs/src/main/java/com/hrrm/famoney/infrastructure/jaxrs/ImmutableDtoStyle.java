@@ -7,7 +7,10 @@ import java.lang.annotation.Target;
 
 import org.immutables.value.Value;
 
-@Target({ ElementType.PACKAGE, ElementType.TYPE })
+@Target({
+        ElementType.PACKAGE,
+        ElementType.TYPE
+})
 @Retention(RetentionPolicy.CLASS)
 @Value.Style(packageGenerated = "*.impl", typeImmutable = "*Impl", overshadowImplementation = true)
 public @interface ImmutableDtoStyle {
