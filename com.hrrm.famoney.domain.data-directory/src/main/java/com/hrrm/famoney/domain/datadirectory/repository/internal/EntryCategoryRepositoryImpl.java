@@ -24,9 +24,11 @@ public abstract class EntryCategoryRepositoryImpl<T extends EntryCategory<T>> ex
 
     @Override
     public List<T> getTopLevelCategories() {
-        return getTxControl().required(getNamedQueryOrAddNew(getTopLevelCategoriesStatementName(),
+        return getTxControl().required(() -> {
+            return getNamedQueryOrAddNew(getTopLevelCategoriesStatementName(),
                 getEntityClass(),
-                this::createTopLevelCategoriesQuery)::getResultList);
+                    this::createTopLevelCategoriesQuery).getResultList();
+        });
     }
 
     protected abstract String getTopLevelCategoriesStatementName();

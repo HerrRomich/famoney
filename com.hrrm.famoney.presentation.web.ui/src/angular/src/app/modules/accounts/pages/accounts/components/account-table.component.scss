@@ -17,11 +17,11 @@ mat-list.movements-list {
   font-weight: 600;
 }
 
-.account-entry-header {
+mat-list-item.mat-list-item.mat-focus-indicator.account-entry-header {
   position: sticky;
+  top: 0;
   font-weight: 700;
   z-index: 1;
-  top: 0;
   background-color: rgba(#ffffff, 1);
 }
 

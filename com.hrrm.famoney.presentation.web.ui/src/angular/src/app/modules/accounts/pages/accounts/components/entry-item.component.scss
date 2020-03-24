@@ -1,4 +1,25 @@
-.number-input{
-  text-align: right;
+@import "styles";
+
+mat-optgroup.mat-optgroup.fm-optgroup-sticky{
+  label.mat-optgroup-label {
+    padding: 0 8px;
+    line-height: 32px;
+    height: 32px;
+    font-weight: 700;
+    background-color: rgba($color: white, $alpha: 1.0);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
 }
 
+mat-form-field.fm-number-input {
+  input.mat-input-element,
+  label.mat-form-field-label {
+    text-align: right;
+  }
+}
+
+mark{
+  background-color: mat-color($my-app-accent, 300);
+}

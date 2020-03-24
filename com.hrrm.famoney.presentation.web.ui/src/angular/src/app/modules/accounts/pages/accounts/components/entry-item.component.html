@@ -2,35 +2,50 @@
   <div matLine fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="12px">
     <mat-form-field fxFlex="80" floatLabel="always">
       <mat-label>Категория</mat-label>
-      <input matInput required placeholder="Категория" [matAutocomplete]="categoryAutocomplete" />
+      <input
+        matInput
+        required
+        placeholder="Категория"
+        [matAutocomplete]="categoryAutocomplete"
+        [formControl]="entryCategoryCtrl"
+      />
       <mat-autocomplete #categoryAutocomplete>
-        <ng-container *ngIf="entryCategoriesService.entryCategories$ | async as entryCategories">
-          <mat-optgroup label="Доходы">
-            <mat-option
-              *ngFor="let category of entryCategories.incomes"
-              [value]="category.name"
-              class="container-configuration-auto-complete-padding"
-              >{{ category.name }}
-            </mat-option>
+        <ng-container *ngIf="(entryCategories$ | async) as entryCategories; else categoriesNotFound">
+          <mat-optgroup label="Расходы" class="fm-optgroup-sticky">
+            <ng-container
+              *ngTemplateOutlet="subCategories; context: { elements: entryCategories.expenses, level: 1 }"
+            ></ng-container>
           </mat-optgroup>
-          <mat-optgroup label="Расходы">
-            <mat-option
-              *ngFor="let category of entryCategories.expenses"
-              [value]="category.name"
-              class="container-configuration-auto-complete-padding"
-              >{{ category.name }}
-            </mat-option>
+          <mat-optgroup label="Доходы" class="fm-optgroup-sticky">
+            <ng-container
+              *ngTemplateOutlet="subCategories; context: { elements: entryCategories.incomes, level: 1 }"
+            ></ng-container>
           </mat-optgroup>
         </ng-container>
       </mat-autocomplete>
     </mat-form-field>
-    <mat-form-field fxFlex="20" floatLabel="always">
+    <mat-form-field fxFlex="20" floatLabel="always" class="fm-number-input">
       <mat-label>Сумма</mat-label>
-      <input class="number-input" matInput [placeholder]="0.0" autocomplete="off" mask="separator.2" />
+      <input matInput [placeholder]="0.0" autocomplete="off" mask="separator.2" />
     </mat-form-field>
   </div>
   <mat-form-field matLine floatLabel="always">
     <mat-label>Комментарий</mat-label>
-    <input matInput autocomplete="off" class="number-input" />
+    <input matInput autocomplete="off" />
   </mat-form-field>
+
+  <ng-template #subCategories let-elements="elements" let-level="level">
+    <ng-container *ngFor="let category of elements">
+      <mat-option [value]="category.id" [style.padding-left]="16 + level * 16 + 'px'"
+        ><span [innerHtml]="category.name"></span>
+      </mat-option>
+      <ng-container
+        *ngTemplateOutlet="subCategories; context: { elements: category.children, level: level + 1 }"
+      ></ng-container
+    ></ng-container>
+  </ng-template>
+
+  <ng-template #categoriesNotFound>
+    <mat-option label="Категории не найдены!" class="fm-optgroup-sticky"></mat-option>
+  </ng-template>
 </div>

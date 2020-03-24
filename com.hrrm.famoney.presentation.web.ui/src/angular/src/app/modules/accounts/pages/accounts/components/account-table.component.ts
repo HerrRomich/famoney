@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, OnDestroy, Inject } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy, Inject, ElementRef, AfterViewInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { MovementDto, AccountsApiService } from '@famoney-apis/accounts';
 import { ActivatedRoute } from '@angular/router';
@@ -10,6 +10,7 @@ import { AccountEntryDialogComponent } from './account-entry-dialog.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { AccountMovementsViertualScrollStrategy } from './account-movements.virtual-scroller-strategy';
 import { MovementDataSource } from './movement-data-source';
+import { MatListItem } from '@angular/material/list';
 
 const fabSpeedDialDelayOnHover = 350;
 
@@ -33,7 +34,7 @@ export class AccountTableComponent implements OnInit, OnDestroy {
   @ViewChild('fabSpeedDialActions', { static: true })
   fabSpeedDialActions: EcoFabSpeedDialActionsComponent;
 
-  @ViewChild(CdkVirtualScrollViewport, { static: false })
+  @ViewChild(CdkVirtualScrollViewport)
   viewPort: CdkVirtualScrollViewport;
 
   private speedDialTriggerSubscription: Subscription;
@@ -69,12 +70,11 @@ export class AccountTableComponent implements OnInit, OnDestroy {
     this.fabSpeedDialOpenChangeSubbscription.unsubscribe();
   }
 
-  get inverseOfTranslation(): string {
-    if (!this.viewPort || !this.viewPort['_renderedContentOffset']) {
+  get inverseTranslation(): string {
+    if (!this.viewPort || !this.viewPort['_renderedContentTransform']) {
       return '-0px';
     }
-    const offset = this.viewPort['_renderedContentOffset'];
-    return `-${offset + 1}px`;
+    return `-${this.viewPort["_renderedContentOffset"]}px`;
   }
 
   triggerSpeedDial() {
@@ -99,20 +99,20 @@ export class AccountTableComponent implements OnInit, OnDestroy {
 
   addEntry() {
     this.stopSpeedDial();
-    const accountEntryDialogRef: MatDialogRef<AccountEntryDialogComponent, MovementDto> = this.accountEntryDialogComponent.open(
+    const accountEntryDialogRef: MatDialogRef<
       AccountEntryDialogComponent,
-      {
-        width: '520px',
-        minWidth: '520px',
-        maxWidth: '520px',
-        panelClass: 'account-entry-dialog',
-        disableClose: true,
-        hasBackdrop: true,
-        data: {
-          date: new Date()
-        } as MovementDto
-      }
-    );
+      MovementDto
+    > = this.accountEntryDialogComponent.open(AccountEntryDialogComponent, {
+      width: '520px',
+      minWidth: '520px',
+      maxWidth: '520px',
+      panelClass: 'account-entry-dialog',
+      disableClose: true,
+      hasBackdrop: true,
+      data: {
+        date: new Date()
+      } as MovementDto
+    });
     accountEntryDialogRef.afterClosed().subscribe(accountEntry => {});
   }
 

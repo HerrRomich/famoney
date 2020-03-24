@@ -17,11 +17,11 @@ export class EntryCategoryService {
   ) {
     this.entryCategories$ = this._entryCategoriesRefreshSubject.pipe(
       switchMap(() => this.dataDirectoryApiService.getEntryCategories()),
+      shareReplay(1),
       catchError(() => {
         this.notificationsService.error('Error', 'Couldn\t load entry categories.');
         return EMPTY;
       }),
-      shareReplay(1),
     );
   }
 

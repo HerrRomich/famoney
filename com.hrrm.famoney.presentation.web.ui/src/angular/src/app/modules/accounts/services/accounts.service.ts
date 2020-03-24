@@ -40,15 +40,13 @@ export class AccountsService {
   getAccounts() {
     if (!this.accounts$) {
       this.accounts$ = this.selectedAccountTags$.pipe(
-        switchMap(tags => this.accountsApiService.getAllAccounts(Array.from(tags)).pipe(
-          retry(3),
-          catchError(() => {
-            this.notificationsService.error('Error', 'Couldn\'t load list of accounts.');
-            return EMPTY;
-          })
-        )),
-        shareReplay(1)
-      );
+        switchMap(tags => this.accountsApiService.getAllAccounts(Array.from(tags))),
+        shareReplay(1),
+        catchError(() => {
+          this.notificationsService.error('Error', 'Couldn\'t load list of accounts.');
+          return EMPTY;
+        })
+    );
     }
     return this.accounts$;
   }
