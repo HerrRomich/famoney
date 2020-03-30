@@ -1,9 +1,20 @@
-<h1 mat-dialog-title>Доход/Расход</h1>
+<h1
+  mat-dialog-title
+  i18n="entry dialog title|Title of dialog for entering account incomes/expensies.@@accounts.entryDialog.title"
+>
+  Доход/Расход
+</h1>
 <div mat-dialog-content fxLayout="column" [formGroup]="entry">
   <div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="12px">
     <div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="12px" fxFlex>
       <mat-form-field floatLabel="always" fxFlex class="entry-date-form-field">
-        <mat-label>Дата записи</mat-label>
+        <mat-label
+          i18n="
+             entry dialog date field title|Title of field for date of account entry in entry
+            dialog.@@accounts.entryDialog.fields.entryDate.title
+          "
+          >Дата записи</mat-label
+        >
         <input matInput [matDatepicker]="entryDatePicker" required autocomplete="off" formControlName="entryDate" />
         <mat-datepicker-toggle matSuffix [for]="entryDatePicker"></mat-datepicker-toggle>
         <mat-datepicker #entryDatePicker></mat-datepicker>
@@ -14,7 +25,13 @@
         fxFlex="33"
         class="entry-date-form-field"
       >
-        <mat-label>Дата учета</mat-label>
+        <mat-label
+          i18n="
+             entry dialog booking date field title|Title of field for booking date of account entry in entry
+            dialog.@@accounts.entryDialog.fields.bookingDate.title
+          "
+          >Дата учета</mat-label
+        >
         <input
           matInput
           [matDatepicker]="bookingDatePicker"
@@ -31,7 +48,13 @@
         fxFlex="33"
         class="entry-date-form-field"
       >
-        <mat-label>Учетный месяц</mat-label>
+        <mat-label
+          i18n="
+             entry dialog booking month filed title|Title of field for booking month in entry
+            dialog.@@accounts.entryDialog.fields.bookingMonth.title
+          "
+          >Учетный месяц</mat-label
+        >
         <input
           matInput
           [appMonthpicker]="budgetMonthPicker"
@@ -45,10 +68,9 @@
     </div>
     <mat-button-toggle-group #extendedDateToggleGroup="matButtonToggleGroup">
       <mat-button-toggle fxFlex="14px" class="narrow-toggle-button" value="extended-date">
-        <mat-icon
-          >{{extendedDateToggleGroup.value == 'extended-date' ? 'keyboard_arrow_left' :
-          'keyboard_arrow_right'}}</mat-icon
-        >
+        <mat-icon>{{
+          extendedDateToggleGroup.value == 'extended-date' ? 'keyboard_arrow_left' : 'keyboard_arrow_right'
+        }}</mat-icon>
       </mat-button-toggle>
     </mat-button-toggle-group>
   </div>
@@ -95,7 +117,16 @@
           appFocusHighlight="entry-item-highlighted"
         >
           <app-entry-item fxFlex></app-entry-item>
-          <button mat-button mat-icon-button class="small-button">
+          <button
+            mat-button
+            mat-icon-button
+            class="small-button"
+            matTooltip="удалить элемент"
+            i18n-matTooltip="
+               entry dialog delete item button tooltip|A tooltip for button to delete an item from entry
+              dialog.@@accounts.entryDialog.items.buttons.delete.tooltip
+            "
+          >
             <mat-icon>clear</mat-icon>
           </button>
         </div>
@@ -111,7 +142,14 @@
           </button>
         </div>
       </div>
-      <button mat-mini-fab class="add-category-button">
+      <button
+        mat-mini-fab
+        class="add-entry-item-button"
+        matTooltip="удалить элемент"
+        i18n-matTooltip="
+           entry dialog add entry item button tooltip|A tooltip for button to add an item in entry dialog.@@accounts.entryDialog.items.buttons.add.tooltip
+        "
+      >
         <mat-icon>add</mat-icon>
       </button>
     </div>
@@ -123,15 +161,32 @@
   <app-entry-item *ngIf="extendedCategoryToggleGroup.value !== 'extended-category'"></app-entry-item>
   <mat-button-toggle-group #extendedCategoryToggleGroup="matButtonToggleGroup">
     <mat-button-toggle value="extended-category" class="thin-toggle-button">
-      <mat-icon
-        >{{extendedCategoryToggleGroup.value == 'extended-category' ? 'keyboard_arrow_up' :
-        'keyboard_arrow_down'}}</mat-icon
-      >
+      <mat-icon>{{
+        extendedCategoryToggleGroup.value == 'extended-category' ? 'keyboard_arrow_up' : 'keyboard_arrow_down'
+      }}</mat-icon>
     </mat-button-toggle>
   </mat-button-toggle-group>
 </div>
 <div mat-dialog-actions fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="12px">
   <div fxFlex></div>
-  <button mat-stroked-button mat-dialog-close>Отменить</button>
-  <button mat-stroked-button mat-dialog-close color="primary">Сохранить</button>
+  <button
+    mat-stroked-button
+    mat-dialog-close
+    i18n="
+      entry dialog cancel button tooltip|Button title for canceling in entry
+      dialog.@@accounts.entryDialog.buttons.cancel.title
+    "
+  >
+    Отменить
+  </button>
+  <button
+    mat-stroked-button
+    mat-dialog-close
+    color="primary"
+    i18n="
+      entry dialog save button tooltip|Button title for saving in entry dialog.@@accounts.entryDialog.buttons.save.title
+    "
+  >
+    Сохранить
+  </button>
 </div>

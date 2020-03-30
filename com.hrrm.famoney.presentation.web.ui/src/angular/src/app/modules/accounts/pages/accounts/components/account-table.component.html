@@ -6,7 +6,14 @@
   #fabSpeedDial
 >
   <eco-fab-speed-dial-trigger [className]="fabSpeedDialActions.miniFabVisible ? 'shown' : 'hidden'">
-    <button mat-fab (click)="addEntry()">
+    <button
+      mat-fab
+      (click)="addEntry()"
+      matTooltip="Добавить доход/расход"
+      i18n-matTooltip="
+         accounts table add entry button|A button to add entry into account.@@accounts.table.buttons.addEntry.tooltip
+      "
+    >
       <mat-icon>add</mat-icon>
     </button>
   </eco-fab-speed-dial-trigger>
@@ -14,19 +21,53 @@
     <button mat-mini-fab (click)="addTransfer()">
       <mat-icon>swap_horiz</mat-icon>
     </button>
-    <button mat-mini-fab (click)="addRefund()">
+    <button
+      mat-mini-fab
+      (click)="addRefund()"
+      matTooltip="Добавить возврат"
+      i18n-matTooltip="
+         accounts table add refund button|A button to add refund into account.@@accounts.table.buttons.addRefund.tooltip
+
+      "
+    >
       <mat-icon>redo</mat-icon>
     </button>
   </eco-fab-speed-dial-actions>
 </eco-fab-speed-dial>
 <cdk-virtual-scroll-viewport fxLayout="column" fxFlex #virtualScrollViewport>
-  <mat-list  class="movements-list" dense>
+  <mat-list class="movements-list" dense>
     <mat-list-item class="account-entry-header" [style.top]="inverseTranslation">
       <div fxLayout="row" fxLayoutAlign="start start" fxFlex>
-        <div flex="0 0 50px">Дата учета</div>
+        <div
+          flex="0 0 50px"
+          i18n="
+            accounts table entrance date column name|Column name for entrance date in an account entries
+            table.@@accounts.table.columns.entryDate.name
+          "
+        >
+          Дата записи
+        </div>
         <div fxFlex></div>
-        <div fxFlex="0 0 80px" fxLayoutAlign="end start">Сумма</div>
-        <div fxFlex="0 0 80px" fxLayoutAlign="end start">Остаток</div>
+        <div
+          fxFlex="0 0 80px"
+          fxLayoutAlign="end start"
+          i18n="
+            accounts table amount column name|Column name for amount in an account entries
+            table.@@accounts.table.columns.amount.name
+          "
+        >
+          Сумма
+        </div>
+        <div
+          fxFlex="0 0 80px"
+          fxLayoutAlign="end start"
+          i18n="
+            accounts table balance column name|Column name for balance in an account entries
+            table.@@accounts.table.columns.balance.name
+          "
+        >
+          Остаток
+        </div>
       </div>
       <mat-divider></mat-divider>
     </mat-list-item>

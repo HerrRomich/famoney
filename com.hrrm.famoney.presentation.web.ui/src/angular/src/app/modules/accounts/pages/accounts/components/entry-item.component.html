@@ -1,22 +1,46 @@
 <div fxLayout="column" flex>
   <div matLine fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="12px">
     <mat-form-field fxFlex="80" floatLabel="always">
-      <mat-label>Категория</mat-label>
+      <mat-label
+        i18n="
+           entry item category field title|Title of category field in entry
+          item.@@accounts.entryItem.fields.category.title
+        "
+        >Категория</mat-label
+      >
       <input
         matInput
         required
         placeholder="Категория"
+        i18n-placeholder="
+           entry item category field placeholder|Placeholder of category field in entry
+          item.@@accounts.entryItem.fields.category.placeholder
+        "
         [matAutocomplete]="categoryAutocomplete"
         [formControl]="entryCategoryCtrl"
       />
       <mat-autocomplete #categoryAutocomplete>
-        <ng-container *ngIf="(entryCategories$ | async) as entryCategories; else categoriesNotFound">
-          <mat-optgroup label="Расходы" class="fm-optgroup-sticky">
+        <ng-container *ngIf="entryCategories$ | async as entryCategories; else categoriesNotFound">
+          <mat-optgroup
+            label="Расходы"
+            i18n-label="
+               dropdown expense category group|Expense category group in a dropdown
+              list.@@accounts.entryItem.fields.category.dropdown.group.expense
+            "
+            class="fm-optgroup-sticky"
+          >
             <ng-container
               *ngTemplateOutlet="subCategories; context: { elements: entryCategories.expenses, level: 1 }"
             ></ng-container>
           </mat-optgroup>
-          <mat-optgroup label="Доходы" class="fm-optgroup-sticky">
+          <mat-optgroup
+            label="Доходы"
+            i18n-label="
+               dropdown income category group|Income category group in a dropdown
+              list.@@accounts.entryItem.fields.category.dropdown.group.income
+            "
+            class="fm-optgroup-sticky"
+          >
             <ng-container
               *ngTemplateOutlet="subCategories; context: { elements: entryCategories.incomes, level: 1 }"
             ></ng-container>
@@ -25,12 +49,18 @@
       </mat-autocomplete>
     </mat-form-field>
     <mat-form-field fxFlex="20" floatLabel="always" class="fm-number-input">
-      <mat-label>Сумма</mat-label>
+      <mat-label
+        i18n="entry item amount field title|Title of entry item amount field.@@accounts.entryItem.fields.amount.title"
+        >Сумма</mat-label
+      >
       <input matInput [placeholder]="0.0" autocomplete="off" mask="separator.2" />
     </mat-form-field>
   </div>
   <mat-form-field matLine floatLabel="always">
-    <mat-label>Комментарий</mat-label>
+    <mat-label
+      i18n="entry item comment field title|Title of entry item comment field.@@accounts.entryItem.fields.comment.title"
+      >Комментарий</mat-label
+    >
     <input matInput autocomplete="off" />
   </mat-form-field>
 

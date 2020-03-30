@@ -1,10 +1,9 @@
-import { Component, ViewEncapsulation, ViewChild, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { EntryCategoryService } from '@famoney-shared/services/entry-category.service';
-import { AUTOCOMPLETE_OPTION_HEIGHT, MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { Observable } from 'rxjs';
 import { EntryCategoriesDto, ExpenseCategoryDto } from '@famoney-apis/data-directory';
 import { FormControl } from '@angular/forms';
-import { debounceTime, switchMap, map, startWith, tap, finalize } from 'rxjs/operators';
+import { debounceTime, switchMap, map, startWith } from 'rxjs/operators';
 
 @Component({
   selector: 'app-entry-item',
@@ -15,9 +14,6 @@ import { debounceTime, switchMap, map, startWith, tap, finalize } from 'rxjs/ope
 export class EntryItemComponent {
   entryCategoryCtrl: FormControl = new FormControl();
   entryCategories$: Observable<EntryCategoriesDto>;
-
-  @ViewChild(MatAutocomplete)
-  categoryAutocomplete: MatAutocomplete;
 
   constructor(public entryCategoriesService: EntryCategoryService) {
     this.entryCategories$ = this.entryCategoryCtrl.valueChanges.pipe(debounceTime(350)).pipe(
@@ -32,10 +28,7 @@ export class EntryItemComponent {
             } as EntryCategoriesDto;
           })
         )
-      ),
-      tap(() => {
-        this.categoryAutocomplete._setVisibility();
-      })
+      )
     );
   }
 
@@ -45,7 +38,9 @@ export class EntryItemComponent {
       if (filter.test(entryCategory.name) || subCategories.length > 0) {
         filteredCategories.push({
           ...entryCategory,
-          name: entryCategory.name.replace(filter, subString => `<mark>${subString}</mark>`),
+          name: entryCategory.name.match(filter).length > 0
+            ? entryCategory.name.replace(filter, subString => `<mark>${subString}</mark>`)
+            : entryCategory.name,
           children: subCategories
         });
       }

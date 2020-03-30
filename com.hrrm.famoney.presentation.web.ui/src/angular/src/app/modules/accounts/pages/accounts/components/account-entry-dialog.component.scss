@@ -21,18 +21,17 @@
   height: 366px;
 }
 
-.add-category-button {
+.add-entry-item-button {
   position: absolute;
   bottom: 12px;
   right: 12px;
   opacity: 0.45;
+  &:hover {
+    opacity: 1;
+  }
 }
 
-.add-category-button:hover {
-  opacity: 1;
-}
-
-@import "styles";
+@import 'styles';
 
 .entry-item {
   padding: 4px;
@@ -41,4 +40,3 @@
 .entry-item-highlighted {
   background-color: mat-color($my-app-accent, 50, 0.45);
 }
-

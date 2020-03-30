@@ -13,6 +13,9 @@
       matInput
       #tagsInput
       placeholder="Тэги"
+      i18n-placeholder="
+        accounts tags popup placeholder|Placeholder for accounts tags field@@accounts.tagPopup.placeholder
+      "
       [formControl]="tagsCtrl"
       [matAutocomplete]="tagAutoComplete"
       [matChipInputFor]="accountTagList"
@@ -25,7 +28,16 @@
       </mat-option>
     </mat-autocomplete>
   </mat-chip-list>
-  <button mat-button mat-icon-button matSuffix (click)="accountsService.clearTags()">
+  <button
+    mat-button
+    mat-icon-button
+    matSuffix
+    (click)="accountsService.clearTags()"
+    matTooltip="Очистить все тэги"
+    i18n-matTooltip="
+      clear tags button tooltip|Tooltip for button clearing all tags@@accounts.tagPopup.buttons.claerAll.tooltip
+    "
+  >
     <mat-icon>cancel</mat-icon>
   </button>
 </mat-form-field>
