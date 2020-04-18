@@ -18,7 +18,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <local.index.policy>REQUIRED</local.index.policy>
         <bnd.maven.version>4.3.1</bnd.maven.version>
-        <eclipselink.version>2.6.8</eclipselink.version>
+        <eclipselink.version>2.6.9</eclipselink.version>
         <famoney.ui.angular>com.hrrm.famoney.presentation.ui/src/angular/famoney</famoney.ui.angular>
         <org.apache.aries.jpa.version>2.7.2-SNAPSHOT</org.apache.aries.jpa.version>
         <jackson.core.version>2.10.1</jackson.core.version>
@@ -712,20 +712,20 @@
                 <plugin>
                     <groupId>org.openapitools</groupId>
                     <artifactId>openapi-generator-maven-plugin</artifactId>
-                    <version>3.3.4</version>
+                    <version>4.3.0</version>
                     <configuration>
-                        <generatorName>custom-typescript-angular</generatorName>
+                        <generatorName>typescript-angular</generatorName>
                         <generateSupportingFiles>true</generateSupportingFiles>
                         <supportingFilesToGenerate>models.ts,api.ts,index.ts,api.module.ts,configuration.ts,variables.ts,encoder.ts</supportingFilesToGenerate>
-                        <additionalProperties>
-                            <additionalProperty>ngVersion=8.0.0</additionalProperty>
-                            <additionalProperty>serviceSuffix=ApiService</additionalProperty>
-                            <additionalProperty>serviceFileSuffix=-api.service</additionalProperty>
-                            <additionalProperty>modelSuffix=Dto</additionalProperty>
-                            <additionalProperty>modelFileSuffix=.dto</additionalProperty>
-                            <additionalProperty>fileNaming=kebab-case</additionalProperty>
-                            <additionalProperty>useInheritance=true</additionalProperty>
-                        </additionalProperties>
+                        <configOptions>
+                            <ngVersion>9.0.0</ngVersion>
+                            <serviceSuffix>ApiService</serviceSuffix>
+                            <serviceFileSuffix>-api.service</serviceFileSuffix>
+                            <modelSuffix>Dto</modelSuffix>
+                            <modelFileSuffix>.dto</modelFileSuffix>
+                            <fileNaming>kebab-case</fileNaming>
+                            <taggedUnions>true</taggedUnions>
+                        </configOptions>
                     </configuration>
                     <dependencies>
                         <dependency>
@@ -738,7 +738,7 @@
                 <plugin>
                     <groupId>io.swagger.core.v3</groupId>
                     <artifactId>swagger-maven-plugin</artifactId>
-                    <version>2.1.0</version>
+                    <version>2.1.2</version>
                     <configuration>
                         <outputFormat>JSON</outputFormat>
                         <prettyPrint>true</prettyPrint>
