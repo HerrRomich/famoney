@@ -31,11 +31,18 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.Sets;
 import com.hrrm.famoney.api.accounts.dto.AccountDTO;
 import com.hrrm.famoney.api.accounts.dto.AccountDataDTO;
+import com.hrrm.famoney.api.accounts.dto.EntryDataDTO;
+import com.hrrm.famoney.api.accounts.dto.EntryItemDataDTO;
 import com.hrrm.famoney.api.accounts.dto.MovementDTO;
+import com.hrrm.famoney.api.accounts.dto.MovementDataDTO;
+import com.hrrm.famoney.api.accounts.dto.MovementDataDTOBuilder;
 import com.hrrm.famoney.api.accounts.dto.MovementOrder;
 import com.hrrm.famoney.api.accounts.dto.impl.AccountDTOImpl;
 import com.hrrm.famoney.api.accounts.dto.impl.AccountDataDTOImpl;
+import com.hrrm.famoney.api.accounts.dto.impl.EntryItemDataDTOImpl;
 import com.hrrm.famoney.api.accounts.dto.impl.MovementDTOImpl;
+import com.hrrm.famoney.api.accounts.dto.impl.RefundDataDTOImpl;
+import com.hrrm.famoney.api.accounts.dto.impl.TransferDataDTOImpl;
 import com.hrrm.famoney.api.accounts.resource.AccountsApi;
 import com.hrrm.famoney.api.accounts.resource.internalexceptions.AccountApiError;
 import com.hrrm.famoney.api.accounts.resource.internalexceptions.AccountNotFoundException;
@@ -43,7 +50,10 @@ import com.hrrm.famoney.application.service.accounts.MovementsProcesor;
 import com.hrrm.famoney.application.service.accounts.dataobject.AccountMovementsRequest;
 import com.hrrm.famoney.application.service.accounts.dataobject.impl.AccountMovementsRequestImpl;
 import com.hrrm.famoney.domain.accounts.Account;
+import com.hrrm.famoney.domain.accounts.movement.Entry;
 import com.hrrm.famoney.domain.accounts.movement.Movement;
+import com.hrrm.famoney.domain.accounts.movement.Refund;
+import com.hrrm.famoney.domain.accounts.movement.Transfer;
 import com.hrrm.famoney.domain.accounts.repository.AccountRepository;
 import com.hrrm.famoney.infrastructure.jaxrs.ApiError;
 import com.hrrm.famoney.infrastructure.jaxrs.ApiException;
@@ -70,12 +80,39 @@ public class AccountsApiImpl implements AccountsApi {
             sum = sum.add(movement.getAmount());
             final var movementDTO = MovementDTOImpl.builder()
                 .id(movement.getId())
-                .date(movement.getDate())
-                .bookingDate(movement.getBookingDate())
-                .amount(movement.getAmount())
-                .sum(sum)
+                .data(convertMovement(movement))
                 .build();
             movementDTOs.add(movementDTO);
+        }
+
+        private MovementDataDTO convertMovement(Movement movement) {
+            return getMovementDataDTOBuilder(movement).date(movement.getDate())
+                .bookingDate(movement.getBookingDate())
+                .budgetMonth(movement.getBudgetPeriod())
+                .amount(movement.getAmount())
+                .build();
+        }
+
+        private MovementDataDTOBuilder<? extends MovementDataDTO> getMovementDataDTOBuilder(Movement movement) {
+            if (movement instanceof Entry) {
+                var entry = (Entry) movement;
+                Iterable<EntryItemDataDTO> iterable = () -> entry.getEntryItems()
+                    .stream()
+                    .map(entryItem -> EntryItemDataDTOImpl.builder()
+                        .categoryId(entryItem.getCategoryId())
+                        .amount(entryItem.getAmount())
+                        .comments(entryItem.getComments())
+                        .build())
+                    .iterator();
+                return new EntryDataDTO.Builder().addAllEntryItems(iterable);
+            } else if (movement instanceof Refund) {
+                var refund = (Refund) movement;
+                return new RefundDataDTOImpl.Builder().categoryId(refund.getCategoryId())
+                    .comments(refund.getComments());
+            } else {
+                var transfer = (Transfer) movement;
+                return new TransferDataDTOImpl.Builder().oppositAccountId(transfer.getOppositAccountId());
+            }
         }
 
         public List<MovementDTO> getMovements() {

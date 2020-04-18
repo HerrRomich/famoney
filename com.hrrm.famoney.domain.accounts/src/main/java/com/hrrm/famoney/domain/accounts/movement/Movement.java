@@ -1,6 +1,7 @@
 package com.hrrm.famoney.domain.accounts.movement;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import javax.persistence.Column;
@@ -45,6 +46,9 @@ public abstract class Movement extends AccountsDomainEntity {
 
     @Column(name = "booking_date")
     private LocalDateTime bookingDate;
+
+    @Column(name = "budget_period")
+    private LocalDate budgetPeriod;
 
     @Column(name = "amount")
     private BigDecimal amount;
