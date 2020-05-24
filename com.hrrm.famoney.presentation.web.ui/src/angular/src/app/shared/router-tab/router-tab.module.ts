@@ -9,6 +9,6 @@ import { MatTabsModule } from '@angular/material/tabs';
 @NgModule({
   imports: [CommonModule, RouterModule, MatTabsModule],
   declarations: [RouterTabComponent, RouterTabItemDirective, RouterTabDirective],
-  exports: [RouterTabComponent, RouterTabItemDirective, RouterTabDirective]
+  exports: [RouterTabComponent, RouterTabItemDirective, RouterTabDirective],
 })
 export class RouterTabModule {}

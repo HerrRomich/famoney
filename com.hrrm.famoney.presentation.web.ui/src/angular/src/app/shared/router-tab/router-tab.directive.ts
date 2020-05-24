@@ -5,11 +5,11 @@ import { MatTab } from '@angular/material/tabs';
 import { RouterLink } from '@angular/router';
 
 @Directive({
-  selector: 'mat-tab[routerLink]'
+  selector: 'mat-tab[routerLink]',
 })
 export class RouterTabDirective {
   @Input()
-  public routerLinkActiveOptions: {
+  public routerLinkActiveOptions?: {
     exact: boolean;
   };
 

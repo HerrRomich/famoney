@@ -6,30 +6,19 @@
   #fabSpeedDial
 >
   <eco-fab-speed-dial-trigger [className]="fabSpeedDialActions.miniFabVisible ? 'shown' : 'hidden'">
-    <button
-      mat-fab
-      (click)="addEntry()"
-      matTooltip="Добавить доход/расход"
-      i18n-matTooltip="
-         accounts table add entry button|A button to add entry into account.@@accounts.table.buttons.addEntry.tooltip
-      "
-    >
+    <button mat-fab (click)="addEntry()" [matTooltip]="'accounts.table.buttons.addEntry.tooltip' | translate">
       <mat-icon>add</mat-icon>
     </button>
   </eco-fab-speed-dial-trigger>
   <eco-fab-speed-dial-actions #fabSpeedDialActions>
-    <button mat-mini-fab (click)="addTransfer()">
-      <mat-icon>swap_horiz</mat-icon>
-    </button>
     <button
       mat-mini-fab
-      (click)="addRefund()"
-      matTooltip="Добавить возврат"
-      i18n-matTooltip="
-         accounts table add refund button|A button to add refund into account.@@accounts.table.buttons.addRefund.tooltip
-
-      "
+      [matTooltip]="'accounts.table.buttons.addTransfer.tooltip' | translate"
+      (click)="addTransfer()"
     >
+      <mat-icon>swap_horiz</mat-icon>
+    </button>
+    <button mat-mini-fab [matTooltip]="'accounts.table.buttons.addRefund.tooltip' | translate" (click)="addRefund()">
       <mat-icon>redo</mat-icon>
     </button>
   </eco-fab-speed-dial-actions>
@@ -38,36 +27,10 @@
   <mat-list class="movements-list" dense>
     <mat-list-item class="account-entry-header" [style.top]="inverseTranslation">
       <div fxLayout="row" fxLayoutAlign="start start" fxFlex>
-        <div
-          flex="0 0 50px"
-          i18n="
-            accounts table entrance date column name|Column name for entrance date in an account entries
-            table.@@accounts.table.columns.entryDate.name
-          "
-        >
-          Дата записи
-        </div>
+        <div flex="0 0 50px" translate="accounts.table.columns.entryDate.name"></div>
         <div fxFlex></div>
-        <div
-          fxFlex="0 0 80px"
-          fxLayoutAlign="end start"
-          i18n="
-            accounts table amount column name|Column name for amount in an account entries
-            table.@@accounts.table.columns.amount.name
-          "
-        >
-          Сумма
-        </div>
-        <div
-          fxFlex="0 0 80px"
-          fxLayoutAlign="end start"
-          i18n="
-            accounts table balance column name|Column name for balance in an account entries
-            table.@@accounts.table.columns.balance.name
-          "
-        >
-          Остаток
-        </div>
+        <div fxFlex="0 0 80px" fxLayoutAlign="end start" translate="accounts.table.columns.amount.name"></div>
+        <div fxFlex="0 0 80px" fxLayoutAlign="end start" translate="accounts.table.columns.balance.name"></div>
       </div>
       <mat-divider></mat-divider>
     </mat-list-item>
@@ -82,7 +45,7 @@
           <div
             fxFlex="0 0 80px"
             fxLayoutAlign="end start"
-            [className]="movement?.amount > 0 ? 'positive-amount' : 'negative-amount'"
+            [ngClass]="movement?.amount > 0 ? 'positive-amount' : 'negative-amount'"
           >
             {{ movement?.amount | number: '1.2-2' }}
           </div>

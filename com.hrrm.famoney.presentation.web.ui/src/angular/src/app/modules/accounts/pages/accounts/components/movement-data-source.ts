@@ -7,9 +7,11 @@ import { MultiRange, multirange } from 'multi-integer-range';
 const PAGE_SIZE = 150;
 const PAGE_BUFFER = 50;
 
+export interface Movement {}
+
 export class MovementDataSource extends DataSource<MovementDto> {
-  private _data: MovementDto[];
-  private _dataPages: MultiRange;
+  private _data: MovementDto[] = [];
+  private _dataPages: MultiRange = new MultiRange();
 
   constructor(private accountsApiService: AccountsApiService, private account$: Observable<AccountDto>) {
     super();
@@ -18,7 +20,7 @@ export class MovementDataSource extends DataSource<MovementDto> {
   connect(collectionViewer: CollectionViewer): Observable<MovementDto[]> {
     return this.account$.pipe(
       tap(account => {
-        this._data = new Array<MovementDto>(account.movementCount);
+        this._data = new Array<MovementDto>(account.movementCount ?? 0);
         this._dataPages = multirange();
       }),
       switchMap(account =>
@@ -32,8 +34,8 @@ export class MovementDataSource extends DataSource<MovementDto> {
           }),
           mergeMap(requieredPages => {
             if (requieredPages.length() > 0) {
-              const min = requieredPages.min();
-              const max = requieredPages.max();
+              const min = requieredPages.min() ?? 0;
+              const max = requieredPages.max() ?? 0;
               const rangeStart = min * PAGE_SIZE;
               const rangeEnd = (max + 1) * PAGE_SIZE;
               return this.accountsApiService.getMovements(account.id, rangeStart, rangeEnd - rangeStart).pipe(
@@ -41,15 +43,15 @@ export class MovementDataSource extends DataSource<MovementDto> {
                   this._data.splice(rangeStart, movements.length, ...movements);
                   this._dataPages = this._dataPages.append([[min, max]]);
                   return this._data;
-                })
+                }),
               );
             } else {
               return of(this._data);
             }
           }, 3),
-          startWith(this._data)
-        )
-      )
+          startWith(this._data),
+        ),
+      ),
     );
   }
 

@@ -12,9 +12,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Value.Immutable
 @ImmutableDtoStyle
 public interface EntryCategoriesDTO {
-    
+
+    @Schema(required = true)
     List<IncomeCategoryDTO> getIncomes();
-    
+
+    @Schema(required = true)
     List<ExpenseCategoryDTO> getExpenses();
 
 }

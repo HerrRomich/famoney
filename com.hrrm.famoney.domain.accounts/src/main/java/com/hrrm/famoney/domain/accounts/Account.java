@@ -17,6 +17,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(schema = AccountsDomainEntity.SCHEMA_NAME, name = "account")
@@ -25,6 +26,7 @@ import lombok.experimental.Accessors;
 @Setter
 @ToString(callSuper = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
+@SuperBuilder
 public class Account extends AccountsDomainEntity {
 
     @Column(name = "name")
@@ -35,8 +37,9 @@ public class Account extends AccountsDomainEntity {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Column(name = "tag")
-    @CollectionTable(schema = AccountsDomainEntity.SCHEMA_NAME, name = "account_tag",
-        joinColumns = { @JoinColumn(name = "account_id") })
+    @CollectionTable(schema = AccountsDomainEntity.SCHEMA_NAME, name = "account_tag", joinColumns = {
+            @JoinColumn(name = "account_id")
+    })
     private Set<String> tags;
 
     @Column(name = "movement_count")

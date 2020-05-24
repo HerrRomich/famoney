@@ -15,8 +15,8 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.log.LoggerFactory;
 
+import com.hrrm.famoney.application.api.datadirectory.resources.EntryCategoriesApi;
 import com.hrrm.famoney.domain.accounts.migrations.v01.V1M2Accounts;
-import com.hrrm.famoney.domain.accounts.migrations.v02.V2M2InitialMovements;
 import com.hrrm.famoney.infrastructure.persistence.migrations.MigrationNamespace;
 
 @Component(service = PreHook.class, property = {
@@ -29,12 +29,15 @@ public class AccountsMigrations implements PreHook {
 
     private final BundleContext context;
     private final LoggerFactory loggerFactory;
+    private EntryCategoriesApi entryCategoriesApi;
 
     @Activate
-    public AccountsMigrations(final BundleContext context, @Reference final LoggerFactory loggerFactory) {
+    public AccountsMigrations(final BundleContext context, @Reference final LoggerFactory loggerFactory,
+            @Reference final EntryCategoriesApi entryCategoriesApi) {
         super();
         this.context = context;
         this.loggerFactory = loggerFactory;
+        this.entryCategoriesApi = entryCategoriesApi;
     }
 
     @Override
@@ -52,8 +55,10 @@ public class AccountsMigrations implements PreHook {
         final Flyway flyway = Flyway.configure(classLoader)
             .dataSource(ds)
             .locations(locationArray)
-            .javaMigrations(new V1M2Accounts(loggerFactory),
-                    new V2M2InitialMovements(loggerFactory))
+            .javaMigrations(new V1M2Accounts(loggerFactory)/*
+                                                            * , new V2M2InitialMovements(loggerFactory,
+                                                            * entryCategoriesApi::getEntryCategories)
+                                                            */)
             .load();
         flyway.migrate();
     }

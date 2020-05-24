@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaQuery;
 
@@ -140,6 +141,12 @@ public abstract class JpaRepositoryImpl<T extends DomainEntity<P>, P extends Ser
         } else {
             return entity;
         }
+    }
+
+    @Override
+    public void lock(T entity, LockModeType lockModeType) {
+        getEntityManager().lock(entity,
+                lockModeType);
     }
 
 }

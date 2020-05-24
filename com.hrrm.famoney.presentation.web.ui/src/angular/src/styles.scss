@@ -1,14 +1,17 @@
-@import "~@angular/cdk/_overlay";
-@import "~@angular/material/_theming";
-@import "./app/modules/accounts/pages/accounts/components/account-tags-popup.theme";
-@import "./app/modules/accounts/pages/accounts/components/account-entry-dialog.theme";
+@import '~@angular/cdk/_overlay';
+@import '~@angular/material/_theming';
+@import './app/modules/accounts/pages/accounts/components/account-tags-popup.theme';
+@import './app/modules/accounts/pages/accounts/components/account-entry-dialog.theme';
 @include mat-core();
 
-$my-app-primary: mat-palette($mat-amber);
-$my-app-accent: mat-palette($mat-deep-orange);
-$my-app-warn: mat-palette($mat-blue-gray);
+$fm-app-primary: mat-palette($mat-amber);
+$fm-app-accent: mat-palette($mat-blue-gray);
+$fm-app-warn: mat-palette($mat-deep-orange);
 
-$my-app-theme: mat-light-theme($my-app-primary, $my-app-accent, $my-app-warn);
+$my-app-theme: mat-light-theme($fm-app-primary, $fm-app-accent, $fm-app-warn);
+
+$fm-expense-color: #FF0000;
+$fm-income-color: #007F00;
 
 @include angular-material-theme($my-app-theme);
 
@@ -18,8 +21,8 @@ $my-app-theme: mat-light-theme($my-app-primary, $my-app-accent, $my-app-warn);
 
 .fm-tags-panel {
   background-color: rgb(255, 255, 255);
-  box-shadow: 0 11px 15px -7px rgba(0, 0, 0, 0.2),
-    0 24px 38px 3px rgba(0, 0, 0, 0.14), 0 9px 46px 8px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 11px 15px -7px rgba(0, 0, 0, 0.2), 0 24px 38px 3px rgba(0, 0, 0, 0.14),
+    0 9px 46px 8px rgba(0, 0, 0, 0.12);
   border-radius: 4px;
   padding: 24px;
 }

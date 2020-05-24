@@ -2,19 +2,19 @@ import { Directive, Input } from '@angular/core';
 
 import { RouterLink } from '@angular/router';
 
-@Directive({ selector: 'app-router-tab-item' })
+@Directive({ selector: 'fm-router-tab-item' })
 export class RouterTabItemDirective {
   @Input()
-  public routerLink: RouterLink;
+  public routerLink?: RouterLink;
 
   @Input()
-  public routerLinkActiveOptions: {
+  public routerLinkActiveOptions?: {
     exact: boolean;
   };
 
   @Input()
-  public disabled: boolean;
+  public disabled?: boolean;
 
   @Input()
-  public label: string;
+  public label?: string;
 }

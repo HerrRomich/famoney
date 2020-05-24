@@ -1,10 +1,10 @@
 import { Directive, Input, ElementRef, Renderer2, HostListener } from '@angular/core';
 
 @Directive({
-  selector: '[appFocusHighlight]'
+  selector: '[fmFocusHighlight]',
 })
 export class FocusHighlightDirective {
-  @Input('appFocusHighlight') highlightClass: string;
+  @Input('fmFocusHighlight') highlightClass: string = '';
 
   constructor(private el: ElementRef, private renderer: Renderer2) {}
 

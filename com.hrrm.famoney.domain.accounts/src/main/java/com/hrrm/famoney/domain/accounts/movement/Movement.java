@@ -20,17 +20,17 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Table(schema = AccountsDomainEntity.SCHEMA_NAME, name = "movement")
 @DiscriminatorColumn(name = "type")
-@Accessors(chain = true)
 @Getter
 @Setter
 @ToString(callSuper = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
+@SuperBuilder
 public abstract class Movement extends AccountsDomainEntity {
 
     public static final String FIND_MOVEMENTS_WITH_PAGINATION = "com.hrrm.famoney.domain.accounts.movement.AccountMovement#finMovenetsWithPagination";

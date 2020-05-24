@@ -6,17 +6,17 @@ import {
 } from '@famoney-apis/data-directory';
 import { HttpClientModule } from '@angular/common/http';
 
-export function accountsApiConfigFactory(): AccountsApiConfiguration {
+const accountsApiConfigFactory = () => {
   return new AccountsApiConfiguration({
     basePath: '/famoney/api/accounts',
   });
-}
+};
 
-export function dataDirectoryApiConfigFactory(): DataDirectoryApiConfiguration {
+const dataDirectoryApiConfigFactory = () => {
   return new DataDirectoryApiConfiguration({
     basePath: '/famoney/api/data-directory',
   });
-}
+};
 
 @NgModule({
   imports: [

@@ -13,7 +13,7 @@ mat-list.movements-list {
 }
 
 .account-entry:hover {
-  background-color: mat-color($my-app-accent, 50);
+  background-color: mat-color($fm-app-accent, 50);
   font-weight: 600;
 }
 
@@ -26,11 +26,11 @@ mat-list-item.mat-list-item.mat-focus-indicator.account-entry-header {
 }
 
 div.positive-amount {
-  color:  green;
+  color: $fm-income-color;
 }
 
 div.negative-amount {
-  color:  red;
+  color: $fm-expense-color;
 }
 
 eco-fab-speed-dial {
@@ -44,5 +44,5 @@ eco-fab-speed-dial-trigger.hidden:hover {
 }
 
 eco-fab-speed-dial-trigger.hidden:not(:hover) {
-  opacity: .45;
+  opacity: 0.45;
 }

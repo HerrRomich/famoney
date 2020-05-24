@@ -1,9 +1,12 @@
 package com.hrrm.famoney.domain.accounts.migrations.v02;
 
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.text.MessageFormat;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -11,31 +14,72 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayDeque;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.TimeZone;
+import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
 import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonString;
 import javax.json.JsonValue;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.flywaydb.core.api.MigrationVersion;
 import org.flywaydb.core.api.migration.Context;
 import org.flywaydb.core.api.migration.JavaMigration;
 import org.osgi.service.log.Logger;
 import org.osgi.service.log.LoggerFactory;
 
+import com.hrrm.famoney.application.api.datadirectory.dto.EntryCategoriesDTO;
+import com.hrrm.famoney.application.api.datadirectory.dto.EntryCategoryDTO;
 import com.hrrm.famoney.domain.accounts.migrations.v01.V1M2Accounts;
 import com.hrrm.famoney.function.throwing.ThrowingBiConsumer;
 import com.hrrm.famoney.function.throwing.ThrowingConsumer;
-import com.hrrm.famoney.function.throwing.ThrowingSupplier;
+import com.hrrm.famoney.function.throwing.ThrowingFunction;
+import com.hrrm.famoney.function.throwing.ThrowingIntConsumer;
+import com.hrrm.famoney.function.throwing.ThrowingRunnable;
 import com.hrrm.famoney.infrastructure.persistence.migrations.MigrationException;
 
 public class V2M2InitialMovements implements JavaMigration {
 
     private final Logger logger;
 
-    public V2M2InitialMovements(final LoggerFactory loggerFactory) {
+    private static final Map<String, String> MOVEMENT_TYPES = Map.of("check",
+            "entry",
+            "transfer",
+            "transfer",
+            "entry",
+            "entry",
+            "balance",
+            "balance");
+    private static final Map<String, String> ACCOUNTS = Map.of("Кошелек Пупсика",
+            "entry",
+            "transfer",
+            "transfer",
+            "entry",
+            "entry",
+            "balance",
+            "balance");
+    private Map<String, Integer> accountIds = new HashMap<>();
+    private Map<String, Integer> categoryIds = new HashMap<>();
+    private Supplier<EntryCategoriesDTO> entryCategoriesSuppier;
+    private EntryCategoriesDTO entryCategories;
+
+    private static final List<Pair<Pattern, String>> CATEGORY_PROCESSORS = List.of(Pair.of(Pattern.compile(
+            "^Питание: Продукты"),
+            "Продукты"));
+
+    public V2M2InitialMovements(final LoggerFactory loggerFactory,
+            final Supplier<EntryCategoriesDTO> entryCategoriesSuppier) {
         super();
         this.logger = loggerFactory.getLogger(V1M2Accounts.class);
+        this.entryCategoriesSuppier = entryCategoriesSuppier;
     }
 
     @Override
@@ -70,6 +114,7 @@ public class V2M2InitialMovements implements JavaMigration {
                 getDescription());
         try (final var jdbcStatements = new InitialMovementsJdbcStatements(context.getConnection(),
             getClass().getClassLoader())) {
+            entryCategories = entryCategoriesSuppier.get();
             insertAccountsMovements(jdbcStatements);
             updateAccountsMovemntsCountAndSum(jdbcStatements);
             logger.info("Migration: \"{} {}\" is successfully completed.",
@@ -106,14 +151,25 @@ public class V2M2InitialMovements implements JavaMigration {
                 accountName);
         try {
             final var accountMovements = accountValue.asJsonArray();
-            final var accountId = findAccountId(jdbcStatements.getAccountIdByNameSelect(),
-                    accountName);
+            final var accountId = accountIds.computeIfAbsent(accountName,
+                    ThrowingFunction.sneaky(key -> findAccountId(jdbcStatements.getAccountIdByNameSelect(),
+                            key)));
             accountMovements.forEach(ThrowingConsumer.sneaky(movementValue -> {
-                final AccountMovementData accountMovementData = getAccountMovementData(jdbcStatements,
+                final var movementData = getMovementData(jdbcStatements,
                         accountId,
                         movementValue);
-                insertMovement(jdbcStatements,
-                        accountMovementData);
+                final var movementId = insertMovement(jdbcStatements.getAccountMovementInsert(),
+                        movementData);
+                if (
+                    movementData.getType()
+                        .equals("entry") &&
+                        !movementData.getEntryItems()
+                            .isEmpty()
+                ) {
+                    insertEntryItems(jdbcStatements.getEntryItemInsert(),
+                            movementData,
+                            movementId);
+                }
             }));
             insertMovmentSlices(jdbcStatements,
                     accountId);
@@ -134,31 +190,46 @@ public class V2M2InitialMovements implements JavaMigration {
         }
     }
 
-    private AccountMovementData getAccountMovementData(final InitialMovementsJdbcStatements jdbcStatements,
-            final int accountId, final JsonValue movementValue) throws MigrationException {
+    private MovementData getMovementData(final InitialMovementsJdbcStatements jdbcStatements, final int accountId,
+            final JsonValue movementValue) throws MigrationException {
         logger.trace("Combining data for account movement.");
         try {
             final var movement = movementValue.asJsonObject();
-            var accountMovementDataBuilder = AccountMovementDataImpl.builder()
-                .accountId(accountId);
-            final var date = DateTimeFormatter.ISO_DATE.parse(movement.getJsonString("date")
-                .getString(),
+            final var movementDataBuilder = MovementDataImpl.builder()
+                .accountId(accountId)
+                .type(V2M2InitialMovements.MOVEMENT_TYPES.get(movement.getString("type")));
+            final var date = DateTimeFormatter.ISO_DATE.parse(movement.getString("date"),
                     LocalDate::from);
-            accountMovementDataBuilder = accountMovementDataBuilder.date(findNextDate(jdbcStatements,
+            movementDataBuilder.date(findNextDate(jdbcStatements,
                     accountId,
                     date));
-
-            final var bookingDateAttribute = Optional.ofNullable(movement.getJsonString("bookingDate"));
-            final var bookingDate = bookingDateAttribute.map(attr -> DateTimeFormatter.ISO_DATE_TIME.parse(attr
-                .getString(),
-                    LocalDateTime::from))
-                .orElseGet(ThrowingSupplier.sneaky(() -> findNextDate(jdbcStatements,
-                        accountId,
-                        date)));
-            accountMovementDataBuilder = accountMovementDataBuilder.bookingDate(bookingDate);
-            accountMovementDataBuilder = accountMovementDataBuilder.amount(movement.getJsonNumber("amount")
-                .bigDecimalValue());
-            final var accountMovementData = accountMovementDataBuilder.build();
+            final var bookingDateAttribute = Optional.ofNullable(movement.getString("bookingDate",
+                    null))
+                .map(attr -> DateTimeFormatter.ISO_DATE_TIME.parse(attr,
+                        LocalDateTime::from));
+            movementDataBuilder.bookingDate(bookingDateAttribute);
+            final var amount = movement.getJsonNumber("amount")
+                .bigDecimalValue();
+            movementDataBuilder.amount(amount);
+            Optional.ofNullable(movement.getJsonArray("items"))
+                .map(ThrowingFunction.sneaky(this::jsonItemsToEntryItems))
+                .ifPresent(movementDataBuilder::addAllEntryItems);
+            Optional.ofNullable(movement.getJsonString("category"))
+                .map(JsonString::getString)
+                .map(category -> categoryIds.computeIfAbsent(category,
+                        ThrowingFunction.sneaky(key -> findCategoryIdByCategoryFullName(key,
+                                amount.signum()))))
+                .ifPresent(movementDataBuilder::categoryId);
+            Optional.ofNullable(movement.getJsonString("comments"))
+                .map(JsonString::getString)
+                .ifPresent(movementDataBuilder::comments);
+            Optional.ofNullable(movement.getJsonString("oppositAccount"))
+                .map(JsonString::getString)
+                .map(account -> accountIds.computeIfAbsent(account,
+                        ThrowingFunction.sneaky(accountName -> findAccountId(jdbcStatements.getAccountIdByNameSelect(),
+                                accountName))))
+                .ifPresent(movementDataBuilder::categoryId);
+            final var accountMovementData = movementDataBuilder.build();
             logger.trace(l -> l.trace("Combined data for account movement: {}",
                     accountMovementData));
             return accountMovementData;
@@ -210,35 +281,167 @@ public class V2M2InitialMovements implements JavaMigration {
         }
     }
 
-    private void insertMovement(final InitialMovementsJdbcStatements jdbcStatements,
-            final AccountMovementData accountMovementData) throws MigrationException {
+    private List<EntryItemData> jsonItemsToEntryItems(JsonArray jsonItems) throws MigrationException {
+        return jsonItems.getValuesAs(jsonItem -> {
+            final var entryItem = jsonItem.asJsonObject();
+            var entryItemBuilder = EntryItemDataImpl.builder();
+            BigDecimal amount = entryItem.getJsonNumber("amount")
+                .bigDecimalValue();
+            entryItemBuilder.amount(amount);
+
+            Optional.ofNullable(entryItem.getJsonString("category"))
+                .map(JsonString::getString)
+                .map(category -> categoryIds.computeIfAbsent(category,
+                        ThrowingFunction.sneaky(key -> findCategoryIdByCategoryFullName(key,
+                                amount.signum()))))
+                .ifPresent(entryItemBuilder::categoryId);
+            Optional.ofNullable(entryItem.getJsonString("comments"))
+                .map(JsonString::getString)
+                .ifPresent(entryItemBuilder::comments);
+            return entryItemBuilder.build();
+        });
+    }
+
+    private Integer findCategoryIdByCategoryFullName(final String categoryFullName, final int amountSignum)
+            throws MigrationException {
+        final var processedCategoryFullName = V2M2InitialMovements.CATEGORY_PROCESSORS.stream()
+            .map(processor -> Pair.of(processor.getLeft()
+                .matcher(categoryFullName),
+                    processor.getRight()))
+            .filter(processor -> processor.getLeft()
+                .find())
+            .findFirst()
+            .map(processor -> processor.getLeft()
+                .replaceAll(processor.getRight()))
+            .orElse(categoryFullName);
+        final var categoryLevels = new ArrayDeque<String>(List.of(StringUtils.split(processedCategoryFullName,
+                ": ")));
+        try {
+            if (amountSignum > 0) {
+                final var incomes = entryCategories.getIncomes();
+                return findCategoryIdByCategoryLevels(categoryLevels,
+                        incomes);
+            } else {
+                final var expenses = entryCategories.getExpenses();
+                return findCategoryIdByCategoryLevels(categoryLevels,
+                        expenses);
+            }
+        } catch (MigrationException e) {
+            throw new MigrationException(MessageFormat.format("Cannot find category: \"{0}\".",
+                    processedCategoryFullName),
+                e);
+        }
+    }
+
+    private <T extends EntryCategoryDTO<T>> Integer findCategoryIdByCategoryLevels(
+            final ArrayDeque<String> categoryLevels, final List<T> incomes) throws MigrationException {
+        final var categoryLevel = categoryLevels.poll();
+        final var foundCategory = incomes.stream()
+            .filter(value -> value.getName()
+                .equals(categoryLevel))
+            .findFirst()
+            .orElseThrow(() -> new MigrationException(MessageFormat.format("Cannot find subcategory: \"{0}\".",
+                    categoryLevel)));
+        return findCategoryIdByCategory(foundCategory,
+                categoryLevels);
+    }
+
+    private <T extends EntryCategoryDTO<T>> Integer findCategoryIdByCategory(final T foundCategory,
+            final ArrayDeque<String> categoryLevels) {
+        if (categoryLevels.isEmpty()) {
+            return foundCategory.getId();
+        }
+        final var categoryLevel = categoryLevels.poll();
+        return foundCategory.getChildren()
+            .stream()
+            .filter(value -> value.getName()
+                .equals(categoryLevel))
+            .findFirst()
+            .map(value -> findCategoryIdByCategory(value,
+                    categoryLevels))
+            .orElse(foundCategory.getId());
+    }
+
+    private Integer insertMovement(final PreparedStatement insertMovementStatement,
+            final MovementData accountMovementData) throws MigrationException {
         logger.trace(l -> l.trace("Inserting account movement: {}.",
                 accountMovementData));
         try {
-            final var accountMovementInsertStmt = jdbcStatements.getAccountMovementInsert();
-
-            accountMovementInsertStmt.setInt(1,
-                    accountMovementData.getAccountId());
-            accountMovementInsertStmt.setString(2,
-                    "entry");
-            accountMovementInsertStmt.setTimestamp(3,
-                    Timestamp.valueOf(accountMovementData.getDate()));
-
-            accountMovementInsertStmt.setTimestamp(3,
-                    Timestamp.valueOf(accountMovementData.getDate()));
-            accountMovementInsertStmt.setTimestamp(4,
-                    Timestamp.valueOf(accountMovementData.getBookingDate()));
-            accountMovementInsertStmt.setBigDecimal(5,
-                    accountMovementData.getAmount());
-            accountMovementInsertStmt.executeUpdate();
+            final var generatedKeys = callInsertMovement(insertMovementStatement,
+                    accountMovementData);
+            if (generatedKeys.next()) {
+                final int movementId = generatedKeys.getInt(1);
+                logger.trace(l -> l.trace("Account movement is successfully inserted with id: {}.",
+                        movementId));
+                return movementId;
+            }
             logger.trace("Account movement is successfully inserted.");
+            return null;
         } catch (DateTimeParseException | SQLException ex) {
-            final String message = MessageFormat.format("It was unable to insert an account movement for data: {}.",
+            final String message = MessageFormat.format("It was unable to insert an account movement for data: {0}.",
                     accountMovementData);
             logger.error(message);
             throw new MigrationException(message,
                 ex);
         }
+    }
+
+    private ResultSet callInsertMovement(final PreparedStatement insertMovementStatement,
+            final MovementData accountMovementData) throws SQLException {
+        insertMovementStatement.setInt(1,
+                accountMovementData.getAccountId());
+        insertMovementStatement.setString(2,
+                accountMovementData.getType());
+        insertMovementStatement.setTimestamp(3,
+                Timestamp.valueOf(accountMovementData.getDate()));
+        accountMovementData.getBookingDate()
+            .ifPresentOrElse(ThrowingConsumer.sneaky(value -> insertMovementStatement.setTimestamp(4,
+                    Timestamp.valueOf(value))),
+                    ThrowingRunnable.sneaky(() -> insertMovementStatement.setNull(4,
+                            Types.TIMESTAMP)));
+        accountMovementData.getBudgetPeriod()
+            .ifPresentOrElse(ThrowingConsumer.sneaky(value -> insertMovementStatement.setDate(5,
+                    Date.valueOf(value))),
+                    ThrowingRunnable.sneaky(() -> insertMovementStatement.setNull(5,
+                            Types.DATE)));
+        accountMovementData.getCategoryId()
+            .ifPresentOrElse(ThrowingIntConsumer.sneaky(value -> insertMovementStatement.setInt(6,
+                    value)),
+                    ThrowingRunnable.sneaky(() -> insertMovementStatement.setNull(6,
+                            Types.INTEGER)));
+        accountMovementData.getComments()
+            .ifPresentOrElse(ThrowingConsumer.sneaky(value -> insertMovementStatement.setString(7,
+                    value)),
+                    ThrowingRunnable.sneaky(() -> insertMovementStatement.setNull(7,
+                            Types.VARCHAR)));
+        accountMovementData.getOppositAccountId()
+            .ifPresentOrElse(ThrowingIntConsumer.sneaky(value -> insertMovementStatement.setInt(8,
+                    value)),
+                    ThrowingRunnable.sneaky(() -> insertMovementStatement.setNull(8,
+                            Types.INTEGER)));
+        insertMovementStatement.setBigDecimal(9,
+                accountMovementData.getAmount());
+        insertMovementStatement.executeUpdate();
+        return insertMovementStatement.getGeneratedKeys();
+    }
+
+    private void insertEntryItems(final PreparedStatement insertEntryItemStmt, MovementData movementData,
+            Integer movementId) {
+        logger.debug(l -> l.debug("Inserting entry items."));
+        final var entryItems = movementData.getEntryItems();
+        entryItems.forEach(ThrowingConsumer.sneaky(entryItem -> {
+            insertEntryItemStmt.setInt(1,
+                    movementId);
+            insertEntryItemStmt.setInt(2,
+                    entryItem.getCategoryId());
+            insertEntryItemStmt.setString(3,
+                    entryItem.getComments());
+            insertEntryItemStmt.setBigDecimal(4,
+                    entryItem.getAmount());
+            insertEntryItemStmt.executeUpdate();
+        }));
+        logger.debug(l -> l.debug("{} entry items are inserted.",
+                entryItems.size()));
     }
 
     private int findAccountId(final PreparedStatement findAccountIdByNameStmt, final String accountName)
@@ -268,12 +471,12 @@ public class V2M2InitialMovements implements JavaMigration {
 
     private int getAccountId(final PreparedStatement findAccountIdByNameStmt, final String accountName)
             throws MigrationException {
-        try (final var accountIds = findAccountIdByNameStmt.getResultSet()) {
-            if (!accountIds.first()) {
+        try (final var accountIdResultSet = findAccountIdByNameStmt.getResultSet()) {
+            if (!accountIdResultSet.first()) {
                 throw new MigrationException(MessageFormat.format("Account by name: {0} is not found.",
                         accountName));
             }
-            return accountIds.getInt(1);
+            return accountIdResultSet.getInt(1);
         } catch (final SQLException e) {
             throw new MigrationException("Cant extract account id.",
                 e);

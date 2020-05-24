@@ -2,15 +2,15 @@ package com.hrrm.famoney.api.accounts.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.Optional;
 
 public interface MovementDataDTOBuilder<T extends MovementDataDTO> {
 
-    public MovementDataDTOBuilder<T> date(LocalDateTime date);
+    public MovementDataDTOBuilder<T> date(LocalDate date);
 
-    public MovementDataDTOBuilder<T> bookingDate(LocalDateTime bookingDate);
+    public MovementDataDTOBuilder<T> bookingDate(Optional<? extends LocalDate> bookingDate);
 
-    public MovementDataDTOBuilder<T> budgetMonth(LocalDate budgetMonth);
+    public MovementDataDTOBuilder<T> budgetPeriod(Optional<? extends LocalDate> budgetPeriod);
 
     public MovementDataDTOBuilder<T> amount(BigDecimal amount);
 

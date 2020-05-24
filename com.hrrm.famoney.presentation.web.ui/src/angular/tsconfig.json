@@ -4,9 +4,15 @@
     "baseUrl": "./",
     "outDir": "./dist/out-tsc",
     "paths": {
-      "@famoney-apis/*": ["src/app/shared/apis/*"],
-      "@famoney-shared/*": ["src/app/shared/*"],
-      "@famoney-modules/*": ["src/app/modules/*"],
+      "@famoney-apis/*": [
+        "src/app/shared/apis/*"
+      ],
+      "@famoney-shared/*": [
+        "src/app/shared/*"
+      ],
+      "@famoney-modules/*": [
+        "src/app/modules/*"
+      ],
     },
     "sourceMap": true,
     "declaration": false,
@@ -16,6 +22,7 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "target": "es2015",
+    "strict": true,
     "typeRoots": [
       "node_modules/@types"
     ],
@@ -23,5 +30,8 @@
       "es2015",
       "dom"
     ]
+  },
+  "angularCompilerOptions": {
+    "fullTemplateTypeCheck": true
   }
 }

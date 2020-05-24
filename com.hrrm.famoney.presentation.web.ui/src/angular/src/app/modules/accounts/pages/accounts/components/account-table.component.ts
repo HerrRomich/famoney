@@ -1,8 +1,8 @@
-import { Component, OnInit, ViewChild, OnDestroy, Inject, ElementRef, AfterViewInit } from '@angular/core';
-import { Subscription } from 'rxjs';
-import { MovementDto, AccountsApiService } from '@famoney-apis/accounts';
+import { Component, OnInit, ViewChild, OnDestroy, Inject } from '@angular/core';
+import { Subscription, empty } from 'rxjs';
+import { AccountsApiService, MovementDataDto, EntryDataDto, AccountDto } from '@famoney-apis/accounts';
 import { ActivatedRoute } from '@angular/router';
-import { map, switchMap, tap, take } from 'rxjs/operators';
+import { map, switchMap, tap, take, filter } from 'rxjs/operators';
 import { CdkVirtualScrollViewport, VIRTUAL_SCROLL_STRATEGY } from '@angular/cdk/scrolling';
 import { EcoFabSpeedDialActionsComponent, EcoFabSpeedDialComponent } from '@ecodev/fab-speed-dial';
 import { interval } from 'rxjs';
@@ -10,71 +10,76 @@ import { AccountEntryDialogComponent } from './account-entry-dialog.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { AccountMovementsViertualScrollStrategy } from './account-movements.virtual-scroller-strategy';
 import { MovementDataSource } from './movement-data-source';
-import { MatListItem } from '@angular/material/list';
 
 const fabSpeedDialDelayOnHover = 350;
 
 @Component({
-  selector: 'app-account-table',
+  selector: 'fm-account-table',
   templateUrl: 'account-table.component.html',
   styleUrls: ['account-table.component.scss'],
   providers: [
     {
       provide: VIRTUAL_SCROLL_STRATEGY,
-      useClass: AccountMovementsViertualScrollStrategy
-    }
-  ]
+      useClass: AccountMovementsViertualScrollStrategy,
+    },
+  ],
 })
 export class AccountTableComponent implements OnInit, OnDestroy {
   movementDataSource: MovementDataSource;
 
   @ViewChild('fabSpeedDial', { static: true })
-  fabSpeedDial: EcoFabSpeedDialComponent;
+  fabSpeedDial!: EcoFabSpeedDialComponent;
 
   @ViewChild('fabSpeedDialActions', { static: true })
-  fabSpeedDialActions: EcoFabSpeedDialActionsComponent;
+  fabSpeedDialActions!: EcoFabSpeedDialActionsComponent;
 
   @ViewChild(CdkVirtualScrollViewport)
-  viewPort: CdkVirtualScrollViewport;
+  viewPort!: CdkVirtualScrollViewport;
 
-  private speedDialTriggerSubscription: Subscription;
+  private speedDialTriggerSubscription?: Subscription;
 
-  private fabSpeedDialOpenChangeSubbscription: Subscription;
+  private fabSpeedDialOpenChangeSubbscription?: Subscription;
+  private accountDTO?: AccountDto;
 
   constructor(
     private route: ActivatedRoute,
     private accountsApiService: AccountsApiService,
     private accountEntryDialogComponent: MatDialog,
     @Inject(VIRTUAL_SCROLL_STRATEGY)
-    private accountMovementsViertualScrollStrategy: AccountMovementsViertualScrollStrategy
-  ) {}
+    private accountMovementsViertualScrollStrategy: AccountMovementsViertualScrollStrategy,
+  ) {
+    const account$ = this.route.paramMap.pipe(
+      map(params => Number.parseInt(params.get('accountId') ?? '', 10)),
+      tap(() => (this.accountDTO = undefined)),
+      filter(accountId => accountId !== NaN),
+      switchMap(accountId => this.accountsApiService.getAccount(accountId)),
+      tap(accountDTO => {
+        this.accountDTO = accountDTO;
+        this.accountMovementsViertualScrollStrategy.switchAccount(accountDTO.movementCount ?? 0);
+      }),
+    );
+    this.movementDataSource = new MovementDataSource(this.accountsApiService, account$);
+  }
 
   ngOnInit() {
     this.fabSpeedDialOpenChangeSubbscription = this.fabSpeedDial.openChange
       .pipe(
         tap(opened => {
           this.fabSpeedDial.fixed = !opened;
-        })
+        }),
       )
       .subscribe();
-
-    const account$ = this.route.paramMap.pipe(
-      map(params => Number.parseInt(params.get('accountId'), 10)),
-      switchMap(accountId => this.accountsApiService.getAccount(accountId)),
-      tap(accountDTO => this.accountMovementsViertualScrollStrategy.switchAccount(accountDTO.movementCount))
-    );
-    this.movementDataSource = new MovementDataSource(this.accountsApiService, account$);
   }
 
   ngOnDestroy() {
-    this.fabSpeedDialOpenChangeSubbscription.unsubscribe();
+    this.fabSpeedDialOpenChangeSubbscription?.unsubscribe();
   }
 
   get inverseTranslation(): string {
     if (!this.viewPort || !this.viewPort['_renderedContentTransform']) {
       return '-0px';
     }
-    return `-${this.viewPort["_renderedContentOffset"]}px`;
+    return `-${this.viewPort['_renderedContentOffset']}px`;
   }
 
   triggerSpeedDial() {
@@ -84,24 +89,24 @@ export class AccountTableComponent implements OnInit, OnDestroy {
           tap(() => {
             this.fabSpeedDial.open = true;
           }),
-          take(1)
+          take(1),
         )
         .subscribe();
     }
   }
 
   stopSpeedDial() {
-    if (this.speedDialTriggerSubscription && !this.speedDialTriggerSubscription.closed) {
+    if (this.speedDialTriggerSubscription?.closed) {
       this.speedDialTriggerSubscription.unsubscribe();
     }
-    this.speedDialTriggerSubscription = null;
+    this.speedDialTriggerSubscription = undefined;
   }
 
   addEntry() {
     this.stopSpeedDial();
     const accountEntryDialogRef: MatDialogRef<
       AccountEntryDialogComponent,
-      MovementDto
+      EntryDataDto
     > = this.accountEntryDialogComponent.open(AccountEntryDialogComponent, {
       width: '520px',
       minWidth: '520px',
@@ -109,11 +114,16 @@ export class AccountTableComponent implements OnInit, OnDestroy {
       panelClass: 'account-entry-dialog',
       disableClose: true,
       hasBackdrop: true,
-      data: {
-        date: new Date()
-      } as MovementDto
     });
-    accountEntryDialogRef.afterClosed().subscribe(accountEntry => {});
+    accountEntryDialogRef.beforeClosed().pipe(
+      switchMap(accountEntry => {
+        if (this.accountDTO && accountEntry) {
+          return this.accountsApiService.addMovement(this.accountDTO.id, accountEntry);
+        } else {
+          return empty();
+        }
+      }),
+    ).subscribe();
   }
 
   addTransfer() {

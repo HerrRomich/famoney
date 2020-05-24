@@ -11,9 +11,6 @@
       "schematics": {
         "@schematics/angular:component": {
           "styleext": "scss"
-        },
-        "i18n": {
-          "sourceLocale": "ru-RU"
         }
       },
       "architect": {

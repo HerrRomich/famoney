@@ -5,7 +5,7 @@ import { tap, mergeMap, skipWhile, takeWhile } from 'rxjs/operators';
 
 @Injectable()
 export class AccountMovementsViertualScrollStrategy extends FixedSizeVirtualScrollStrategy {
-  private viewport: CdkVirtualScrollViewport;
+  private viewport?: CdkVirtualScrollViewport;
   private dataChanged: Subject<void>;
   private accountSwitched: Subject<number>;
   private dataLengeChangedProcessorSubscription: Subscription;
@@ -16,12 +16,12 @@ export class AccountMovementsViertualScrollStrategy extends FixedSizeVirtualScro
     this.accountSwitched = new Subject();
     this.dataLengeChangedProcessorSubscription = zip(this.dataChanged, this.accountSwitched)
       .pipe(
-        tap(() => this.viewport.scrollToIndex(0)),
+        tap(() => this.viewport?.scrollToIndex(0)),
         mergeMap(() =>
           timer(0, 50).pipe(
-            skipWhile(() => this.viewport.getRenderedRange().start !== 0),
-            tap(() => this.viewport.scrollToIndex(this.viewport.getDataLength())),
-            takeWhile(() => this.viewport.getRenderedRange().end !== this.viewport.getDataLength()),
+            skipWhile(() => this.viewport?.getRenderedRange().start !== 0),
+            tap(() => this.viewport?.scrollToIndex(this.viewport?.getDataLength())),
+            takeWhile(() => this.viewport?.getRenderedRange().end !== this.viewport?.getDataLength()),
           ),
         ),
       )

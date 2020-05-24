@@ -6,31 +6,30 @@ import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/mat
 
 export const MY_FORMATS = {
   parse: {
-    dateInput: 'MMM YYYY'
+    dateInput: 'MMM YYYY',
   },
   display: {
     dateInput: 'MMM YYYY',
     monthYearLabel: 'MMM YYYY',
     dateA11yLabel: 'LL',
-    monthYearA11yLabel: 'MMMM YYYY'
-  }
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
 };
 
 @Component({
-  selector: 'app-monthpicker',
+  selector: 'fm-monthpicker',
   template: '',
   providers: [
     {
       provide: DateAdapter,
       useClass: MomentDateAdapter,
-      deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS]
+      deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS],
     },
     { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
-    { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { strict: true } }
-  ]
+    { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { strict: true } },
+  ],
 })
 export class MonthPickerComponent<D> extends MatDatepicker<D> implements OnInit {
-
   ngOnInit() {
     this.startView = 'year';
     this.calendarHeaderComponent = MonthCalendarHeaderComponent;
@@ -41,5 +40,4 @@ export class MonthPickerComponent<D> extends MatDatepicker<D> implements OnInit 
     this.select(normalizedMonth);
     this.close();
   }
-
 }

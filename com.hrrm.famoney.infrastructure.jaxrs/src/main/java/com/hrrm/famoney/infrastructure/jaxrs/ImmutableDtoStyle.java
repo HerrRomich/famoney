@@ -12,7 +12,7 @@ import org.immutables.value.Value;
         ElementType.TYPE
 })
 @Retention(RetentionPolicy.CLASS)
-@Value.Style(packageGenerated = "*.impl", typeImmutable = "*Impl", overshadowImplementation = true)
+@Value.Style(packageGenerated = "*.impl", typeImmutable = "*Impl", overshadowImplementation = true, init = "*")
 public @interface ImmutableDtoStyle {
 
 }

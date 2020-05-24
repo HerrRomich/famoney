@@ -1,19 +1,16 @@
 package com.hrrm.famoney.domain.accounts.migrations.v02;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 import org.immutables.value.Value;
 
 @Value.Immutable
-public interface AccountMovementData {
+public interface EntryItemData {
 
-    int getAccountId();
-
-    LocalDateTime getDate();
-
-    LocalDateTime getBookingDate();
+    Integer getCategoryId();
 
     BigDecimal getAmount();
+
+    String getComments();
 
 }

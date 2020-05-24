@@ -68,10 +68,11 @@ public class V1M2EntryCategories implements JavaMigration {
                     .getResourceAsStream("initial_entry_categories.json"))) {
             final var rootJsonObject = parser.getObject();
             final var incomeCategoriesJsonArray = rootJsonObject.getJsonArray("incomes");
-            addCategories(CategoryGroupDataImpl.builder()
+            CategoryGroupData categoryGroupData = CategoryGroupDataImpl.builder()
                 .type("income")
                 .parentId(OptionalInt.empty())
-                .build(),
+                .build();
+            addCategories(categoryGroupData,
                     incomeCategoriesJsonArray,
                     jdbcStatements);
             final var expenseCategoriesJsonArray = rootJsonObject.getJsonArray("expenses");

@@ -26,6 +26,7 @@ public interface TransferDataDTO extends MovementDataDTO {
 
     }
 
+    @Schema(required = true)
     Integer getOppositAccountId();
 
 }

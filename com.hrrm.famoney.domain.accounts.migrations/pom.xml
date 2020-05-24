@@ -38,6 +38,10 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>com.hrrm.famoney.infrastructure.wrappers</artifactId>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>com.hrrm.famoney.application.api.data-directory</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.ops4j.pax.jdbc</groupId>

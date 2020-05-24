@@ -19,7 +19,7 @@ public class InitialMovementsJdbcStatements extends JdbcMigrationStetemnets {
     }
 
     public PreparedStatement getAccountMovementInsert() throws MigrationException {
-        return getStatement("movement_insert.sql");
+        return getStatementWithGeneratedKeys("movement_insert.sql");
     }
 
     public PreparedStatement getAccountMovementsMinMaxDatesSelect() throws MigrationException {
@@ -48,6 +48,10 @@ public class InitialMovementsJdbcStatements extends JdbcMigrationStetemnets {
 
     public PreparedStatement getAccountMovementsMaxDateBetweenDatesSelect() throws MigrationException {
         return getStatement("account_movements_max_date_between_dates_select.sql");
+    }
+
+    public PreparedStatement getEntryItemInsert() throws MigrationException {
+        return getStatement("entry_item_insert.sql");
     }
 
 }

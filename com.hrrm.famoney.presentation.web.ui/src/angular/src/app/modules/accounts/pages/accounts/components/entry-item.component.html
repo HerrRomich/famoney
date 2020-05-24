@@ -1,81 +1,56 @@
-<div fxLayout="column" flex>
+<div fxLayout="column" flex [formGroup]="formGroup" fxLayoutGap="12px" *ngIf="entryCategories$ | async as entryCategories" >
   <div matLine fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="12px">
     <mat-form-field fxFlex="80" floatLabel="always">
-      <mat-label
-        i18n="
-           entry item category field title|Title of category field in entry
-          item.@@accounts.entryItem.fields.category.title
-        "
-        >Категория</mat-label
-      >
+      <mat-label translate="accounts.entryItem.fields.category.title"></mat-label>
       <input
         matInput
-        required
-        placeholder="Категория"
-        i18n-placeholder="
-           entry item category field placeholder|Placeholder of category field in entry
-          item.@@accounts.entryItem.fields.category.placeholder
-        "
+        [placeholder]="'accounts.entryItem.fields.category.placeholder' | translate"
         [matAutocomplete]="categoryAutocomplete"
-        [formControl]="entryCategoryCtrl"
+        formControlName="categoryId"
+        required
       />
-      <mat-autocomplete #categoryAutocomplete>
-        <ng-container *ngIf="entryCategories$ | async as entryCategories; else categoriesNotFound">
-          <mat-optgroup
-            label="Расходы"
-            i18n-label="
-               dropdown expense category group|Expense category group in a dropdown
-              list.@@accounts.entryItem.fields.category.dropdown.group.expense
-            "
-            class="fm-optgroup-sticky"
-          >
-            <ng-container
-              *ngTemplateOutlet="subCategories; context: { elements: entryCategories.expenses, level: 1 }"
-            ></ng-container>
-          </mat-optgroup>
-          <mat-optgroup
-            label="Доходы"
-            i18n-label="
-               dropdown income category group|Income category group in a dropdown
-              list.@@accounts.entryItem.fields.category.dropdown.group.income
-            "
-            class="fm-optgroup-sticky"
-          >
-            <ng-container
-              *ngTemplateOutlet="subCategories; context: { elements: entryCategories.incomes, level: 1 }"
-            ></ng-container>
-          </mat-optgroup>
-        </ng-container>
+      <mat-error>{{ getCategoryErrorMessage$() | async }}</mat-error>
+      <mat-hint>{{ getCategoryPath$() | async }}</mat-hint>
+      <mat-autocomplete #categoryAutocomplete [displayWith]="getCategoryName(entryCategories.flatEntryCategories)">
+        <mat-optgroup
+          [label]="'accounts.entryItem.fields.category.dropdown.group.income' | translate"
+          class="fm-optgroup-sticky"
+        >
+          <mat-option
+            *ngFor="let category of entryCategories.incomes"
+            [value]="category.id"
+            [style.padding-left]="16 + category.level * 16 + 'px'"
+            ><span [innerHtml]="category.optionName"></span>
+          </mat-option>
+        </mat-optgroup>
+        <mat-optgroup
+          [label]="'accounts.entryItem.fields.category.dropdown.group.expense' | translate"
+          class="fm-optgroup-sticky"
+        >
+          <mat-option
+            *ngFor="let category of entryCategories.expenses"
+            [value]="category.id"
+            [style.padding-left]="16 + category.level * 16 + 'px'"
+            ><span [innerHtml]="category.optionName"></span>
+          </mat-option>
+        </mat-optgroup>
       </mat-autocomplete>
     </mat-form-field>
     <mat-form-field fxFlex="20" floatLabel="always" class="fm-number-input">
-      <mat-label
-        i18n="entry item amount field title|Title of entry item amount field.@@accounts.entryItem.fields.amount.title"
-        >Сумма</mat-label
-      >
-      <input matInput [placeholder]="0.0" autocomplete="off" mask="separator.2" />
+      <mat-label translate="accounts.entryItem.fields.amount.title"></mat-label>
+      <input
+        type="number"
+        matInput
+        autocomplete="off"
+        formControlName="amount"
+        required
+        [ngClass]="getEntryItemClass$() | async"
+      />
+      <mat-error>{{ getAmountErrorMessage$() | async }}</mat-error>
     </mat-form-field>
   </div>
   <mat-form-field matLine floatLabel="always">
-    <mat-label
-      i18n="entry item comment field title|Title of entry item comment field.@@accounts.entryItem.fields.comment.title"
-      >Комментарий</mat-label
-    >
-    <input matInput autocomplete="off" />
+    <mat-label translate="accounts.entryItem.fields.comments.title"></mat-label>
+    <input matInput autocomplete="off" formControlName="comments" />
   </mat-form-field>
-
-  <ng-template #subCategories let-elements="elements" let-level="level">
-    <ng-container *ngFor="let category of elements">
-      <mat-option [value]="category.id" [style.padding-left]="16 + level * 16 + 'px'"
-        ><span [innerHtml]="category.name"></span>
-      </mat-option>
-      <ng-container
-        *ngTemplateOutlet="subCategories; context: { elements: category.children, level: level + 1 }"
-      ></ng-container
-    ></ng-container>
-  </ng-template>
-
-  <ng-template #categoriesNotFound>
-    <mat-option label="Категории не найдены!" class="fm-optgroup-sticky"></mat-option>
-  </ng-template>
 </div>

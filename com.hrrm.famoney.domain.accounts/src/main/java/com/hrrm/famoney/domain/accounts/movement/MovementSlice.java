@@ -17,6 +17,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(schema = AccountsDomainEntity.SCHEMA_NAME, name = "movement_slice")
@@ -25,11 +26,16 @@ import lombok.experimental.Accessors;
 @Setter
 @ToString(callSuper = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
+@SuperBuilder
 public class MovementSlice extends AccountsDomainEntity {
 
     public static final Integer FIRST_SLICE_ID = -1;
-    public static final LocalDate FIRST_SLICE_DATE = LocalDate.of(1970, 1, 1);
-    public static final LocalDate LAST_SLICE_DATE = LocalDate.of(2070, 1, 1);
+    public static final LocalDate FIRST_SLICE_DATE = LocalDate.of(1970,
+            1,
+            1);
+    public static final LocalDate LAST_SLICE_DATE = LocalDate.of(2070,
+            1,
+            1);
 
     @ManyToOne
     @JoinColumn(name = "account_id")
@@ -38,16 +44,10 @@ public class MovementSlice extends AccountsDomainEntity {
     @Column(name = "date")
     private LocalDate date;
 
-    @Column(name = "movement_count")
+    @Column(name = "count")
     private Integer movementCount;
 
-    @Column(name = "movement_sum")
+    @Column(name = "sum")
     private BigDecimal movementSum;
-
-    @Column(name = "booking_count")
-    private Integer bookingCount;
-
-    @Column(name = "booking_sum")
-    private BigDecimal bookingSum;
 
 }

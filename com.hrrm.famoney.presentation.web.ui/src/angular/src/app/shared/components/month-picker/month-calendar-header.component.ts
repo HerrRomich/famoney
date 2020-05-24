@@ -3,7 +3,7 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { MatCalendarHeader } from '@angular/material/datepicker';
 
 @Component({
-  selector: 'app-month-calendar-header',
+  selector: 'fm-month-calendar-header',
   template: `
     <div class="mat-calendar-header">
       <div class="mat-calendar-controls">
@@ -43,11 +43,10 @@ import { MatCalendarHeader } from '@angular/material/datepicker';
       </div>
     </div>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MonthCalendarHeaderComponent<D> extends MatCalendarHeader<D> {
   currentPeriodClicked(): void {
     this.calendar.currentView = this.calendar.currentView === 'year' ? 'multi-year' : 'year';
   }
 }
-

@@ -12,17 +12,24 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
 import { ApisModule } from '@famoney-shared/modules/apis.module';
+import { TranslateModule, TranslateService, TranslateLoader } from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { HttpClient } from '@angular/common/http';
+import localeRu from '@angular/common/locales/ru';
+import { registerLocaleData } from '@angular/common';
+
+registerLocaleData(localeRu);
 
 export const MY_FORMATS = {
   parse: {
-    dateInput: 'L'
+    dateInput: 'L',
   },
   display: {
     dateInput: 'L',
     monthYearLabel: 'MMM YYYY',
     dateA11yLabel: 'LL',
-    monthYearA11yLabel: 'MMMM YYYY'
-  }
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
 };
 
 @NgModule({
@@ -38,20 +45,32 @@ export const MY_FORMATS = {
     MatNativeDateModule,
     FlexLayoutModule,
     SimpleNotificationsModule.forRoot({
-      timeOut: 5000
+      timeOut: 5000,
     }),
-    ApisModule
+    TranslateModule.forRoot({
+      defaultLanguage: 'ru',
+      loader: {
+        provide: TranslateLoader,
+        useFactory: (httpClient: HttpClient) => new TranslateHttpLoader(httpClient, 'assets/i18n/'),
+        deps: [HttpClient],
+      },
+    }),
+    ApisModule,
   ],
   providers: [
-    { provide: MAT_DATE_LOCALE, useValue: 'ru-RU' },
+    {
+      provide: MAT_DATE_LOCALE,
+      useFactory: (translateService: TranslateService) => translateService.currentLang ?? translateService.defaultLang,
+      deps: [TranslateService],
+    },
     {
       provide: DateAdapter,
       useClass: MomentDateAdapter,
-      deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS]
+      deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS],
     },
     { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
-    { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { strict: true } }
+    { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { strict: true } },
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
 export class AppModule {}

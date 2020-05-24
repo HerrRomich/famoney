@@ -18,6 +18,7 @@ import javax.ws.rs.core.MediaType;
 import com.hrrm.famoney.api.accounts.dto.AccountDTO;
 import com.hrrm.famoney.api.accounts.dto.AccountDataDTO;
 import com.hrrm.famoney.api.accounts.dto.MovementDTO;
+import com.hrrm.famoney.api.accounts.dto.MovementDataDTO;
 import com.hrrm.famoney.api.accounts.dto.MovementOrder;
 import com.hrrm.famoney.infrastructure.jaxrs.ApiErrorDTO;
 
@@ -38,7 +39,7 @@ public interface AccountsApi {
     @Operation(description = "Gets a list of accounts filtered by tags.")
     @ApiResponse(description = "A list of all accounts")
     List<AccountDTO> getAllAccounts(@Parameter(name = "tags",
-        description = "List of tags to filter accounts. If empty, all accounts will be provided") @QueryParam("tags") Set<String> tags);
+            description = "List of tags to filter accounts. If empty, all accounts will be provided") @QueryParam("tags") Set<String> tags);
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -52,7 +53,7 @@ public interface AccountsApi {
     @Operation(description = "Changes a specified account.")
     @ApiResponse(description = "A changed account.")
     @ApiResponse(responseCode = "404", description = "No account was found for specified id.", content = @Content(
-        mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ApiErrorDTO.class)))
+            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ApiErrorDTO.class)))
     AccountDataDTO changeAccount(@PathParam("id") Integer id, AccountDataDTO accountData);
 
     @GET
@@ -61,7 +62,7 @@ public interface AccountsApi {
     @Operation(description = "Gets a detailed account info.")
     @ApiResponse(description = "A detailed account info.")
     @ApiResponse(responseCode = "404", description = "No account was found for specified id.", content = @Content(
-        mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ApiErrorDTO.class)))
+            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ApiErrorDTO.class)))
     AccountDTO getAccount(@PathParam("id") Integer id);
 
     @GET
@@ -70,14 +71,25 @@ public interface AccountsApi {
     @Operation(description = "Gets a sorted list of account movements.")
     @ApiResponse(description = "A list of account movements of specified account.")
     @ApiResponse(responseCode = "404", description = "No account was found for specified id.", content = @Content(
-        mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ApiErrorDTO.class)))
+            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ApiErrorDTO.class)))
     List<MovementDTO> getMovements(@Parameter(name = "id", in = ParameterIn.PATH,
-        description = "Identifier of account, for which the movements will be searched.") @NotNull @PathParam("id") Integer id,
+            description = "Identifier of account, for which the movements will be searched.") @NotNull @PathParam("id") Integer id,
             @Parameter(name = "offset", in = ParameterIn.QUERY,
-                description = "Offset in the ordered list of movements. If omited, then from first movement.") @QueryParam("offset") Integer offset,
+                    description = "Offset in the ordered list of movements. If omited, then from first movement.") @QueryParam("offset") Integer offset,
             @Parameter(name = "limit", in = ParameterIn.QUERY,
-                description = "Count of movements starting from offset. If omitted, then all from offset.") @QueryParam("limit") Integer limit,
+                    description = "Count of movements starting from offset. If omitted, then all from offset.") @QueryParam("limit") Integer limit,
             @Parameter(name = "order", in = ParameterIn.QUERY, schema = @Schema(implementation = MovementOrder.class,
-                defaultValue = "movement")) @QueryParam("order") @DefaultValue("MOVEMENT_DATE") MovementOrder order);
+                    defaultValue = "movement")) @QueryParam("order") @DefaultValue("MOVEMENT_DATE") MovementOrder order);
+
+    @POST
+    @Path("{id}/movements")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Operation(description = "Creates a a new account movement.")
+    @ApiResponse(description = "New account movement will be created.")
+    @ApiResponse(responseCode = "404", description = "No account was found for specified id.", content = @Content(
+            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ApiErrorDTO.class)))
+    void addMovement(@Parameter(name = "id", in = ParameterIn.PATH,
+            description = "Identifier of account, for which the movements will be searched.") @NotNull @PathParam("id") Integer id,
+            MovementDataDTO movementDataDTO);
 
 }

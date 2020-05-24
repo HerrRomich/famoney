@@ -18,10 +18,10 @@
   padding: 2px;
   overflow-y: scroll;
   font-size: 14px;
-  height: 366px;
+  max-height: 404px;
 }
 
-.add-entry-item-button {
+.fm-add-entry-item-button {
   position: absolute;
   bottom: 12px;
   right: 12px;
@@ -37,6 +37,14 @@
   padding: 4px;
 }
 
-.entry-item-highlighted {
-  background-color: mat-color($my-app-accent, 50, 0.45);
+.fm-entry-item-highlighted {
+  background-color: mat-color($fm-app-accent, 50, 0.45);
+}
+
+div.positive-amount {
+  color: $fm-income-color;
+}
+
+div.negative-amount {
+  color: $fm-expense-color;
 }

@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @DiscriminatorValue("transfer")
@@ -17,6 +18,7 @@ import lombok.experimental.Accessors;
 @Setter
 @ToString(callSuper = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
+@SuperBuilder
 public class Transfer extends Movement {
 
     @Column(name = "opposit_account_id")

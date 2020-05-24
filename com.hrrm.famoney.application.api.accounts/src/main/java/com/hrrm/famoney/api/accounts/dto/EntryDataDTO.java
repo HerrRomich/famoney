@@ -5,6 +5,7 @@ import java.util.List;
 import org.immutables.value.Value;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.hrrm.famoney.api.accounts.dto.impl.EntryDataDTOImpl;
 import com.hrrm.famoney.infrastructure.jaxrs.ImmutableDtoStyle;
 
@@ -20,6 +21,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
         })
 })
 @JsonTypeName("entry")
+@JsonDeserialize(builder = EntryDataDTO.Builder.class)
 @Value.Immutable
 @ImmutableDtoStyle
 public interface EntryDataDTO extends MovementDataDTO {
@@ -28,6 +30,7 @@ public interface EntryDataDTO extends MovementDataDTO {
 
     }
 
+    @Schema(required = true)
     List<EntryItemDataDTO> getEntryItems();
 
 }

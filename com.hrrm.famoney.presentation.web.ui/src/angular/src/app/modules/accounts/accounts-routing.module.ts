@@ -17,13 +17,13 @@ const routes: Routes = [
       {
         path: ':accountId',
         component: AccountTableComponent,
-        canActivate: [AccountsGuard]
-      }
-    ]
-  }
+        canActivate: [AccountsGuard],
+      },
+    ],
+  },
 ];
 
 @NgModule({
-  imports: [RouterModule.forChild(routes)]
+  imports: [RouterModule.forChild(routes)],
 })
 export class AccountsRoutingModule {}

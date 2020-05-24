@@ -1,7 +1,7 @@
 <mat-form-field fxFlex class="account-tags-popup">
   <mat-chip-list #accountTagList fxFlex>
     <mat-chip
-      *ngFor="let tag of accountsService.selectedAccountTags | async"
+      *ngFor="let tag of accountsService.selectedAccountTags$ | async"
       [selectable]="true"
       [removable]="true"
       (removed)="removeTag(tag)"
@@ -12,10 +12,7 @@
     <input
       matInput
       #tagsInput
-      placeholder="Тэги"
-      i18n-placeholder="
-        accounts tags popup placeholder|Placeholder for accounts tags field@@accounts.tagPopup.placeholder
-      "
+      [placeholder]="'accounts.tagPopup.placeholder' | translate"
       [formControl]="tagsCtrl"
       [matAutocomplete]="tagAutoComplete"
       [matChipInputFor]="accountTagList"
@@ -23,7 +20,7 @@
       (matChipInputTokenEnd)="addTag($event)"
     />
     <mat-autocomplete #tagAutoComplete="matAutocomplete" (optionSelected)="selectTag($event)">
-      <mat-option *ngFor="let tag of accountTags | async" [value]="tag">
+      <mat-option *ngFor="let tag of filtersAccountTags$ | async" [value]="tag">
         {{ tag }}
       </mat-option>
     </mat-autocomplete>
@@ -32,11 +29,8 @@
     mat-button
     mat-icon-button
     matSuffix
-    (click)="accountsService.clearTags()"
-    matTooltip="Очистить все тэги"
-    i18n-matTooltip="
-      clear tags button tooltip|Tooltip for button clearing all tags@@accounts.tagPopup.buttons.claerAll.tooltip
-    "
+    (click)="accountsService.clearSelectedTags()"
+    [matTooltip]="'accounts.tagPopup.buttons.clearAll.tooltip' | translate"
   >
     <mat-icon>cancel</mat-icon>
   </button>

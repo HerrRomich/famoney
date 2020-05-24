@@ -8,7 +8,6 @@ import { AccountTagsPopupComponent } from './pages/accounts/components/account-t
 import { RouterTabModule } from 'src/app/shared/router-tab/router-tab.module';
 import { AccountEntryDialogComponent } from './pages/accounts/components/account-entry-dialog.component';
 import { AccountsGuard } from './services/accounts.guard';
-import { ApisModule } from '@famoney-shared/modules/apis.module';
 import { OverlayModule } from '@angular/cdk/overlay';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatBadgeModule } from '@angular/material/badge';
@@ -28,6 +27,12 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { MonthPickerModule } from '@famoney-shared/components/month-picker.module';
 import { EntryItemComponent } from './pages/accounts/components/entry-item.component';
+import { NgxMaskModule, IConfig } from 'ngx-mask';
+import { SharedModule } from '@famoney-shared/modules/shared.module';
+
+export const options: Partial<IConfig> | (() => Partial<IConfig>) = {
+  decimalMarker: '.',
+};
 
 @NgModule({
   declarations: [
@@ -41,6 +46,7 @@ import { EntryItemComponent } from './pages/accounts/components/entry-item.compo
   providers: [AccountsService, AccountsGuard],
   imports: [
     AngularModule,
+    SharedModule,
     MatIconModule,
     MatBadgeModule,
     MatMenuModule,
@@ -59,6 +65,7 @@ import { EntryItemComponent } from './pages/accounts/components/entry-item.compo
     FlexLayoutModule,
     RouterTabModule,
     MonthPickerModule,
+    NgxMaskModule.forRoot(options),
   ],
   exports: [AccountsRoutingModule],
 })

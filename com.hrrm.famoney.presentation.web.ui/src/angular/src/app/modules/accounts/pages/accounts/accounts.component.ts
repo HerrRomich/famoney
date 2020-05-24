@@ -1,40 +1,44 @@
 import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
-import { AccountDto } from '@famoney-apis/accounts';
+import { Observable, combineLatest } from 'rxjs';
+import { tap, map } from 'rxjs/operators';
 import { AccountTagsPopupComponent } from './components/account-tags-popup.component';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { Overlay, CdkOverlayOrigin } from '@angular/cdk/overlay';
 import { ActivatedRoute } from '@angular/router';
-import { AccountsService } from '@famoney-modules/accounts/services/accounts.service';
+import { AccountsService, Account } from '@famoney-modules/accounts/services/accounts.service';
 
 @Component({
-  selector: 'app-accounts',
+  selector: 'fm-accounts',
   templateUrl: './accounts.component.html',
-  styleUrls: ['./accounts.component.scss']
+  styleUrls: ['./accounts.component.scss'],
 })
-export class AccountsComponent implements OnInit, AfterViewInit {
-  public accounts$: Observable<Array<AccountDto>>;
+export class AccountsComponent implements AfterViewInit {
+  public accounts$: Observable<Array<Account>>;
   public accountTags$: Observable<string[]>;
 
-  @ViewChild('accountTagsPopupButton', { static: true }) accountTagsPopupButton: CdkOverlayOrigin;
+  @ViewChild('accountTagsPopupButton', { static: true }) accountTagsPopupButton!: CdkOverlayOrigin;
 
-  accountTagsPopupPortal: ComponentPortal<AccountTagsPopupComponent>;
+  private _accountTagsPopupPortal?: ComponentPortal<AccountTagsPopupComponent>;
 
-  constructor(private acountsService: AccountsService, private overlay: Overlay, private route: ActivatedRoute) {}
-
-  ngOnInit(): void {
-    this.accounts$ = this.acountsService.getAccounts().pipe(tap(accounts => {
-      accounts.findIndex(accountDto => accountDto.id === this.route.snapshot.params['accountId']);
-    }));
+  constructor(private acountsService: AccountsService, private overlay: Overlay, private route: ActivatedRoute) {
+    this.accounts$ = combineLatest([this.acountsService.accounts$, this.acountsService.selectedAccountTags$]).pipe(
+      map(([accounts, tags]) => {
+        return accounts.filter(
+          account => tags.size === 0 || account.tags?.reduce((result: boolean, tag) => result || tags.has(tag), false),
+        );
+      }),
+    );
     this.accountTags$ = this.acountsService.getTags();
   }
 
-  ngAfterViewInit(): void {
-    this.accountTagsPopupPortal = new ComponentPortal(AccountTagsPopupComponent);
+  ngAfterViewInit() {
+    this._accountTagsPopupPortal = new ComponentPortal(AccountTagsPopupComponent);
   }
 
-  openAccountTagsPopup(): void {
+  openAccountTagsPopup() {
+    if (!this.accountTagsPopupButton) {
+      return;
+    }
     const position = this.overlay
       .position()
       .flexibleConnectedTo(this.accountTagsPopupButton.elementRef)
@@ -46,18 +50,18 @@ export class AccountsComponent implements OnInit, AfterViewInit {
       positionStrategy: position,
       hasBackdrop: true,
       panelClass: 'fm-tags-panel',
-      backdropClass: 'cdk-overlay-dark-backdrop'
+      backdropClass: 'cdk-overlay-dark-backdrop',
     });
-    accountTagsPopup.attach(this.accountTagsPopupPortal);
+    accountTagsPopup.attach(this._accountTagsPopupPortal);
     accountTagsPopup.backdropClick().subscribe(() => accountTagsPopup.detach());
   }
 
-  getAccountTagsCount(): number {
-    return this.acountsService.selectedAccountTags.value.size;
+  getAccountTagsCount() {
+    return this.acountsService.selectedAccountTags$.value.size;
   }
 
-  getAccountTags(): string {
-    return Array.from(this.acountsService.selectedAccountTags.value)
+  getAccountTags() {
+    return Array.from(this.acountsService.selectedAccountTags$.value)
       .map(tag => '- ' + tag)
       .join('\n');
   }

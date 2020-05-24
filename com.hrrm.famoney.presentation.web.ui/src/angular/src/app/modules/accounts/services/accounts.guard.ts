@@ -10,22 +10,22 @@ export class AccountsGuard implements CanActivate {
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
     const accountId = parseInt(route.params.accountId, 10) || 0;
-    return this.accountsService.getAccounts().pipe(
+    return this.accountsService.accounts$.pipe(
       map(accounts => {
         let result = accounts.find(value => value.id === accountId);
         if (!result) {
-          result = accounts.find(value => value.id === this.accountsService.getSelectedAccountId());
+          result = accounts.find(value => value.id === this.accountsService.selectedAccountId);
         }
         if (!result) {
           return accounts[0].id ?? 0;
         }
         return result.id;
       }),
-      tap(value => this.accountsService.setSelectedAccountId(value)),
+      tap(value => (this.accountsService.selectedAccountId = value)),
       tap(value => {
         if (value !== accountId) {
           this.router.navigate([
-            route.parent.pathFromRoot
+            route.parent?.pathFromRoot
               .map(ars => ars.url.map(segment => segment.path).join('/'))
               .filter(part => part.length !== 0)
               .join('/'),

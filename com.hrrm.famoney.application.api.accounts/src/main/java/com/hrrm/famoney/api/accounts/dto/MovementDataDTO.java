@@ -2,7 +2,7 @@ package com.hrrm.famoney.api.accounts.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
@@ -30,11 +30,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public interface MovementDataDTO extends DTO {
 
     @Schema(required = true)
-    LocalDateTime getDate();
+    LocalDate getDate();
 
-    LocalDateTime getBookingDate();
+    Optional<LocalDate> getBookingDate();
 
-    LocalDate getBudgetMonth();
+    Optional<LocalDate> getBudgetPeriod();
 
     @Schema(required = true)
     BigDecimal getAmount();

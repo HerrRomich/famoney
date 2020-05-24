@@ -19,7 +19,7 @@ import { MonthpickerInputDirective } from './month-picker/month-picker-input.dir
     MatButtonModule,
     FlexLayoutModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
   ],
   exports: [
     MatDatepickerModule,
@@ -30,7 +30,7 @@ import { MonthpickerInputDirective } from './month-picker/month-picker-input.dir
     FormsModule,
     ReactiveFormsModule,
     MonthPickerComponent,
-    MonthpickerInputDirective
-  ]
+    MonthpickerInputDirective,
+  ],
 })
 export class MonthPickerModule {}
