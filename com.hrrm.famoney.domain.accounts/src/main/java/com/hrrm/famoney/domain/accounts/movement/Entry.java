@@ -15,15 +15,15 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.experimental.SuperBuilder;
+import lombok.experimental.Accessors;
 
 @Entity
 @DiscriminatorValue("entry")
+@Accessors(chain = true)
 @Getter
 @Setter
 @ToString(callSuper = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
-@SuperBuilder
 public class Entry extends Movement {
 
     @ElementCollection

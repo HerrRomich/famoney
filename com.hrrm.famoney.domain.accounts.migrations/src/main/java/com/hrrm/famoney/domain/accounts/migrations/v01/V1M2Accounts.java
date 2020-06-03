@@ -93,8 +93,8 @@ public class V1M2Accounts implements JavaMigration {
 
     private void insertAccountData(final AccountsJdbcStatements jdbcStatements, final AccountData accountData)
             throws MigrationException {
-        logger.debug(l -> l.debug("Inserting account data for account: \"{}\".",
-                accountData.getName()));
+        logger.debug("Inserting account data for account: \"{}\".",
+                accountData.getName());
         logger.trace(l -> l.trace("Inserting account data: {}.",
                 accountData));
         final var accountId = insertAccount(jdbcStatements.getAccountInsert(),
@@ -103,25 +103,25 @@ public class V1M2Accounts implements JavaMigration {
             .forEach(ThrowingConsumer.sneaky(accountTag -> insertAccountTag(jdbcStatements.getAccountTagInsert(),
                     accountId,
                     accountTag)));
-        logger.debug(l -> l.debug("Account data for account: \"{}\" is successfully inserted.",
-                accountData.getName()));
+        logger.debug("Account data for account: \"{}\" is successfully inserted.",
+                accountData.getName());
         logger.trace(l -> l.trace("Inserting account data: {}.",
                 accountData));
     }
 
     private Integer insertAccount(final PreparedStatement stmt, final AccountData accountData)
             throws MigrationException {
-        logger.debug(l -> l.debug("Inserting account: \"{}\".",
-                accountData.getName()));
+        logger.debug("Inserting account: \"{}\".",
+                accountData.getName());
         try (final var generatedKeys = callInsertAccount(stmt,
                 accountData)) {
-            logger.debug(l -> l.debug("Account: \"{}\" is successfully inserted.",
-                    accountData.getName()));
+            logger.debug("Account: \"{}\" is successfully inserted.",
+                    accountData.getName());
             if (generatedKeys.next()) {
                 final int accountId = generatedKeys.getInt(1);
-                logger.trace(l -> l.trace("Account: \"{}\" is successfully inserted with id: {}.",
+                logger.trace("Account: \"{}\" is successfully inserted with id: {}.",
                         accountData.getName(),
-                        accountId));
+                        accountId);
                 return accountId;
             }
             return null;
@@ -147,23 +147,23 @@ public class V1M2Accounts implements JavaMigration {
 
     private void insertAccountTag(final PreparedStatement stmt, final Integer accountId, final String accountTag)
             throws MigrationException {
-        logger.debug(l -> l.debug("Inserting tag: {} into account with id: {}.",
+        logger.debug("Inserting tag: {} into account with id: {}.",
                 accountTag,
-                accountId));
+                accountId);
         try {
             stmt.setInt(1,
                     accountId);
             stmt.setString(2,
                     accountTag);
             stmt.executeUpdate();
-            logger.debug(l -> l.debug("Tag: {} is successfully inserted into account with id: {}.",
+            logger.debug("Tag: {} is successfully inserted into account with id: {}.",
                     accountTag,
-                    accountId));
+                    accountId);
         } catch (final SQLException e) {
-            logger.debug(l -> l.debug("Tag: {} couldn't be inserted into account with id: {}.",
+            logger.debug("Tag: {} couldn't be inserted into account with id: {}.",
                     accountTag,
                     accountId,
-                    e));
+                    e);
             throw new MigrationException(e);
         }
     }

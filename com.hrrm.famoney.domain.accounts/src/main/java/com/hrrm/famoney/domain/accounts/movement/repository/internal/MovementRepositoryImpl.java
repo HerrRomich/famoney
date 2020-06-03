@@ -202,7 +202,7 @@ public class MovementRepositoryImpl extends AccountsDomainRepositoryImpl<Movemen
     }
 
     @Override
-    public List<Movement> findMovementsByAccountIdAfterMovementDate(@NotNull final Integer accountId,
+    public List<Movement> findMovementsByAccountIdAfterDate(@NotNull final Integer accountId,
             final LocalDateTime dateFrom, final Optional<Integer> limitOptional) {
         return getTxControl().required(() -> {
             final var query = getNamedQueryOrAddNew(FIND_MOVEMENTS_BY_ACCOUNT_ID_AFTER_MOVEMENT_DATE,
@@ -253,12 +253,12 @@ public class MovementRepositoryImpl extends AccountsDomainRepositoryImpl<Movemen
 
     private List<Movement> findMovementsByAccountIdAfterDate(final Integer accountId, final LocalDateTime dateFrom,
             final Optional<Integer> limitOptional, final TypedQuery<Movement> query, final String orderText) {
-        logger.debug(l -> l.debug("Searching all movements by specified acount id: {} after {} {} with count {}.",
+        logger.debug("Searching all movements by specified acount id: {} after {} {} with count {}.",
                 accountId,
                 orderText,
                 dateFrom,
                 limitOptional.map(Object::toString)
-                    .orElse("ALL")));
+                    .orElse("ALL"));
 
         limitOptional.ifPresent(query::setMaxResults);
         final var movements = query.setParameter(ACCOUNT_ID_PARAMETER_NAME,
@@ -266,13 +266,13 @@ public class MovementRepositoryImpl extends AccountsDomainRepositoryImpl<Movemen
             .setParameter(DATE_FROM_PARAMETER_NAME,
                     dateFrom)
             .getResultList();
-        logger.debug(l -> l.debug("Found {} movements by specified acount id: {} after {} " + "{} with count {}.",
+        logger.debug("Found {} movements by specified acount id: {} after {} " + "{} with count {}.",
                 movements.size(),
                 accountId,
                 orderText,
                 dateFrom,
                 limitOptional.map(Object::toString)
-                    .orElse("ALL")));
+                    .orElse("ALL"));
         logger.trace(l -> l.trace("Found {} movements by specified acount id: {} after {} " + "{} with count {}./p/n{}",
                 movements.size(),
                 accountId,

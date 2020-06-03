@@ -19,7 +19,7 @@ public interface MovementRepository extends AccountsDomainRepository<Movement> {
 
     Long getMoventsCountByAccountId(@NotNull Integer accountId);
 
-    List<Movement> findMovementsByAccountIdAfterMovementDate(@NotNull Integer accountId,
+    List<Movement> findMovementsByAccountIdAfterDate(@NotNull Integer accountId,
             LocalDateTime dateFrom, Optional<Integer> limitOptional);
 
     List<Movement> findMovementsByAccountIdAfterBookingDate(@NotNull Integer accountId,

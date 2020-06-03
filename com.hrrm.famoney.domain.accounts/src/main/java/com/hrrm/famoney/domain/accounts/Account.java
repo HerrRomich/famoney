@@ -17,7 +17,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(schema = AccountsDomainEntity.SCHEMA_NAME, name = "account")
@@ -26,7 +25,6 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @ToString(callSuper = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
-@SuperBuilder
 public class Account extends AccountsDomainEntity {
 
     @Column(name = "name")

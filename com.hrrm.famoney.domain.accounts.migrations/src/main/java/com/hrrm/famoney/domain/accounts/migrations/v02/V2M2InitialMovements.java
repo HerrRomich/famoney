@@ -177,9 +177,9 @@ public class V2M2InitialMovements implements JavaMigration {
                 .commit();
             logger.info("Initial movements for account: \"{}\" are successfully inserted.",
                     accountName);
-            logger.debug(l -> l.debug("{} initial movements for account: \"{}\" are successfully inserted.",
+            logger.debug("{} initial movements for account: \"{}\" are successfully inserted.",
                     accountMovements.size(),
-                    accountName));
+                    accountName);
         } catch (MigrationException | SQLException e) {
             final var message = MessageFormat.format("It is unable to insert movements for account: \"{0}\"",
                     accountName);
@@ -243,9 +243,9 @@ public class V2M2InitialMovements implements JavaMigration {
 
     private LocalDateTime findNextDate(final InitialMovementsJdbcStatements jdbcStatements, final int accountId,
             final LocalDate date) throws MigrationException {
-        logger.trace(l -> logger.trace("Searching for next free timestamp for account id: {} on date.",
+        logger.trace("Searching for next free timestamp for account id: {} on date.",
                 accountId,
-                date));
+                date);
         try {
             final var accountMovementsMaxDateBetweenDatesSelectStmt = jdbcStatements
                 .getAccountMovementsMaxDateBetweenDatesSelect();
@@ -265,9 +265,9 @@ public class V2M2InitialMovements implements JavaMigration {
                     .orElse(date.atTime(12,
                             0));
             }
-            logger.trace(l -> logger.trace("Next free timestamp for account id: {} is {}.",
+            logger.trace("Next free timestamp for account id: {} is {}.",
                     accountId,
-                    date));
+                    date);
             return dateTime;
         } catch (MigrationException | SQLException e) {
             final var message = MessageFormat.format(
@@ -371,8 +371,8 @@ public class V2M2InitialMovements implements JavaMigration {
                     accountMovementData);
             if (generatedKeys.next()) {
                 final int movementId = generatedKeys.getInt(1);
-                logger.trace(l -> l.trace("Account movement is successfully inserted with id: {}.",
-                        movementId));
+                logger.trace("Account movement is successfully inserted with id: {}.",
+                        movementId);
                 return movementId;
             }
             logger.trace("Account movement is successfully inserted.");
@@ -427,7 +427,7 @@ public class V2M2InitialMovements implements JavaMigration {
 
     private void insertEntryItems(final PreparedStatement insertEntryItemStmt, MovementData movementData,
             Integer movementId) {
-        logger.debug(l -> l.debug("Inserting entry items."));
+        logger.debug("Inserting entry items.");
         final var entryItems = movementData.getEntryItems();
         entryItems.forEach(ThrowingConsumer.sneaky(entryItem -> {
             insertEntryItemStmt.setInt(1,
@@ -440,25 +440,25 @@ public class V2M2InitialMovements implements JavaMigration {
                     entryItem.getAmount());
             insertEntryItemStmt.executeUpdate();
         }));
-        logger.debug(l -> l.debug("{} entry items are inserted.",
-                entryItems.size()));
+        logger.debug("{} entry items are inserted.",
+                entryItems.size());
     }
 
     private int findAccountId(final PreparedStatement findAccountIdByNameStmt, final String accountName)
             throws MigrationException {
-        logger.debug(l -> l.debug("Searching for account with name: {}.",
-                accountName));
+        logger.debug("Searching for account with name: {}.",
+                accountName);
         try {
             findAccountIdByNameStmt.setString(1,
                     accountName);
             findAccountIdByNameStmt.execute();
             final var accountId = getAccountId(findAccountIdByNameStmt,
                     accountName);
-            logger.debug(l -> l.debug("Account with name: {} is found.",
-                    accountName));
-            logger.trace(l -> l.debug("Account with name: {} is found under id: {}.",
+            logger.debug("Account with name: {} is found.",
+                    accountName);
+            logger.trace("Account with name: {} is found under id: {}.",
                     accountName,
-                    accountId));
+                    accountId);
             return accountId;
         } catch (final SQLException e) {
             final var message = MessageFormat.format("Cant find account id by name: {0}.",

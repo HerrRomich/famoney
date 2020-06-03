@@ -1,7 +1,7 @@
 package com.hrrm.famoney.domain.accounts.movement;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,7 +17,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(schema = AccountsDomainEntity.SCHEMA_NAME, name = "movement_slice")
@@ -26,28 +25,31 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @ToString(callSuper = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
-@SuperBuilder
 public class MovementSlice extends AccountsDomainEntity {
 
     public static final Integer FIRST_SLICE_ID = -1;
-    public static final LocalDate FIRST_SLICE_DATE = LocalDate.of(1970,
+    public static final LocalDateTime FIRST_SLICE_DATE = LocalDateTime.of(1970,
             1,
-            1);
-    public static final LocalDate LAST_SLICE_DATE = LocalDate.of(2070,
             1,
-            1);
+            0,
+            0);
+    public static final LocalDateTime LAST_SLICE_DATE = LocalDateTime.of(2070,
+            1,
+            1,
+            0,
+            0);
 
     @ManyToOne
     @JoinColumn(name = "account_id")
     private Account account;
 
     @Column(name = "date")
-    private LocalDate date;
+    private LocalDateTime date;
 
     @Column(name = "count")
-    private Integer movementCount;
+    private Integer count;
 
     @Column(name = "sum")
-    private BigDecimal movementSum;
+    private BigDecimal sum;
 
 }

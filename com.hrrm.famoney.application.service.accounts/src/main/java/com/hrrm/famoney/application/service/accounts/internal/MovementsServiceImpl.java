@@ -55,11 +55,11 @@ public class MovementsServiceImpl implements MovementsService {
             var movementSliceAfterDate = movementSliceRepository.findFirstByAccountIdAfterDate(account.getId(),
                     movement.getDate());
             movementSliceAfterDate.ifPresent(movementSlice -> {
-                movementSlice.setMovementCount(movementSlice.getMovementCount() + 1);
-                movementSlice.setMovementSum(movementSlice.getMovementSum()
+                movementSlice.setCount(movementSlice.getCount() + 1);
+                movementSlice.setSum(movementSlice.getSum()
                     .add(movement.getAmount()));
             });
-            movementSlicesService.rebalanceSicesByMovementDate(account.getId(),
+            movementSlicesService.rebalanceSlicesByMovementDate(account.getId(),
                     movement.getDate());
             return savedMovement;
         });

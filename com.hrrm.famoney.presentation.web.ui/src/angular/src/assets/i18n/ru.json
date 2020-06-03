@@ -105,5 +105,10 @@
         }
       }
     }
+  },
+  "notifications": {
+    "title": {
+      "error": "Ошибка"
+    }
   }
 }

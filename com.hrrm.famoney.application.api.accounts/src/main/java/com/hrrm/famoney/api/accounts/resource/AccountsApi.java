@@ -5,7 +5,6 @@ import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -19,7 +18,6 @@ import com.hrrm.famoney.api.accounts.dto.AccountDTO;
 import com.hrrm.famoney.api.accounts.dto.AccountDataDTO;
 import com.hrrm.famoney.api.accounts.dto.MovementDTO;
 import com.hrrm.famoney.api.accounts.dto.MovementDataDTO;
-import com.hrrm.famoney.api.accounts.dto.MovementOrder;
 import com.hrrm.famoney.infrastructure.jaxrs.ApiErrorDTO;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -77,19 +75,33 @@ public interface AccountsApi {
             @Parameter(name = "offset", in = ParameterIn.QUERY,
                     description = "Offset in the ordered list of movements. If omited, then from first movement.") @QueryParam("offset") Integer offset,
             @Parameter(name = "limit", in = ParameterIn.QUERY,
-                    description = "Count of movements starting from offset. If omitted, then all from offset.") @QueryParam("limit") Integer limit,
-            @Parameter(name = "order", in = ParameterIn.QUERY, schema = @Schema(implementation = MovementOrder.class,
-                    defaultValue = "movement")) @QueryParam("order") @DefaultValue("MOVEMENT_DATE") MovementOrder order);
+                    description = "Count of movements starting from offset. If omitted, then all from offset.") @QueryParam("limit") Integer limit);
 
     @POST
     @Path("{id}/movements")
     @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     @Operation(description = "Creates a a new account movement.")
     @ApiResponse(description = "New account movement will be created.")
     @ApiResponse(responseCode = "404", description = "No account was found for specified id.", content = @Content(
             mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ApiErrorDTO.class)))
-    void addMovement(@Parameter(name = "id", in = ParameterIn.PATH,
+    MovementDTO addMovement(@Parameter(name = "id", in = ParameterIn.PATH,
             description = "Identifier of account, for which the movements will be searched.") @NotNull @PathParam("id") Integer id,
             MovementDataDTO movementDataDTO);
+
+    @GET
+    @Path("{id}/movements/{movementId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(description = "Gets a movement of account, specified by id.")
+    @ApiResponse(description = "A Movement of account specified by id.")
+    @ApiResponse(responseCode = "404", description = "No account was found for specified id.", content = @Content(
+            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ApiErrorDTO.class)))
+    @ApiResponse(responseCode = "404", description = "No movement was found in an account for specified id.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(
+                    implementation = ApiErrorDTO.class)))
+    MovementDTO getMovement(@Parameter(name = "id", in = ParameterIn.PATH,
+            description = "Identifier of account, for which the movement will be searched.") @NotNull @PathParam("id") Integer id,
+            @Parameter(name = "movementId", in = ParameterIn.PATH,
+                    description = "Identifier of movement that will be searched.") @NotNull @PathParam("movementId") Integer movementId);
 
 }

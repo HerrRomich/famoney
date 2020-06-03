@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, OnDestroy, Inject } from '@angular/core';
 import { Subscription, empty } from 'rxjs';
-import { AccountsApiService, MovementDataDto, EntryDataDto, AccountDto } from '@famoney-apis/accounts';
+import { AccountsApiService, MovementDataDto, EntryDataDto, AccountDto, MovementDto } from '@famoney-apis/accounts';
 import { ActivatedRoute } from '@angular/router';
 import { map, switchMap, tap, take, filter } from 'rxjs/operators';
 import { CdkVirtualScrollViewport, VIRTUAL_SCROLL_STRATEGY } from '@angular/cdk/scrolling';
@@ -10,6 +10,8 @@ import { AccountEntryDialogComponent } from './account-entry-dialog.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { AccountMovementsViertualScrollStrategy } from './account-movements.virtual-scroller-strategy';
 import { MovementDataSource } from './movement-data-source';
+import { NotificationsService } from 'angular2-notifications';
+import { TranslateService } from '@ngx-translate/core';
 
 const fabSpeedDialDelayOnHover = 350;
 
@@ -45,6 +47,8 @@ export class AccountTableComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private accountsApiService: AccountsApiService,
     private accountEntryDialogComponent: MatDialog,
+    private notificationsService: NotificationsService,
+    private translateService: TranslateService,
     @Inject(VIRTUAL_SCROLL_STRATEGY)
     private accountMovementsViertualScrollStrategy: AccountMovementsViertualScrollStrategy,
   ) {
@@ -104,9 +108,24 @@ export class AccountTableComponent implements OnInit, OnDestroy {
 
   addEntry() {
     this.stopSpeedDial();
+    if (this.accountDTO === undefined) {
+      this.translateService
+        .get(['notifications.title.error', 'accounts.table.errors.noAccount'])
+        .pipe(
+          tap((errorMesages: { [key: string]: string }) =>
+            this.notificationsService.error(
+              errorMesages['notifications.title.error'],
+              errorMesages['accounts.table.errors.noAccount'],
+            ),
+          ),
+        )
+        .subscribe();
+      return;
+    }
+    const data: [AccountDto, MovementDto | null] = [this.accountDTO, null];
     const accountEntryDialogRef: MatDialogRef<
       AccountEntryDialogComponent,
-      EntryDataDto
+      [MovementDto]
     > = this.accountEntryDialogComponent.open(AccountEntryDialogComponent, {
       width: '520px',
       minWidth: '520px',
@@ -114,16 +133,12 @@ export class AccountTableComponent implements OnInit, OnDestroy {
       panelClass: 'account-entry-dialog',
       disableClose: true,
       hasBackdrop: true,
+      data: data,
     });
-    accountEntryDialogRef.beforeClosed().pipe(
-      switchMap(accountEntry => {
-        if (this.accountDTO && accountEntry) {
-          return this.accountsApiService.addMovement(this.accountDTO.id, accountEntry);
-        } else {
-          return empty();
-        }
-      }),
-    ).subscribe();
+    accountEntryDialogRef
+      .afterClosed()
+      .pipe(tap())
+      .subscribe();
   }
 
   addTransfer() {

@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import lombok.experimental.SuperBuilder;
 
 @Entity
 @DiscriminatorValue("balance")
@@ -17,7 +16,6 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @ToString(callSuper = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
-@SuperBuilder
 public class Balance extends Movement {
 
 }

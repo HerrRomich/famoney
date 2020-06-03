@@ -1,26 +1,26 @@
 package com.hrrm.famoney.domain.accounts.internal;
 
-import java.sql.Date;
-import java.time.LocalDate;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 
 @Converter(autoApply = true)
-public class LocalDateTimeAttributeConverter implements AttributeConverter<LocalDate, Date> {
+public class LocalDateTimeAttributeConverter implements AttributeConverter<LocalDateTime, Timestamp> {
 
     @Override
-    public Date convertToDatabaseColumn(LocalDate value) {
+    public Timestamp convertToDatabaseColumn(LocalDateTime value) {
         return Optional.ofNullable(value)
-            .map(Date::valueOf)
+            .map(Timestamp::valueOf)
             .orElse(null);
     }
 
     @Override
-    public LocalDate convertToEntityAttribute(Date value) {
+    public LocalDateTime convertToEntityAttribute(Timestamp value) {
         return Optional.ofNullable(value)
-            .map(Date::toLocalDate)
+            .map(Timestamp::toLocalDateTime)
             .orElse(null);
     }
 

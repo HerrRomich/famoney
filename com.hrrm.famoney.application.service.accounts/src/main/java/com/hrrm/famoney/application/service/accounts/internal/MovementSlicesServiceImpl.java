@@ -10,6 +10,7 @@ import org.osgi.service.log.LoggerFactory;
 import org.osgi.service.transaction.control.TransactionControl;
 
 import com.hrrm.famoney.application.service.accounts.MovementSlicesService;
+import com.hrrm.famoney.domain.accounts.movement.MovementSlice;
 import com.hrrm.famoney.domain.accounts.movement.repository.MovementSliceRepository;
 
 @Component
@@ -29,8 +30,21 @@ public class MovementSlicesServiceImpl implements MovementSlicesService {
     }
 
     @Override
-    public void rebalanceSicesByMovementDate(Integer id, LocalDateTime date) {
+    public void rebalanceSlicesByMovementDate(final Integer accountId, final LocalDateTime date) {
         txControl.required(() -> {
+            final var movementSlice = movementSliceRepository.findFirstByAccountIdAfterDate(accountId,
+                    date);
+            movementSlice.ifPresent(this::rebalanceSlice);
+            return true;
+        });
+    }
+
+    @Override
+    public void rebalanceSlice(final MovementSlice movementSlice) {
+        txControl.required(() -> {
+            final var mergedMovementSlice = movementSliceRepository.save(movementSlice);
+
+            mergedMovementSlice.getCount();
 
             return true;
         });

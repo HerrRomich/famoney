@@ -18,7 +18,4 @@ public interface ApiErrorDTO extends DTO {
     @JsonIncludeNonNull
     Optional<String> getDescription();
 
-    @JsonIncludeNonNull
-    Optional<String> getStackTrace();
-
 }

@@ -15,10 +15,7 @@ public interface MovementSliceRepository extends AccountsDomainRepository<Moveme
 
     Optional<MovementSlice> findFirstByAccountIdAfterDate(@NotNull Integer accountId, @NotNull LocalDateTime dateFrom);
 
-    Optional<MovementSlice> findLastByAccountBeforeOffsetByMovementDate(@NotNull Integer accountId,
-            @NotNull Integer offset);
-
-    Optional<MovementSlice> findLastByAccountBeforeOffsetByBookingDate(@NotNull Integer accountId,
+    Optional<MovementSlice> findLastByAccountBeforeOffsetByDate(@NotNull Integer accountId,
             @NotNull Integer offset);
 
 }

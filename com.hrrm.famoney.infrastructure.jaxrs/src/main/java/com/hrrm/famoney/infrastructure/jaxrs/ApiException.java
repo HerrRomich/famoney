@@ -10,26 +10,33 @@ public class ApiException extends RuntimeException {
 
     private final String errorDescription;
 
+    private final Status status;
+
+    public ApiException(String message) {
+        super(message);
+        this.errorCode = COMMON_ERROR_PREFIX;
+        this.errorDescription = null;
+        this.status = Status.INTERNAL_SERVER_ERROR;
+    }
+
     public ApiException(ApiError error, String description, Throwable cause) {
         super(error.getMessage(),
             cause);
-        this.errorCode = getApiErrorCodePrefix() + "-" + error.getCode();
+        this.errorCode = error.getPrefix() + "-" + error.getCode();
         this.errorDescription = description;
+        this.status = error.getStatus();
     }
 
     public ApiException(ApiError error, String description) {
-        this(error,
-            description,
-            null);
+        super(error.getMessage());
+        this.errorCode = error.getPrefix() + "-" + error.getCode();
+        this.errorDescription = description;
+        this.status = error.getStatus();
     }
 
     public ApiException(ApiError error) {
         this(error,
             null);
-    }
-
-    public String getApiErrorCodePrefix() {
-        return COMMON_ERROR_PREFIX;
     }
 
     public final String getErrorCode() {
@@ -45,7 +52,7 @@ public class ApiException extends RuntimeException {
     }
 
     public Status getResponseStatus() {
-        return Status.INTERNAL_SERVER_ERROR;
+        return status;
     }
 
 }

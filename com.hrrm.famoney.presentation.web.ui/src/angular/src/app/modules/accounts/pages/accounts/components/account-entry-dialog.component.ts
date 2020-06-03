@@ -1,14 +1,21 @@
-import { Component, Optional, Inject, OnDestroy } from '@angular/core';
+import { Component, Optional, Inject } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import * as moment from 'moment';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { EntryDataDto, EntryItemDataDto } from '@famoney-apis/accounts';
-import { EntryCategoryService, EntryCategory } from '@famoney-shared/services/entry-category.service';
-import { Subscription, Observable, empty, EMPTY } from 'rxjs';
-import { tap, map, startWith } from 'rxjs/operators';
+import {
+  EntryDataDto,
+  EntryItemDataDto,
+  AccountsApiService,
+  AccountDto,
+  MovementDto,
+  ApiErrorDto,
+} from '@famoney-apis/accounts';
+import { Observable, EMPTY } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { AccountEntry } from './account-entry.data';
+import { NotificationsService } from 'angular2-notifications';
 
 @Component({
   selector: 'fm-account-entry-dialog',
@@ -20,12 +27,15 @@ export class AccountEntryDialogComponent {
   comulatedSum$: Observable<{ amount: number }> = EMPTY;
 
   constructor(
-    private dialogRef: MatDialogRef<AccountEntryDialogComponent, EntryDataDto>,
+    private dialogRef: MatDialogRef<AccountEntryDialogComponent, MovementDto>,
     private formBuilder: FormBuilder,
+    private accountsApiService: AccountsApiService,
     @Optional() @Inject(MAT_DATE_LOCALE) private dateLocale: string,
     private translateService: TranslateService,
-    @Inject(MAT_DIALOG_DATA) entryData?: EntryDataDto,
+    private notificationsService: NotificationsService,
+    @Inject(MAT_DIALOG_DATA) private data: [AccountDto, EntryDataDto | null],
   ) {
+    const [, entryData] = data;
     this.entryForm = this.formBuilder.group({
       entryDate: entryData?.date,
       bookingDate: entryData?.bookingDate,
@@ -50,7 +60,7 @@ export class AccountEntryDialogComponent {
     return entryDate.locale(this.dateLocale).format(format);
   }
 
-  private getEntryDateOrDefault(entryDate? : moment.Moment) {
+  private getEntryDateOrDefault(entryDate?: moment.Moment) {
     return entryDate ?? moment();
   }
 
@@ -83,8 +93,9 @@ export class AccountEntryDialogComponent {
   }
 
   submit() {
+    const [account] = this.data;
     const accountEentry: AccountEntry = this.entryForm.value;
-    this.dialogRef.close({
+    const entry: EntryDataDto = {
       type: 'entry',
       date: this.getEntryDateOrDefault(accountEentry.entryDate).format('YYYY-MM-DD'),
       bookingDate: accountEentry.bookingDate?.format('YYYY-MM-DD'),
@@ -95,6 +106,16 @@ export class AccountEntryDialogComponent {
         comments: entryItem.comments,
       })),
       amount: accountEentry.entryItems.reduce((amount, entryItem) => amount + entryItem.amount, 0),
-    });
+    };
+    this.accountsApiService
+      .addMovement(account.id, entry, 'body')
+      .pipe(
+        tap(movement => this.dialogRef.close(movement)),
+        catchError((err: ApiErrorDto) => {
+          this.notificationsService.error('Error', err.description);
+          return EMPTY;
+        }),
+      )
+      .subscribe();
   }
 }

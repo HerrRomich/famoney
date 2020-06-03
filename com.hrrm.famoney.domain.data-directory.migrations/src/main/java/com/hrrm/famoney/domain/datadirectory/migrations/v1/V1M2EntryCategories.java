@@ -97,8 +97,8 @@ public class V1M2EntryCategories implements JavaMigration {
         if (categories == null) {
             return;
         }
-        logger.debug(l -> l.debug("Adding category group under category with id: {}.",
-                categoryGroupData.getParentId()));
+        logger.debug("Adding category group under category with id: {}.",
+                categoryGroupData.getParentId());
         categories.forEach(ThrowingConsumer.sneaky(categoryJsonValue -> {
             final JsonObject categoryJsonObject = categoryJsonValue.asJsonObject();
             final var categoryData = CategoryDataImpl.builder()
@@ -114,14 +114,14 @@ public class V1M2EntryCategories implements JavaMigration {
                     categoryJsonObject.getJsonArray("children"),
                     jdbcStatements);
         }));
-        logger.debug(l -> l.debug("Category group under category with id: {} is successfully added.",
-                categoryGroupData.getParentId()));
+        logger.debug("Category group under category with id: {} is successfully added.",
+                categoryGroupData.getParentId());
     }
 
     private int insertCategory(final CategoryData categoryData, final PreparedStatement stmt)
             throws MigrationException {
-        logger.debug(l -> l.debug("Inserting category: \"{}\".",
-                categoryData.getName()));
+        logger.debug("Inserting category: \"{}\".",
+                categoryData.getName());
         try (final ResultSet generatedKeys = callInsertAccount(stmt,
                 categoryData)) {
             if (generatedKeys.next()) {

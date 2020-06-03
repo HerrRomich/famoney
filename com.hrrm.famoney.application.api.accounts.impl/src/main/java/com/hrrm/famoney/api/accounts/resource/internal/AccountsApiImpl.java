@@ -29,6 +29,7 @@ import org.osgi.service.log.Logger;
 import org.osgi.service.log.LoggerFactory;
 import org.osgi.service.transaction.control.ScopedWorkException;
 import org.osgi.service.transaction.control.TransactionControl;
+import org.osgi.service.transaction.control.TransactionException;
 
 import com.google.common.base.Predicates;
 import com.google.common.collect.Sets;
@@ -39,28 +40,23 @@ import com.hrrm.famoney.api.accounts.dto.EntryItemDataDTO;
 import com.hrrm.famoney.api.accounts.dto.MovementDTO;
 import com.hrrm.famoney.api.accounts.dto.MovementDataDTO;
 import com.hrrm.famoney.api.accounts.dto.MovementDataDTOBuilder;
-import com.hrrm.famoney.api.accounts.dto.MovementOrder;
 import com.hrrm.famoney.api.accounts.dto.impl.AccountDTOImpl;
 import com.hrrm.famoney.api.accounts.dto.impl.AccountDataDTOImpl;
-import com.hrrm.famoney.api.accounts.dto.impl.EntryItemDataDTOImpl;
 import com.hrrm.famoney.api.accounts.dto.impl.MovementDTOImpl;
 import com.hrrm.famoney.api.accounts.dto.impl.RefundDataDTOImpl;
 import com.hrrm.famoney.api.accounts.dto.impl.TransferDataDTOImpl;
 import com.hrrm.famoney.api.accounts.resource.AccountsApi;
-import com.hrrm.famoney.api.accounts.resource.internalexceptions.AccountApiError;
-import com.hrrm.famoney.api.accounts.resource.internalexceptions.AccountNotFoundException;
+import com.hrrm.famoney.api.accounts.resource.internalexceptions.AccountsApiError;
 import com.hrrm.famoney.application.service.accounts.MovementsProcesor;
 import com.hrrm.famoney.application.service.accounts.MovementsService;
-import com.hrrm.famoney.application.service.accounts.dataobject.AccountMovementsRequest;
-import com.hrrm.famoney.application.service.accounts.dataobject.impl.AccountMovementsRequestImpl;
 import com.hrrm.famoney.domain.accounts.Account;
 import com.hrrm.famoney.domain.accounts.movement.Entry;
 import com.hrrm.famoney.domain.accounts.movement.EntryItem;
 import com.hrrm.famoney.domain.accounts.movement.Movement;
 import com.hrrm.famoney.domain.accounts.movement.Refund;
 import com.hrrm.famoney.domain.accounts.movement.Transfer;
+import com.hrrm.famoney.domain.accounts.movement.repository.MovementRepository;
 import com.hrrm.famoney.domain.accounts.repository.AccountRepository;
-import com.hrrm.famoney.infrastructure.jaxrs.ApiError;
 import com.hrrm.famoney.infrastructure.jaxrs.ApiException;
 
 import io.swagger.v3.oas.annotations.Hidden;
@@ -73,10 +69,12 @@ public class AccountsApiImpl implements AccountsApi {
 
     private static final String NO_ACCOUNT_IS_FOUND_MESSAGE = "No account is found for id: {0}.";
 
+    private static final String NO_ACCOUNT_MOVEMENT_IS_FOUND_MESSAGE = "No movement info for id: {1} is found in account with id: {0}.";
+
     private final Logger logger;
     private final AccountRepository accountRepository;
-    private final MovementsProcesor movementsProcessorByBookingDate;
-    private final MovementsProcesor movementsProcessorByMovementDate;
+    private final MovementRepository movementRepository;
+    private final MovementsProcesor movementsProcessor;
     private final MovementsService movementsService;
     private final TransactionControl txControl;
 
@@ -87,24 +85,23 @@ public class AccountsApiImpl implements AccountsApi {
 
     @Activate
     public AccountsApiImpl(@Reference(service = LoggerFactory.class) final Logger logger,
-            @Reference final AccountRepository accountRepository, @Reference(
-                    target = "(component.name=MovementsProcessorByMovementDate)") final MovementsProcesor movementsProcessorByBookingDate,
-            @Reference(
-                    target = "(component.name=MovementsProcessorByMovementDate)") final MovementsProcesor movementsProcessorByMovementDate,
-            @Reference final MovementsService movementsService, @Reference final TransactionControl txControl) {
+            @Reference final AccountRepository accountRepository,
+            @Reference final MovementRepository movementRepository,
+            @Reference final MovementsProcesor movementsProcessor, @Reference final MovementsService movementsService,
+            @Reference final TransactionControl txControl) {
         super();
         this.logger = logger;
         this.accountRepository = accountRepository;
-        this.movementsProcessorByBookingDate = movementsProcessorByBookingDate;
-        this.movementsProcessorByMovementDate = movementsProcessorByMovementDate;
+        this.movementRepository = movementRepository;
+        this.movementsProcessor = movementsProcessor;
         this.movementsService = movementsService;
         this.txControl = txControl;
     }
 
     @Override
     public List<AccountDTO> getAllAccounts(final Set<String> tags) {
-        logger.debug(l -> l.debug("Getting all accounts by {} tag(s).",
-                tags.size()));
+        logger.debug("Getting all accounts by {} tag(s).",
+                tags.size());
         logger.trace(l -> l.trace("Getting all accounts by tag(s): {}.",
                 tags));
 
@@ -156,11 +153,9 @@ public class AccountsApiImpl implements AccountsApi {
         logger.debug("Creating new account with name: {}.",
                 accountData.getName());
         final var accountId = txControl.required(() -> {
-            final var account = Account.builder()
-                .name(accountData.getName())
-                .openDate(accountData.getOpenDate())
-                .tags(accountData.getTags())
-                .build();
+            final var account = new Account().setName(accountData.getName())
+                .setOpenDate(accountData.getOpenDate())
+                .setTags(accountData.getTags());
             return accountRepository.save(account)
                 .getId();
         });
@@ -180,7 +175,7 @@ public class AccountsApiImpl implements AccountsApi {
         try {
             return txControl.required(() -> {
                 final var account = getAccountByIdOrThrowNotFound(id,
-                        AccountApiError.NO_ACCOUNT_BY_CHANGE);
+                        AccountsApiError.NO_ACCOUNT_BY_CHANGE);
                 account.setName(accountData.getName())
                     .setOpenDate(accountData.getOpenDate())
                     .setTags(accountData.getTags());
@@ -197,62 +192,57 @@ public class AccountsApiImpl implements AccountsApi {
         logger.debug("Getting account info with ID: {}",
                 id);
         final var account = getAccountByIdOrThrowNotFound(id,
-                AccountApiError.NO_ACCOUNT_ON_GET_ACCOUNT);
+                AccountsApiError.NO_ACCOUNT_ON_GET_ACCOUNT);
         logger.debug("Got account info with ID: {}",
                 account.getId());
         return mapAccountToAccountDTO(account);
     }
 
     @Override
-    public List<MovementDTO> getMovements(@NotNull final Integer id, final Integer offset, final Integer limit,
-            final MovementOrder order) {
-        final AccountMovementsRequest accountMovementsRequest = AccountMovementsRequestImpl.builder()
+    public List<MovementDTO> getMovements(@NotNull final Integer id, final Integer offset, final Integer limit) {
+        final var accountMovementsRequest = MovementsProcesor.AccountMovementsRequestByOffsetAndLimit.builder()
             .accountId(id)
             .offset(offset)
             .limit(limit)
             .build();
 
-        final var orderdByText = order == MovementOrder.BOOKING_DATE ? "booking date" : "movement date";
-        logger.debug("Getting all movemnts of account with id: {}, offset: {} and count: {}," + " ordered by {}",
+        logger.debug("Getting all movemnts of account with id: {}, offset: {} and count: {}.",
                 id,
                 accountMovementsRequest.getOffset()
                     .map(Object::toString)
                     .orElse("\"from beginning\""),
                 accountMovementsRequest.getLimit()
                     .map(Object::toString)
-                    .orElse("\"all\""),
-                orderdByText);
+                    .orElse("\"all\""));
         getAccountByIdOrThrowNotFound(id,
-                AccountApiError.NO_ACCOUNT_ON_GET_ALL_ACCOUNT_MOVEMENTS);
-        final var movementProcessor = order == MovementOrder.BOOKING_DATE ? movementsProcessorByBookingDate
-                : movementsProcessorByMovementDate;
+                AccountsApiError.NO_ACCOUNT_ON_GET_ALL_ACCOUNT_MOVEMENTS);
         try {
             final var movementDTOs = txControl.required(() -> {
-                final var accountMovementsResponse = movementProcessor.getMovementsSlice(accountMovementsRequest);
+                final var accountMovementsResponse = movementsProcessor.getMovementsByOffsetAndLimit(accountMovementsRequest);
                 final var movementDTOCollector = new MovementDTOCollector(accountMovementsResponse.getStartSum());
                 accountMovementsResponse.getMovements()
                     .stream()
                     .forEachOrdered(movementDTOCollector::addNextMovement);
                 return movementDTOCollector.getMovements();
             });
-            logger.debug(l -> l.debug("Got {} movemnts of account with ID: {}",
+            logger.debug("Got {} movemnts of account with ID: {}",
                     movementDTOs.size(),
-                    id));
-            logger.trace(l -> l.trace("Got movemnts of account with ID: {}. {}",
+                    id);
+            logger.trace("Got movemnts of account with ID: {}. {}",
                     id,
-                    movementDTOs));
+                    movementDTOs);
             return movementDTOs;
         } catch (final ScopedWorkException e) {
             throw e.as(ApiException.class);
         }
     }
 
-    private Account getAccountByIdOrThrowNotFound(@NotNull final Integer accountId, final ApiError error) {
+    private Account getAccountByIdOrThrowNotFound(@NotNull final Integer accountId, final AccountsApiError error) {
         return accountRepository.find(accountId)
             .orElseThrow(() -> {
                 final var errorMessage = MessageFormat.format(NO_ACCOUNT_IS_FOUND_MESSAGE,
                         accountId);
-                final var exception = new AccountNotFoundException(error,
+                final var exception = new ApiException(error,
                     errorMessage);
                 logger.warn(errorMessage);
                 logger.trace(errorMessage,
@@ -262,44 +252,138 @@ public class AccountsApiImpl implements AccountsApi {
     }
 
     @Override
-    public void addMovement(@NotNull Integer id, MovementDataDTO movementDataDTO) {
-        logger.debug(l -> l.debug("Adding movement"));
-        final var account = getAccountByIdOrThrowNotFound(id,
-                AccountApiError.NO_ACCOUNT_ON_ADD_MOVEMENT);
-
-        final var resultMovement = txControl.required(() -> {
-            Movement movement = null;
-            if (movementDataDTO instanceof EntryDataDTO) {
-                final var entryDataDTO = (EntryDataDTO) movementDataDTO;
-                movement = Entry.builder()
-                    .account(account)
-                    .amount(entryDataDTO.getAmount())
-                    .date(entryDataDTO.getDate()
-                        .atTime(LocalTime.of(12,
-                                0)))
-                    .bookingDate(entryDataDTO.getBookingDate()
-                        .map(bookingDate -> bookingDate.atTime(LocalTime.of(12,
-                                0)))
-                        .orElse(null))
-                    .budgetPeriod(entryDataDTO.getBudgetPeriod()
-                        .orElse(null))
-                    .entryItems(entryDataDTO.getEntryItems()
-                        .stream()
-                        .map(entryItemDataDTO -> EntryItem.builder()
-                            .categoryId(entryItemDataDTO.getCategoryId())
-                            .amount(entryItemDataDTO.getAmount())
-                            .comments(entryItemDataDTO.getComments())
-                            .build())
-                        .collect(Collectors.toList()))
-                    .build();
-            }
-            return movementsService.addMovement(movement);
-        });
-
-        httpServletResponse.setStatus(Status.CREATED.getStatusCode());
+    public MovementDTO getMovement(@NotNull Integer id, @NotNull Integer movementId) {
+        logger.debug("Getting movement info.");
+        logger.trace("Geting movement info by id {} from account with id: {} with data: {}",
+                movementId,
+                id);
+        try {
+            return txControl.required(() -> {
+                final var account = getAccountByIdOrThrowNotFound(id,
+                        AccountsApiError.NO_ACCOUNT_ON_ADD_MOVEMENT);
+                return movementRepository.find(movementId)
+                    .map(movement -> MovementDTOImpl.builder()
+                        .id(movement.getId())
+                        .data(convertMovement(movement))
+                        .build())
+                    .orElseThrow(() -> {
+                        final var errorMessage = MessageFormat.format(NO_ACCOUNT_MOVEMENT_IS_FOUND_MESSAGE,
+                                account.getId(),
+                                movementId);
+                        final var exception = new ApiException(AccountsApiError.NO_MOVEMENT_ON_GET_MOVEMENT,
+                            errorMessage);
+                        logger.warn(errorMessage);
+                        logger.trace(errorMessage,
+                                exception);
+                        return exception;
+                    });
+            });
+        } catch (ScopedWorkException e) {
+            throw e.as(ApiException.class);
+        }
     }
 
-    private static class MovementDTOCollector {
+    @Override
+    public MovementDTO addMovement(@NotNull Integer id, MovementDataDTO movementDataDTO) {
+        logger.debug("Adding movement");
+        logger.trace("Adding movement to account id: {} with data: {}",
+                id,
+                movementDataDTO);
+        try {
+            var movementDTO = txControl.required(() -> {
+                final var account = getAccountByIdOrThrowNotFound(id,
+                        AccountsApiError.NO_ACCOUNT_ON_ADD_MOVEMENT);
+                Movement movement = null;
+                if (movementDataDTO instanceof EntryDataDTO) {
+                    movement = createEntryMovement(account,
+                            movementDataDTO);
+                }
+                final var resultMovement = movementsService.addMovement(movement);
+                httpServletResponse.setStatus(Status.CREATED.getStatusCode());
+                final var location = uriInfo.getAbsolutePathBuilder()
+                    .path(AccountsApi.class,
+                            "getMovement")
+                    .build(account.getId(),
+                            resultMovement.getId());
+                httpServletResponse.setHeader(HttpHeaders.LOCATION,
+                        location.toString());
+                MovementDataDTO data = convertMovement(movement);
+                return MovementDTOImpl.builder()
+                    .id(movement.getId())
+                    .data(data)
+                    .sum(data.getAmount())
+                    .build();
+            });
+            logger.debug("A movement was added to account.");
+            logger.trace("A movement was added to account by id : {}. A new id: {} was generated.",
+                    id,
+                    movementDTO.getId());
+            return movementDTO;
+        } catch (TransactionException e) {
+            String message = "Problem during adding a movement to account.";
+            logger.error(message,
+                    e);
+            throw new ApiException(message);
+        } catch (ScopedWorkException e) {
+            throw e.as(ApiException.class);
+        }
+    }
+
+    private Movement createEntryMovement(final Account account, MovementDataDTO movementDataDTO) {
+        Movement movement;
+        final var entryDataDTO = (EntryDataDTO) movementDataDTO;
+        movement = new Entry().setEntryItems(entryDataDTO.getEntryItems()
+            .stream()
+            .map(entryItemDataDTO -> new EntryItem().setCategoryId(entryItemDataDTO.getCategoryId())
+                .setAmount(entryItemDataDTO.getAmount())
+                .setComments(entryItemDataDTO.getComments()))
+            .collect(Collectors.toList()))
+            .setAccount(account)
+            .setAmount(entryDataDTO.getAmount())
+            .setDate(entryDataDTO.getDate()
+                .atTime(LocalTime.of(12,
+                        0)))
+            .setBookingDate(entryDataDTO.getBookingDate()
+                .map(bookingDate -> bookingDate.atTime(LocalTime.of(12,
+                        0)))
+                .orElse(null))
+            .setBudgetPeriod(entryDataDTO.getBudgetPeriod()
+                .orElse(null));
+        return movement;
+    }
+
+    private MovementDataDTO convertMovement(Movement movement) {
+        return getMovementDataDTOBuilder(movement).date(movement.getDate()
+            .toLocalDate())
+            .bookingDate(Optional.ofNullable(movement.getBookingDate())
+                .map(LocalDateTime::toLocalDate))
+            .budgetPeriod(Optional.ofNullable(movement.getBudgetPeriod()))
+            .amount(movement.getAmount())
+            .build();
+    }
+
+    private MovementDataDTOBuilder<? extends MovementDataDTO> getMovementDataDTOBuilder(Movement movement) {
+        if (movement instanceof Entry) {
+            var entry = (Entry) movement;
+            Iterable<EntryItemDataDTO> iterable = () -> entry.getEntryItems()
+                .stream()
+                .map(entryItem -> new EntryItemDataDTO.Builder().categoryId(entryItem.getCategoryId())
+                    .amount(entryItem.getAmount())
+                    .comments(entryItem.getComments())
+                    .build())
+                .iterator();
+            return new EntryDataDTO.Builder().addAllEntryItems(iterable);
+        } else if (movement instanceof Refund) {
+            var refund = (Refund) movement;
+            return new RefundDataDTOImpl.Builder().categoryId(refund.getCategoryId())
+                .comments(refund.getComments());
+        } else {
+            var transfer = (Transfer) movement;
+            return new TransferDataDTOImpl.Builder().oppositAccountId(transfer.getOppositAccountId());
+        }
+    }
+
+    private class MovementDTOCollector {
         private BigDecimal sum;
         private final List<MovementDTO> movementDTOs;
 
@@ -313,40 +397,9 @@ public class AccountsApiImpl implements AccountsApi {
             sum = sum.add(movement.getAmount());
             final var movementDTO = MovementDTOImpl.builder()
                 .id(movement.getId())
-                .data(convertMovement(movement))
+                .data(AccountsApiImpl.this.convertMovement(movement))
                 .build();
             movementDTOs.add(movementDTO);
-        }
-
-        private MovementDataDTO convertMovement(Movement movement) {
-            return getMovementDataDTOBuilder(movement).date(movement.getDate()
-                .toLocalDate())
-                .bookingDate(Optional.ofNullable(movement.getBookingDate())
-                    .map(LocalDateTime::toLocalDate))
-                .budgetPeriod(Optional.ofNullable(movement.getBudgetPeriod()))
-                .amount(movement.getAmount())
-                .build();
-        }
-
-        private MovementDataDTOBuilder<? extends MovementDataDTO> getMovementDataDTOBuilder(Movement movement) {
-            if (movement instanceof Entry) {
-                var entry = (Entry) movement;
-                Iterable<EntryItemDataDTO> iterable = () -> entry.getEntryItems()
-                    .stream()
-                    .map(entryItem -> new EntryItemDataDTOImpl.Builder().categoryId(entryItem.getCategoryId())
-                        .amount(entryItem.getAmount())
-                        .comments(entryItem.getComments())
-                        .build())
-                    .iterator();
-                return new EntryDataDTO.Builder().addAllEntryItems(iterable);
-            } else if (movement instanceof Refund) {
-                var refund = (Refund) movement;
-                return new RefundDataDTOImpl.Builder().categoryId(refund.getCategoryId())
-                    .comments(refund.getComments());
-            } else {
-                var transfer = (Transfer) movement;
-                return new TransferDataDTOImpl.Builder().oppositAccountId(transfer.getOppositAccountId());
-            }
         }
 
         public List<MovementDTO> getMovements() {

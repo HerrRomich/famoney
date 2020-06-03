@@ -31,7 +31,7 @@
     "core-js": "^3.6.5",
     "moment": "^2.26.0",
     "multi-integer-range": "^4.0.8",
-    "ngx-mask": "^9.0.2",
+    "ngx-mask": "^9.1.2",
     "rxjs": "^6.5.5",
     "tslib": "^1.13.0",
     "zone.js": "^0.10.3"
@@ -60,7 +60,7 @@
     "karma-jasmine-html-reporter": "^1.5.4",
     "prettier": "^1.19.1",
     "protractor": "^5.4.4",
-    "ts-node": "^8.10.1",
+    "ts-node": "^8.10.2",
     "typescript": "~3.8.3"
   }
 }

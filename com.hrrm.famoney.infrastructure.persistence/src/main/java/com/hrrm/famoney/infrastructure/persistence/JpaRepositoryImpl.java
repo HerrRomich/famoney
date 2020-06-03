@@ -50,9 +50,9 @@ public abstract class JpaRepositoryImpl<T extends DomainEntity<P>, P extends Ser
                 getEntityClass());
         try {
             final List<T> entities = getTxControl().required(() -> getFindAllQuery().getResultList());
-            logger.debug(l -> l.debug("Successfully found {} elements of entity class: {}.",
+            logger.debug("Successfully found {} elements of entity class: {}.",
                     entities.size(),
-                    getEntityClass()));
+                    getEntityClass());
             logger.trace(l -> l.trace("Successfully found {} elements of entity class: {}/p/n{}.",
                     entities.size(),
                     getEntityClass(),
@@ -113,7 +113,7 @@ public abstract class JpaRepositoryImpl<T extends DomainEntity<P>, P extends Ser
         logger.debug("Searching for an entity {} by its id: {}",
                 entityClass,
                 id);
-        final Optional<T> entity = getTxControl().supports(() -> Optional.ofNullable(getEntityManager().find(
+        final Optional<T> entity = getTxControl().required(() -> Optional.ofNullable(getEntityManager().find(
                 entityClass,
                 id)));
         entity.ifPresentOrElse(e -> {

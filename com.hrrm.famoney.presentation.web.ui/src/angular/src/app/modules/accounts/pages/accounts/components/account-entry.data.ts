@@ -3,7 +3,7 @@ import * as moment from 'moment';
 export interface AccountEntry {
   entryDate?: moment.Moment;
   bookingDate?: moment.Moment;
-  budgetMonth?: moment.Moment;
+  budgetPeriod?: moment.Moment;
   entryItems: EntryItem[];
 }
 
