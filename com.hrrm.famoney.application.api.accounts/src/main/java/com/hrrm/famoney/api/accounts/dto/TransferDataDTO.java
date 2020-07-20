@@ -1,5 +1,7 @@
 package com.hrrm.famoney.api.accounts.dto;
 
+import javax.annotation.Nullable;
+
 import org.immutables.value.Value;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -14,7 +16,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
         MovementDataDTO.class
 }, extensions = {
         @Extension(properties = {
-                @ExtensionProperty(name = "x-discriminator-value", value = "refund")
+                @ExtensionProperty(name = "x-discriminator-value", value = "transfer")
         })
 })
 @JsonTypeName("transfer")
@@ -28,5 +30,8 @@ public interface TransferDataDTO extends MovementDataDTO {
 
     @Schema(required = true)
     Integer getOppositAccountId();
+
+    @Nullable
+    String getComments();
 
 }

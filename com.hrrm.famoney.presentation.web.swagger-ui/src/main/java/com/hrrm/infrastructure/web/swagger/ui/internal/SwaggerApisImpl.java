@@ -17,7 +17,6 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
-import org.osgi.service.component.annotations.ServiceScope;
 import org.osgi.service.log.Logger;
 import org.osgi.service.log.LoggerFactory;
 
@@ -28,7 +27,7 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.hrrm.famoney.infrastructure.jaxrs.ApiSpecification;
 import com.hrrm.infrastructure.web.swagger.ui.SwaggerApis;
 
-@Component(service = SwaggerApis.class, scope = ServiceScope.SINGLETON)
+@Component(service = SwaggerApis.class)
 public class SwaggerApisImpl implements SwaggerApis {
 
     private static final String CONTENT_TYPE = "Content-Type";

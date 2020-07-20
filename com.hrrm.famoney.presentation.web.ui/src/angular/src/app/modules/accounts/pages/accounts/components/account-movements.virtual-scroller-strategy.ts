@@ -8,13 +8,13 @@ export class AccountMovementsViertualScrollStrategy extends FixedSizeVirtualScro
   private viewport?: CdkVirtualScrollViewport;
   private dataChanged: Subject<void>;
   private accountSwitched: Subject<number>;
-  private dataLengeChangedProcessorSubscription: Subscription;
+  private dataLengthChangedProcessorSubscription: Subscription;
 
   constructor() {
     super(40, 600, 800);
     this.dataChanged = new Subject();
     this.accountSwitched = new Subject();
-    this.dataLengeChangedProcessorSubscription = zip(this.dataChanged, this.accountSwitched)
+    this.dataLengthChangedProcessorSubscription = zip(this.dataChanged, this.accountSwitched)
       .pipe(
         tap(() => this.viewport?.scrollToIndex(0)),
         mergeMap(() =>
@@ -43,7 +43,7 @@ export class AccountMovementsViertualScrollStrategy extends FixedSizeVirtualScro
   }
 
   detach() {
-    this.dataLengeChangedProcessorSubscription.unsubscribe();
+    this.dataLengthChangedProcessorSubscription.unsubscribe();
     super.detach();
   }
 }

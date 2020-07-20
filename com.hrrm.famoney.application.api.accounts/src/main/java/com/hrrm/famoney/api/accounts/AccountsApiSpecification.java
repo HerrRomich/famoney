@@ -10,8 +10,9 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-@OpenAPIDefinition(info = @Info(title = "Accounts", version = "1.0.0"), tags = { @Tag(name = "accounts",
-    description = "Accounts related requests.") })
+@OpenAPIDefinition(info = @Info(title = "Accounts", version = "1.0.0"), tags = {
+        @Tag(name = "accounts", description = "Accounts related requests.")
+})
 public abstract class AccountsApiSpecification extends Application implements ApiSpecification {
 
     public static final String API_PATH = "accounts";

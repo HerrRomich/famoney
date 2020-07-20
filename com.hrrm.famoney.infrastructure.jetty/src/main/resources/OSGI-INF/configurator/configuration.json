@@ -3,7 +3,7 @@
 	"org.apache.felix.http~famoney": {
 		"org.apache.felix.http.enable": true,
 		"org.osgi.service.http.port": 8080,
-		"org.apache.felix.https.enable": true,
+		"org.apache.felix.https.enable": false,
 		"org.osgi.service.http.port.secure": 8443,
 		"org.apache.felix.https.keystore:binary": "/etc/keystore/keystore",
 		"org.apache.felix.https.keystore.password": "welcome1",

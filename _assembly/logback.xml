@@ -13,6 +13,9 @@
     <logger name="com.hrrm.famoney" level="INFO"/>
     <logger name="org.eclipse.persistence" level="INFO"/>
     <logger name="com.hrrm.famoney.api.accounts.resource" level="INFO"/>
+    <logger name="com.hrrm.famoney.api.datadirectory.resource" level="INFO"/>
+    <logger name="org.apache.aries.jax.rs" level="INFO"/>
+    <logger name="org.eclipse.jetty" level="INFO"/>
 
     <root level="INFO">
         <appender-ref ref="STDOUT" />

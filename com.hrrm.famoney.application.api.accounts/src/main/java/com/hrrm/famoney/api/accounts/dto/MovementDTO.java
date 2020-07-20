@@ -18,6 +18,6 @@ public interface MovementDTO extends DTO, IdDTO {
     MovementDataDTO getData();
 
     @Schema(required = true)
-    BigDecimal getSum();
+    BigDecimal getTotal();
 
 }

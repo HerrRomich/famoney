@@ -3,16 +3,18 @@ package com.hrrm.famoney.infrastructure.persistence;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaQuery;
 
+import org.eclipse.persistence.internal.sessions.AbstractSession;
 import org.osgi.service.log.Logger;
 import org.osgi.service.log.LoggerFactory;
-import org.osgi.service.transaction.control.ScopedWorkException;
 import org.osgi.service.transaction.control.TransactionControl;
 import org.osgi.service.transaction.control.jpa.JPAEntityManagerProvider;
 
@@ -80,18 +82,31 @@ public abstract class JpaRepositoryImpl<T extends DomainEntity<P>, P extends Ser
 
     protected final <S> TypedQuery<S> getNamedQueryOrAddNew(final String queryName, final Class<S> resultClass,
             final Supplier<TypedQuery<S>> querySupplier) {
+        return getNamedQueryOrAddQueryInternal(queryName,
+                querySupplier,
+                qn -> entityManager.createNamedQuery(qn,
+                        resultClass));
+    }
+
+    protected final Query getNamedQueryOrAddNew(final String queryName, final Supplier<Query> querySupplier) {
+        return getNamedQueryOrAddQueryInternal(queryName,
+                querySupplier,
+                entityManager::createNamedQuery);
+    }
+
+    private <T extends Query> T getNamedQueryOrAddQueryInternal(final String queryName, final Supplier<T> querySupplier,
+            final Function<String, T> queryCreator) {
         logger.debug("Trying to find a registered named query: {}",
                 queryName);
-        try {
-            final TypedQuery<S> namedQuery = txControl.supports(() -> entityManager.createNamedQuery(queryName,
-                    resultClass));
+        final var session = getSession();
+        if (session.containsQuery(queryName)) {
+            final var namedQuery = queryCreator.apply(queryName);
             logger.debug("A named query: {} is successfully found in registry.",
                     queryName);
             return namedQuery;
-        } catch (final ScopedWorkException ex) {
+        } else {
             logger.debug("A named query: {} was not found in registry. Trying to create and register a new one.",
-                    queryName,
-                    ex);
+                    queryName);
             final var namedQuery = querySupplier.get();
             entityManager.getEntityManagerFactory()
                 .addNamedQuery(queryName,
@@ -100,6 +115,10 @@ public abstract class JpaRepositoryImpl<T extends DomainEntity<P>, P extends Ser
                     queryName);
             return namedQuery;
         }
+    }
+
+    private AbstractSession getSession() {
+        return entityManager.unwrap(AbstractSession.class);
     }
 
     private CriteriaQuery<T> getEntityCriteriaQuery(final EntityManager entityManager) {
@@ -147,6 +166,11 @@ public abstract class JpaRepositoryImpl<T extends DomainEntity<P>, P extends Ser
     public void lock(T entity, LockModeType lockModeType) {
         getEntityManager().lock(entity,
                 lockModeType);
+    }
+
+    @Override
+    public void flush() {
+        getEntityManager().flush();
     }
 
 }

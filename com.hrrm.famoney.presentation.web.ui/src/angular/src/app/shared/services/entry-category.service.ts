@@ -20,6 +20,7 @@ export interface HierarchicalEntryCategory {
 
 export interface FlatEntryCategory extends EntryCategory {
   path: string;
+  fullPath: string;
   level: number;
 }
 
@@ -29,6 +30,7 @@ interface EntryCategories {
   incomes: EntryCategory[];
 }
 
+export const pathSeparator = ' ' + String.fromCharCode(8594) + ' ';
 @Injectable({
   providedIn: 'root',
 })
@@ -71,12 +73,14 @@ export class EntryCategoryService {
     path = '',
   ) {
     entryCategories?.forEach(entryCategory => {
+      const fullPath = (path ? path + pathSeparator : '') + entryCategory.name;
       result.set(entryCategory.id, {
         ...entryCategory,
-        path: path.substr(4),
+        path: path,
+        fullPath: fullPath,
         level: level,
       });
-      this.flattenEntryCategories(result, entryCategory.children, level + 1, path + ' -> ' + entryCategory.name);
+      this.flattenEntryCategories(result, entryCategory.children, level + 1, fullPath);
     });
   }
 

@@ -11,11 +11,12 @@ import {
   MovementDto,
   ApiErrorDto,
 } from '@famoney-apis/accounts';
-import { Observable, EMPTY } from 'rxjs';
-import { tap, catchError } from 'rxjs/operators';
+import { Observable, EMPTY, forkJoin, of } from 'rxjs';
+import { tap, catchError, map, switchMap } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { AccountEntry } from './account-entry.data';
 import { NotificationsService } from 'angular2-notifications';
+import { EntryCategoryService } from '@famoney-shared/services/entry-category.service';
 
 @Component({
   selector: 'fm-account-entry-dialog',
@@ -30,6 +31,7 @@ export class AccountEntryDialogComponent {
     private dialogRef: MatDialogRef<AccountEntryDialogComponent, MovementDto>,
     private formBuilder: FormBuilder,
     private accountsApiService: AccountsApiService,
+    private entryCategoriesService: EntryCategoryService,
     @Optional() @Inject(MAT_DATE_LOCALE) private dateLocale: string,
     private translateService: TranslateService,
     private notificationsService: NotificationsService,
@@ -93,23 +95,39 @@ export class AccountEntryDialogComponent {
   }
 
   submit() {
-    const [account] = this.data;
+    const [{ id: accountId }] = this.data;
     const accountEentry: AccountEntry = this.entryForm.value;
-    const entry: EntryDataDto = {
-      type: 'entry',
-      date: this.getEntryDateOrDefault(accountEentry.entryDate).format('YYYY-MM-DD'),
-      bookingDate: accountEentry.bookingDate?.format('YYYY-MM-DD'),
-      budgetPeriod: accountEentry.budgetPeriod?.format('YYYY-MM'),
-      entryItems: accountEentry.entryItems.map(entryItem => ({
-        categoryId: entryItem.categoryId,
-        amount: entryItem.amount,
-        comments: entryItem.comments,
-      })),
-      amount: accountEentry.entryItems.reduce((amount, entryItem) => amount + entryItem.amount, 0),
-    };
-    this.accountsApiService
-      .addMovement(account.id, entry, 'body')
+    this.entryCategoriesService.entryCategoriesForVisualisation$
       .pipe(
+        map(entryCategories => {
+          const entryItems = accountEentry.entryItems.map(entryItem => {
+            const entryCategory = entryCategories.flatEntryCategories.get(entryItem.categoryId);
+            let amount = 0;
+            switch (entryCategory?.type) {
+              case 'income':
+                amount = entryItem.amount;
+                break;
+              case 'expense':
+                amount = -entryItem.amount;
+                break;
+            }
+            return {
+              categoryId: entryItem.categoryId,
+              amount: amount,
+              comments: entryItem.comments,
+            };
+          });
+          const entry: EntryDataDto = {
+            type: 'entry',
+            date: this.getEntryDateOrDefault(accountEentry.entryDate).format('YYYY-MM-DD'),
+            bookingDate: accountEentry.bookingDate?.format('YYYY-MM-DD'),
+            budgetPeriod: accountEentry.budgetPeriod?.format('YYYY-MM'),
+            entryItems: entryItems,
+            amount: entryItems.reduce((amount, entryItem) => amount + entryItem.amount, 0),
+          };
+          return entry;
+        }),
+        switchMap(entry => this.accountsApiService.addMovement(accountId, entry, 'body')),
         tap(movement => this.dialogRef.close(movement)),
         catchError((err: ApiErrorDto) => {
           this.notificationsService.error('Error', err.description);

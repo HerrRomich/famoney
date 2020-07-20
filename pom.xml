@@ -27,17 +27,8 @@
         <org.mapstruct.version>1.3.1.Final</org.mapstruct.version>
         <eclipselink-maven-plugin.version>2.7.5.1</eclipselink-maven-plugin.version>
         <junit.jupiter.version>5.5.2</junit.jupiter.version>
+        <jetty.version>9.4.28.v20200408</jetty.version>
     </properties>
-
-    <repositories>
-        <!--repository> <id>OSSRH Snapshots</id> <url>https://oss.sonatype.org/content/repositories/snapshots/</url> 
-            <releases> <enabled>false</enabled> </releases> <snapshots> <enabled>true</enabled> 
-            </snapshots> </repository> <repository> <id>OSGi Snapshots</id> <url>https://oss.sonatype.org/content/groups/osgi/</url> 
-            <releases> <enabled>false</enabled> </releases> <snapshots> <enabled>true</enabled> 
-            </snapshots> </repository> <repository> <id>Apache Snapshots</id> <url>https://repository.apache.org/snapshots/</url> 
-            <releases> <enabled>false</enabled> </releases> <snapshots> <enabled>true</enabled> 
-            </snapshots> </repository -->
-    </repositories>
 
     <dependencyManagement>
         <dependencies>
@@ -84,11 +75,6 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>com.hrrm.famoney.domain.data-directory.migrations</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>com.hrrm.famoney.domain.accounts.impl</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -144,12 +130,7 @@
             <dependency>
                 <groupId>org.eclipse.platform</groupId>
                 <artifactId>org.eclipse.osgi</artifactId>
-                <version>3.15.100</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>org.apache.felix.framework</artifactId>
-                <version>6.0.3</version>
+                <version>3.15.300</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.felix</groupId>
@@ -182,6 +163,11 @@
                 <version>2.1.14</version>
             </dependency>
             <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.eventadmin</artifactId>
+                <version>1.5.0</version>
+            </dependency>
+            <dependency>
                 <groupId>org.eclipse.platform</groupId>
                 <artifactId>org.eclipse.equinox.console</artifactId>
                 <version>1.3.100</version>
@@ -189,7 +175,13 @@
             <dependency>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>org.apache.felix.http.jetty</artifactId>
-                <version>4.0.6</version>
+                <version>4.0.18</version>
+                <classifier>light</classifier>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.http.servlet-api</artifactId>
+                <version>1.1.2</version>
             </dependency>
             <dependency>
                 <groupId>javax.servlet</groupId>
@@ -205,11 +197,6 @@
                 <groupId>org.apache.felix</groupId>
                 <artifactId>org.apache.felix.configadmin</artifactId>
                 <version>1.9.10</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>org.apache.felix.eventadmin</artifactId>
-                <version>1.5.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.felix</groupId>
@@ -277,7 +264,7 @@
             <dependency>
                 <groupId>org.apache.aries.jax.rs</groupId>
                 <artifactId>org.apache.aries.jax.rs.whiteboard</artifactId>
-                <version>1.0.3</version>
+                <version>1.0.8</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.aries.jax.rs</groupId>
@@ -290,9 +277,9 @@
                 <version>1.3.2</version>
             </dependency>
             <dependency>
-                <groupId>javax.activation</groupId>
-                <artifactId>javax.activation-api</artifactId>
-                <version>1.2.0</version>
+                <groupId>jakarta.activation</groupId>
+                <artifactId>jakarta.activation-api</artifactId>
+                <version>1.2.2</version>
             </dependency>
 
             <dependency>
@@ -449,7 +436,7 @@
             <dependency>
                 <groupId>org.apache.aries.spifly</groupId>
                 <artifactId>org.apache.aries.spifly.dynamic.bundle</artifactId>
-                <version>1.0.14</version>
+                <version>1.3.0</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.persistence</groupId>
@@ -529,17 +516,17 @@
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-annotations</artifactId>
-                <version>2.0.10</version>
+                <version>2.1.2</version>
             </dependency>
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-core</artifactId>
-                <version>2.0.10</version>
+                <version>2.1.2</version>
             </dependency>
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-models</artifactId>
-                <version>2.1.0</version>
+                <version>2.1.2</version>
             </dependency>
 
             <dependency>
@@ -559,6 +546,52 @@
                 <artifactId>lombok</artifactId>
                 <version>1.18.12</version>
                 <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-server</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-servlet</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-security</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-jmx</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-alpn-server</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty.http2</groupId>
+                <artifactId>http2-server</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-alpn-java-server</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-util</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty.alpn</groupId>
+                <artifactId>alpn-api</artifactId>
+                <version>1.1.3.v20160715</version>
             </dependency>
 
             <dependency>
@@ -641,6 +674,7 @@
                     <configuration>
                         <includeJar>true</includeJar>
                         <localURLs>${local.index.policy}</localURLs>
+                        <addMvnURLs>false</addMvnURLs>
                     </configuration>
                     <executions>
                         <execution>
@@ -810,14 +844,14 @@
                                     <pluginExecutionFilter>
                                         <groupId>biz.aQute.bnd</groupId>
                                         <artifactId>bnd-indexer-maven-plugin</artifactId>
-                                        <versionRange>[4.3.1,)</versionRange>
+                                        <versionRange>[5.1.1,)</versionRange>
                                         <goals>
                                             <goal>index</goal>
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
                                         <execute>
-                                            <runOnIncremental>false</runOnIncremental>
+                                            <runOnIncremental>true</runOnIncremental>
                                             <runOnConfiguration>true</runOnConfiguration>
                                         </execute>
                                     </action>

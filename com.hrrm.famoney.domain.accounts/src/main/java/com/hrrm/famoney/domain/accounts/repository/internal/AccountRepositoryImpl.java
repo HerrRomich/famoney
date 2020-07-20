@@ -7,7 +7,6 @@ import javax.persistence.TypedQuery;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
 import org.osgi.service.log.LoggerFactory;
 import org.osgi.service.transaction.control.TransactionControl;
 import org.osgi.service.transaction.control.jpa.JPAEntityManagerProvider;
@@ -16,7 +15,7 @@ import com.hrrm.famoney.domain.accounts.Account;
 import com.hrrm.famoney.domain.accounts.Account_;
 import com.hrrm.famoney.domain.accounts.repository.AccountRepository;
 
-@Component(service = AccountRepository.class, scope = ServiceScope.SINGLETON)
+@Component(service = AccountRepository.class)
 public class AccountRepositoryImpl extends AccountsDomainRepositoryImpl<Account> implements AccountRepository {
 
     @Activate

@@ -32,15 +32,18 @@ public class Activator implements BundleActivator {
     public static final String CONFIG_PID = "org.apache.aries.jax.rs.jackson";
 
     public static final OSGi<Dictionary<String, ?>> CONFIGURATION = all(configurations(CONFIG_PID),
-        coalesce(configuration(CONFIG_PID), just(Hashtable::new))).filter(c -> !Objects.equals(c
-            .get("enabled"), "false"));
+            coalesce(configuration(CONFIG_PID),
+                    just(Hashtable::new))).filter(c -> !Objects.equals(c.get("enabled"),
+                            "false"));
 
     @Override
     public void start(BundleContext context) throws Exception {
-        result = CONFIGURATION.flatMap(properties -> register(new String[] { MessageBodyReader.class
-            .getName(), MessageBodyWriter.class.getName() },
-            new JsonProviderPrototypeServiceFactory(properties), getRegistrationProperties(
-                properties)))
+        result = CONFIGURATION.flatMap(properties -> register(new String[] {
+                MessageBodyReader.class.getName(),
+                MessageBodyWriter.class.getName()
+        },
+                new JsonProviderPrototypeServiceFactory(properties),
+                getRegistrationProperties(properties)))
             .run(context);
     }
 
@@ -53,16 +56,24 @@ public class Activator implements BundleActivator {
 
     private Map<String, ?> getRegistrationProperties(Dictionary<String, ?> properties) {
         Map<String, Object> serviceProps = new HashMap<>();
-        serviceProps.put(JaxrsWhiteboardConstants.JAX_RS_EXTENSION, true);
-        serviceProps.put(JaxrsWhiteboardConstants.JAX_RS_MEDIA_TYPE, MediaType.APPLICATION_JSON);
-        serviceProps.putIfAbsent(JaxrsWhiteboardConstants.JAX_RS_NAME, "jaxb-json");
-        serviceProps.put(Constants.SERVICE_RANKING, Integer.MIN_VALUE);
+        serviceProps.put(JaxrsWhiteboardConstants.JAX_RS_EXTENSION,
+                true);
+        serviceProps.put(JaxrsWhiteboardConstants.JAX_RS_MEDIA_TYPE,
+                MediaType.APPLICATION_JSON);
+        serviceProps.putIfAbsent(JaxrsWhiteboardConstants.JAX_RS_NAME,
+                "jaxb-json");
+        serviceProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT,
+                String.format("(%s=%s)",
+                        JaxrsWhiteboardConstants.JAX_RS_NAME,
+                        "com.hrrm.famoney.application.api.*"));
+        serviceProps.put(Constants.SERVICE_RANKING,
+                Integer.MIN_VALUE);
         serviceProps.put("jackson.jaxb.version",
-            new com.fasterxml.jackson.module.jaxb.PackageVersion().version()
-                .toString());
+                new com.fasterxml.jackson.module.jaxb.PackageVersion().version()
+                    .toString());
         serviceProps.put("jackson.jaxrs.json.version",
-            new com.fasterxml.jackson.jaxrs.json.PackageVersion().version()
-                .toString());
+                new com.fasterxml.jackson.jaxrs.json.PackageVersion().version()
+                    .toString());
 
         Enumeration<String> keys = properties.keys();
 
@@ -70,7 +81,8 @@ public class Activator implements BundleActivator {
             String key = keys.nextElement();
 
             if (!key.startsWith(".")) {
-                serviceProps.put(key, properties.get(key));
+                serviceProps.put(key,
+                        properties.get(key));
             }
         }
 

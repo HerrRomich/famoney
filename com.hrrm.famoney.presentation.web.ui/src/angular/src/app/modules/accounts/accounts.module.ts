@@ -29,6 +29,8 @@ import { MonthPickerModule } from '@famoney-shared/components/month-picker.modul
 import { EntryItemComponent } from './pages/accounts/components/entry-item.component';
 import { NgxMaskModule, IConfig } from 'ngx-mask';
 import { SharedModule } from '@famoney-shared/modules/shared.module';
+import { DragDropModule } from '@angular/cdk/drag-drop';
+import { MovementsService } from './services/movements.service';
 
 export const options: Partial<IConfig> | (() => Partial<IConfig>) = {
   decimalMarker: '.',
@@ -43,7 +45,7 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = {
     EntryItemComponent,
   ],
   entryComponents: [AccountTagsPopupComponent, AccountEntryDialogComponent, EntryItemComponent],
-  providers: [AccountsService, AccountsGuard],
+  providers: [AccountsService, AccountsGuard, MovementsService],
   imports: [
     AngularModule,
     SharedModule,
@@ -66,6 +68,7 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = {
     RouterTabModule,
     MonthPickerModule,
     NgxMaskModule.forRoot(options),
+    DragDropModule,
   ],
   exports: [AccountsRoutingModule],
 })

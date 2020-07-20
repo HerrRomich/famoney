@@ -8,14 +8,18 @@ import javax.ws.rs.ext.ExceptionMapper;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.jaxrs.whiteboard.propertytypes.JSONRequired;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsApplicationSelect;
 import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsExtension;
 
 import com.hrrm.famoney.infrastructure.jaxrs.ApiException;
 import com.hrrm.famoney.infrastructure.jaxrs.impl.ApiErrorDTOImpl;
 
-@Component(service = { ExceptionMapper.class })
+@Component(service = {
+        ExceptionMapper.class
+})
 @JaxrsExtension
 @JSONRequired
+@JaxrsApplicationSelect("(osgi.jaxrs.name=com.hrrm.famoney.application.api.*)")
 public class ErrorHandlerExtension implements ExceptionMapper<ApiException> {
 
     @Activate
@@ -30,7 +34,8 @@ public class ErrorHandlerExtension implements ExceptionMapper<ApiException> {
             .message(exception.getErrorMessage())
             .description(exception.getErrorDescription());
         return Response.status(exception.getResponseStatus())
-            .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+            .header(HttpHeaders.CONTENT_TYPE,
+                    MediaType.APPLICATION_JSON)
             .entity(errorDTOBuilder.build())
             .build();
     }

@@ -46,8 +46,8 @@ export class EntryItemComponent implements OnInit {
             const filter = new RegExp(filterValue, 'i');
             return {
               flatEntryCategories: entryCategories.flatEntryCategories,
-              expenses: this.filterCategories(filter, entryCategories.expenses),
-              incomes: this.filterCategories(filter, entryCategories.incomes),
+              expenses: this.filterCategories(filter, entryCategories.flatEntryCategories, entryCategories.expenses),
+              incomes: this.filterCategories(filter, entryCategories.flatEntryCategories, entryCategories.incomes),
             };
           }),
         ),
@@ -57,28 +57,19 @@ export class EntryItemComponent implements OnInit {
 
   filterCategories(
     filter: RegExp,
+    flatEntryCategories: Map<number, FlatEntryCategory>,
     entryCategories?: EntryCategoryDto[],
-    level = 1,
-    path = '',
   ): EntryCategoryWithFilterOption[] {
     const filteredEntryCategories = entryCategories?.reduce((filteredCategories, entryCategory) => {
-      const subCategories = this.filterCategories(
-        filter,
-        entryCategory.children,
-        level + 1,
-        path + ' -> ' + entryCategory.name,
-      );
-      if (filter.test(entryCategory.name) || subCategories.length > 0) {
+      const flattenEntryCategory = flatEntryCategories.get(entryCategory.id);
+      const subCategories = this.filterCategories(filter, flatEntryCategories, entryCategory.children);
+      if ((filter.test(entryCategory.name) || subCategories.length > 0) && flattenEntryCategory) {
         filteredCategories.push({
-          id: entryCategory.id,
-          name: entryCategory.name,
+          ...flattenEntryCategory,
           optionName:
             entryCategory.name.match(filter)?.join().length ?? 0 > 0
               ? entryCategory.name.replace(filter, subString => `<mark>${subString}</mark>`)
               : entryCategory.name,
-          path: path.substr(4),
-          level: level,
-          type: entryCategory.type,
         });
         filteredCategories.push(...subCategories);
       }

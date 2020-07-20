@@ -43,7 +43,7 @@ public class Account extends AccountsDomainEntity {
     @Column(name = "movement_count")
     private Integer movementCount;
 
-    @Column(name = "movement_sum")
-    private BigDecimal movementSum;
+    @Column(name = "movement_total")
+    private BigDecimal movementTotal;
 
 }

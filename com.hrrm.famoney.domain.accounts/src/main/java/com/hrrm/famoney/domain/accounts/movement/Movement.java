@@ -53,4 +53,7 @@ public abstract class Movement extends AccountsDomainEntity {
     @Column(name = "amount")
     private BigDecimal amount;
 
+    @Column(name = "total")
+    private BigDecimal total;
+
 }

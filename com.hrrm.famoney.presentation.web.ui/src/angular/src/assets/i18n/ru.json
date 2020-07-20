@@ -25,6 +25,12 @@
         "entryDate": {
           "name": "Дата записи"
         },
+        "comments": {
+          "name": "Комментарий"
+        },
+        "category": {
+          "name": "Категория"
+        },
         "amount": {
           "name": "Сумма"
         },
@@ -42,6 +48,9 @@
         "addRefund": {
           "tooltip": "Добавить возврат"
         }
+      },
+      "errors": {
+        "noAccount": "Кошелек не выбран!"
       }
     },
     "tagPopup": {

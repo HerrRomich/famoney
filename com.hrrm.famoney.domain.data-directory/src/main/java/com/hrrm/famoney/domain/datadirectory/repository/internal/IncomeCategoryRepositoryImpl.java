@@ -5,7 +5,6 @@ import javax.persistence.metamodel.SingularAttribute;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
 import org.osgi.service.log.LoggerFactory;
 import org.osgi.service.transaction.control.TransactionControl;
 import org.osgi.service.transaction.control.jpa.JPAEntityManagerProvider;
@@ -14,7 +13,7 @@ import com.hrrm.famoney.domain.datadirectory.IncomeCategory;
 import com.hrrm.famoney.domain.datadirectory.IncomeCategory_;
 import com.hrrm.famoney.domain.datadirectory.repository.IncomeCategoryRepository;
 
-@Component(service = IncomeCategoryRepository.class, scope = ServiceScope.SINGLETON)
+@Component(service = IncomeCategoryRepository.class)
 public class IncomeCategoryRepositoryImpl extends EntryCategoryRepositoryImpl<IncomeCategory> implements
         IncomeCategoryRepository {
 

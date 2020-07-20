@@ -3,7 +3,7 @@ insert into account(
                     open_date,
                     name,
                     movement_count,
-                    movement_sum
+                    movement_total
                    )
 values(
        ?,

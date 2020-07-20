@@ -1,8 +1,9 @@
+import { MovementsService } from './../../../services/movements.service';
 import { Component, OnInit, ViewChild, OnDestroy, Inject } from '@angular/core';
-import { Subscription, empty } from 'rxjs';
-import { AccountsApiService, MovementDataDto, EntryDataDto, AccountDto, MovementDto } from '@famoney-apis/accounts';
+import { Subscription, EMPTY } from 'rxjs';
+import { AccountsApiService, AccountDto, MovementDto } from '@famoney-apis/accounts';
 import { ActivatedRoute } from '@angular/router';
-import { map, switchMap, tap, take, filter } from 'rxjs/operators';
+import { map, switchMap, tap, take, filter, retryWhen, delay, shareReplay } from 'rxjs/operators';
 import { CdkVirtualScrollViewport, VIRTUAL_SCROLL_STRATEGY } from '@angular/cdk/scrolling';
 import { EcoFabSpeedDialActionsComponent, EcoFabSpeedDialComponent } from '@ecodev/fab-speed-dial';
 import { interval } from 'rxjs';
@@ -12,6 +13,7 @@ import { AccountMovementsViertualScrollStrategy } from './account-movements.virt
 import { MovementDataSource } from './movement-data-source';
 import { NotificationsService } from 'angular2-notifications';
 import { TranslateService } from '@ngx-translate/core';
+import { EntryCategoryService } from '@famoney-shared/services/entry-category.service';
 
 const fabSpeedDialDelayOnHover = 350;
 
@@ -38,35 +40,50 @@ export class AccountTableComponent implements OnInit, OnDestroy {
   @ViewChild(CdkVirtualScrollViewport)
   viewPort!: CdkVirtualScrollViewport;
 
-  private speedDialTriggerSubscription?: Subscription;
+  private _speedDialTriggerSubscription?: Subscription;
+  private _movementsChangeEventsSubscription: Subscription;
 
-  private fabSpeedDialOpenChangeSubbscription?: Subscription;
-  private accountDTO?: AccountDto;
+  private _fabSpeedDialOpenChangeSubbscription?: Subscription;
+  private _accountDTO?: AccountDto;
 
   constructor(
-    private route: ActivatedRoute,
-    private accountsApiService: AccountsApiService,
-    private accountEntryDialogComponent: MatDialog,
-    private notificationsService: NotificationsService,
-    private translateService: TranslateService,
+    private _route: ActivatedRoute,
+    private _accountsApiService: AccountsApiService,
+    private _movementsService: MovementsService,
+    private _accountEntryDialogComponent: MatDialog,
+    private _entryCategoriesService: EntryCategoryService,
+    private _notificationsService: NotificationsService,
+    private _translateService: TranslateService,
     @Inject(VIRTUAL_SCROLL_STRATEGY)
-    private accountMovementsViertualScrollStrategy: AccountMovementsViertualScrollStrategy,
+    private _accountMovementsViertualScrollStrategy: AccountMovementsViertualScrollStrategy,
   ) {
-    const account$ = this.route.paramMap.pipe(
+    const account$ = this._route.paramMap.pipe(
       map(params => Number.parseInt(params.get('accountId') ?? '', 10)),
-      tap(() => (this.accountDTO = undefined)),
+      tap(() => (this._accountDTO = undefined)),
       filter(accountId => accountId !== NaN),
-      switchMap(accountId => this.accountsApiService.getAccount(accountId)),
-      tap(accountDTO => {
-        this.accountDTO = accountDTO;
-        this.accountMovementsViertualScrollStrategy.switchAccount(accountDTO.movementCount ?? 0);
+      switchMap(accountId => {
+        return this._accountsApiService.getAccount(accountId);
       }),
+      tap(accountDTO => {
+        this._accountDTO = accountDTO;
+        this._accountMovementsViertualScrollStrategy.switchAccount(accountDTO.movementCount ?? 0);
+      }),
+      shareReplay(1),
     );
-    this.movementDataSource = new MovementDataSource(this.accountsApiService, account$);
+    this.movementDataSource = new MovementDataSource(this._accountsApiService, account$);
+    this._movementsChangeEventsSubscription = account$
+      .pipe(
+        switchMap(accountDTO => this._movementsService.getMovementsChangeEvents(accountDTO.id)),
+        tap(() => {
+          this._accountMovementsViertualScrollStrategy.onDataLengthChanged();
+        }),
+        retryWhen(errors => errors.pipe(delay(10000))),
+      )
+      .subscribe();
   }
 
   ngOnInit() {
-    this.fabSpeedDialOpenChangeSubbscription = this.fabSpeedDial.openChange
+    this._fabSpeedDialOpenChangeSubbscription = this.fabSpeedDial.openChange
       .pipe(
         tap(opened => {
           this.fabSpeedDial.fixed = !opened;
@@ -76,7 +93,8 @@ export class AccountTableComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.fabSpeedDialOpenChangeSubbscription?.unsubscribe();
+    this._fabSpeedDialOpenChangeSubbscription?.unsubscribe();
+    this._movementsChangeEventsSubscription.unsubscribe();
   }
 
   get inverseTranslation(): string {
@@ -87,8 +105,8 @@ export class AccountTableComponent implements OnInit, OnDestroy {
   }
 
   triggerSpeedDial() {
-    if (!this.speedDialTriggerSubscription || this.speedDialTriggerSubscription.closed) {
-      this.speedDialTriggerSubscription = interval(fabSpeedDialDelayOnHover)
+    if (!this._speedDialTriggerSubscription || this._speedDialTriggerSubscription.closed) {
+      this._speedDialTriggerSubscription = interval(fabSpeedDialDelayOnHover)
         .pipe(
           tap(() => {
             this.fabSpeedDial.open = true;
@@ -100,20 +118,49 @@ export class AccountTableComponent implements OnInit, OnDestroy {
   }
 
   stopSpeedDial() {
-    if (this.speedDialTriggerSubscription?.closed) {
-      this.speedDialTriggerSubscription.unsubscribe();
+    if (this._speedDialTriggerSubscription?.closed) {
+      this._speedDialTriggerSubscription.unsubscribe();
     }
-    this.speedDialTriggerSubscription = undefined;
+    this._speedDialTriggerSubscription = undefined;
+  }
+
+  getMovementComments(movement?: MovementDto) {
+    switch (movement?.data?.type) {
+      case 'entry':
+        const entryItems = movement?.data?.entryItems ?? [];
+        return entryItems.length === 1 ? entryItems[0].comments : undefined;
+      case 'refund':
+      case 'transfer':
+        return movement?.data?.comments;
+    }
+  }
+
+  getMovementCategoryPath$(movement?: MovementDto) {
+    switch (movement?.data?.type) {
+      case 'entry':
+        const entryItems = movement?.data?.entryItems ?? [];
+        return entryItems.length === 1 ? this.getCategoryPathById$(entryItems[0].categoryId) : EMPTY;
+      case 'refund':
+        return this.getCategoryPathById$(movement?.data?.categoryId);
+      default:
+        return EMPTY;
+    }
+  }
+
+  private getCategoryPathById$(categoryId: number) {
+    return this._entryCategoriesService.entryCategoriesForVisualisation$.pipe(
+      map(entryCategories => entryCategories.flatEntryCategories.get(categoryId)?.fullPath),
+    );
   }
 
   addEntry() {
     this.stopSpeedDial();
-    if (this.accountDTO === undefined) {
-      this.translateService
+    if (this._accountDTO === undefined) {
+      this._translateService
         .get(['notifications.title.error', 'accounts.table.errors.noAccount'])
         .pipe(
           tap((errorMesages: { [key: string]: string }) =>
-            this.notificationsService.error(
+            this._notificationsService.error(
               errorMesages['notifications.title.error'],
               errorMesages['accounts.table.errors.noAccount'],
             ),
@@ -122,11 +169,11 @@ export class AccountTableComponent implements OnInit, OnDestroy {
         .subscribe();
       return;
     }
-    const data: [AccountDto, MovementDto | null] = [this.accountDTO, null];
+    const data: [AccountDto, MovementDto | null] = [this._accountDTO, null];
     const accountEntryDialogRef: MatDialogRef<
       AccountEntryDialogComponent,
       [MovementDto]
-    > = this.accountEntryDialogComponent.open(AccountEntryDialogComponent, {
+    > = this._accountEntryDialogComponent.open(AccountEntryDialogComponent, {
       width: '520px',
       minWidth: '520px',
       maxWidth: '520px',

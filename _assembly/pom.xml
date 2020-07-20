@@ -10,7 +10,6 @@
     </parent>
 
     <artifactId>_assembly</artifactId>
-    <packaging>pom</packaging>
 
     <dependencies>
         <dependency>

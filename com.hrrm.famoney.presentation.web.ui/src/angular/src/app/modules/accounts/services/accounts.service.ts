@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject, combineLatest, empty, EMPTY } from 'rxjs';
-import { AccountDto, AccountsApiService } from '@famoney-apis/accounts';
-import { map, switchMap, shareReplay, retry, catchError } from 'rxjs/operators';
+import { Observable, BehaviorSubject, combineLatest, EMPTY } from 'rxjs';
+import { AccountsApiService } from '@famoney-apis/accounts';
+import { map, shareReplay, catchError } from 'rxjs/operators';
 import { NotificationsService } from 'angular2-notifications';
 
 const ACCOUNT_TAGS_STORAGE = 'ACCOUNT_TAGS_STORAGE';
@@ -33,24 +33,24 @@ export class AccountsService {
     window.localStorage.setItem(ACCOUNT_ID_STORAGE, newAccountId?.toString(10) ?? '');
   }
 
-  constructor(private accountsApiService: AccountsApiService, private notificationsService: NotificationsService) {
+  constructor(private _accountsApiService: AccountsApiService, private _notificationsService: NotificationsService) {
     let tags: string[] = [];
     if (window.localStorage) {
       tags = JSON.parse(window.localStorage.getItem(ACCOUNT_TAGS_STORAGE) ?? '[]');
       this.selectedAccountId = parseInt(window.localStorage.getItem(ACCOUNT_ID_STORAGE) ?? '', 10);
     }
     this.selectedAccountTags$ = new BehaviorSubject(new Set<string>(tags));
-    this.accounts$ = this.accountsApiService.getAllAccounts().pipe(
+    this.accounts$ = this._accountsApiService.getAllAccounts().pipe(
       shareReplay(1),
       catchError(() => {
-        this.notificationsService.error('Error', "Couldn't load list of accounts.");
+        this._notificationsService.error('Error', "Couldn't load list of accounts.");
         return EMPTY;
       }),
     );
   }
 
   getTags() {
-    return combineLatest([this.accountsApiService.getAllAccountTags(), this.selectedAccountTags$]).pipe(
+    return combineLatest([this._accountsApiService.getAllAccountTags(), this.selectedAccountTags$]).pipe(
       map(([original, selected]) => Array.from(new Set(original.filter(tag => !selected.has(tag))))),
     );
   }

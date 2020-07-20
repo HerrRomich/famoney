@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
 import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsApplicationSelect;
 import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.osgi.service.log.Logger;
@@ -29,7 +28,7 @@ import com.hrrm.famoney.domain.datadirectory.repository.IncomeCategoryRepository
 
 import io.swagger.v3.oas.annotations.Hidden;
 
-@Component(service = EntryCategoriesApi.class, scope = ServiceScope.BUNDLE)
+@Component(service = EntryCategoriesApi.class)
 @JaxrsResource
 @JaxrsApplicationSelect("(osgi.jaxrs.name=com.hrrm.famoney.application.api.data-dictionary)")
 @Hidden
@@ -51,13 +50,25 @@ public class EntryCategoriesApiImpl implements EntryCategoriesApi {
 
     @Override
     public EntryCategoriesDTO getEntryCategories() {
-        return EntryCategoriesDTOImpl.builder()
+        logger.debug("Getting the hierarchical structure of all entry categories.");
+        final var expenseCategories = expenseCategoryRepository.findAll();
+        final var incomeCategories = incomeCategoryRepository.findAll();
+        final var entryCategoriesDTO = EntryCategoriesDTOImpl.builder()
             .expenses(this.<ExpenseCategory, ExpenseCategoryDTO>mapEntryCategoriesToDTO(expenseCategoryRepository
                 .getTopLevelCategories(),
                     ExpenseCategoryDTO.Builder::new))
             .incomes(mapEntryCategoriesToDTO(incomeCategoryRepository.getTopLevelCategories(),
                     IncomeCategoryDTO.Builder::new))
             .build();
+        logger.debug("Found {} expense categories and {} income categories.",
+                expenseCategories.size(),
+                incomeCategories.size());
+        logger.trace(l -> l.trace("Found {} expense categories: {}/p/n and {} income categories {}.",
+                expenseCategories.size(),
+                expenseCategories,
+                incomeCategories.size(),
+                incomeCategories));
+        return entryCategoriesDTO;
     }
 
     private <T extends EntryCategory<T>, P extends EntryCategoryDTO<P>> Iterable<P> mapEntryCategoriesToDTO(

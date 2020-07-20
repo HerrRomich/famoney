@@ -16,4 +16,6 @@ public interface JpaRepository<T extends DomainEntity<P>, P extends Serializable
 
     void lock(T entity, LockModeType lockModeType);
 
+    void flush();
+
 }

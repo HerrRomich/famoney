@@ -25,6 +25,10 @@ export class MovementDataSource extends DataSource<MovementDto> {
       }),
       switchMap(account =>
         collectionViewer.viewChange.pipe(
+          startWith({
+            start: 0,
+            end: PAGE_SIZE + PAGE_BUFFER
+          }),
           map(range => {
             const pageStart = Math.floor((range.start - PAGE_BUFFER) / PAGE_SIZE);
             const pageEnd = Math.floor((range.end + PAGE_BUFFER) / PAGE_SIZE);

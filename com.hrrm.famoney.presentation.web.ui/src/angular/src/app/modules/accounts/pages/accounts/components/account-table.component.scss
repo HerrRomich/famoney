@@ -15,14 +15,37 @@ mat-list.movements-list {
 .account-entry:hover {
   background-color: mat-color($fm-app-accent, 50);
   font-weight: 600;
+  button.account-entry-action {
+    display: block;
+  }
 }
 
-mat-list-item.mat-list-item.mat-focus-indicator.account-entry-header {
+.account-entry {
+  button.account-entry-action {
+    display: none;
+  }
+}
+
+mat-list-item.mat-focus-indicator.account-entry-header {
   position: sticky;
   top: 0;
   font-weight: 700;
   z-index: 1;
   background-color: rgba(#ffffff, 1);
+}
+
+mat-list-item {
+  &.account-entry-header,
+  &.account-entry {
+    div.fixed-width {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+  > div.mat-list-item-content {
+    padding: 12px 0 0 0;
+  }
 }
 
 div.positive-amount {

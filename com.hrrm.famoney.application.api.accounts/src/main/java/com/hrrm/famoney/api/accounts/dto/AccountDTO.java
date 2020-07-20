@@ -21,6 +21,6 @@ public interface AccountDTO extends DTO, IdDTO, AccountDataDTO {
     Integer getMovementCount();
 
     @Schema(required = true)
-    BigDecimal getSum();
+    BigDecimal getTotal();
 
 }

@@ -25,7 +25,7 @@
             <groupId>org.osgi</groupId>
             <artifactId>osgi.core</artifactId>
         </dependency>
-        
+
         <dependency>
             <groupId>com.hrrm.famoney</groupId>
             <artifactId>com.hrrm.famoney.infrastructure.jetty</artifactId>
@@ -37,6 +37,12 @@
         <dependency>
             <groupId>com.hrrm.famoney</groupId>
             <artifactId>com.hrrm.famoney.application.api.data-directory</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.http.jetty</artifactId>
+            <classifier>light</classifier>
         </dependency>
     </dependencies>
 
