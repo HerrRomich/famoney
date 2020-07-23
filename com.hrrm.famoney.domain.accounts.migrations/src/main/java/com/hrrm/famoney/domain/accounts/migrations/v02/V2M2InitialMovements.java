@@ -36,8 +36,8 @@ import org.flywaydb.core.api.migration.JavaMigration;
 import org.osgi.service.log.Logger;
 import org.osgi.service.log.LoggerFactory;
 
-import com.hrrm.famoney.application.api.datadirectory.dto.EntryCategoriesDTO;
-import com.hrrm.famoney.application.api.datadirectory.dto.EntryCategoryDTO;
+import com.hrrm.famoney.application.api.masterdata.dto.EntryCategoriesDTO;
+import com.hrrm.famoney.application.api.masterdata.dto.EntryCategoryDTO;
 import com.hrrm.famoney.domain.accounts.migrations.v01.V1M2Accounts;
 import com.hrrm.famoney.function.throwing.ThrowingBiConsumer;
 import com.hrrm.famoney.function.throwing.ThrowingConsumer;

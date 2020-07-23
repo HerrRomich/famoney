@@ -1,8 +1,0 @@
-{
-	":configurator:resource-version": 1,
-	"com.hrrm.famoney.infrastructure.persistence.EntityMnagerProvider~famoney.data-directory": {
-		"data_source.target": "(dataSourceName=famoney.data-directory)",
-		"emfb.target": "(osgi.unit.name=famoney.data-directory)",
-		"name": "data-directory"
-	}
-}

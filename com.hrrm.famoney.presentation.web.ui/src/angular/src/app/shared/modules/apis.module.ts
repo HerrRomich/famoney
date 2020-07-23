@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import { ApiModule as AccountsApiModule, Configuration as AccountsApiConfiguration } from '@famoney-apis/accounts';
 import {
-  ApiModule as DataDirectoryApiModule,
-  Configuration as DataDirectoryApiConfiguration,
-} from '@famoney-apis/data-directory';
+  ApiModule as MasterDataApiModule,
+  Configuration as MasterDataApiConfiguration,
+} from '@famoney-apis/master-data';
 import { HttpClientModule } from '@angular/common/http';
 
 const accountsApiConfigFactory = () => {
@@ -12,16 +12,16 @@ const accountsApiConfigFactory = () => {
   });
 };
 
-const dataDirectoryApiConfigFactory = () => {
-  return new DataDirectoryApiConfiguration({
-    basePath: '/famoney/api/data-directory',
+const masterDataApiConfigFactory = () => {
+  return new MasterDataApiConfiguration({
+    basePath: '/famoney/api/master-data',
   });
 };
 
 @NgModule({
   imports: [
     AccountsApiModule.forRoot(accountsApiConfigFactory),
-    DataDirectoryApiModule.forRoot(dataDirectoryApiConfigFactory),
+    MasterDataApiModule.forRoot(masterDataApiConfigFactory),
     HttpClientModule,
   ],
 })

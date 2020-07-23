@@ -40,7 +40,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>com.hrrm.famoney.application.api.data-directory</artifactId>
+            <artifactId>com.hrrm.famoney.application.api.master-data</artifactId>
         </dependency>
 
         <dependency>

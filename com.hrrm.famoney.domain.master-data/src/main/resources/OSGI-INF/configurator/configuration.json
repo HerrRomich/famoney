@@ -1,0 +1,8 @@
+{
+	":configurator:resource-version": 1,
+	"com.hrrm.famoney.infrastructure.persistence.EntityMnagerProvider~famoney.master-data": {
+		"data_source.target": "(dataSourceName=famoney.master-data)",
+		"emfb.target": "(osgi.unit.name=famoney.master-data)",
+		"name": "master-data"
+	}
+}

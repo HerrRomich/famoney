@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { DataDirectoryApiService, EntryCategoriesDto } from '@famoney-apis/data-directory';
+import { MasterDataApiService, EntryCategoriesDto } from '@famoney-apis/master-data';
 import { Observable, BehaviorSubject, EMPTY } from 'rxjs';
 import { switchMap, shareReplay, catchError, map } from 'rxjs/operators';
 import { NotificationsService } from 'angular2-notifications';
-import { EntryCategoryDto } from '@famoney-apis/data-directory/model/entry-category.dto';
+import { EntryCategoryDto } from '@famoney-apis/master-data/model/entry-category.dto';
 
 export interface EntryCategory {
   id: number;
@@ -41,10 +41,10 @@ export class EntryCategoryService {
 
   constructor(
     private notificationsService: NotificationsService,
-    private dataDirectoryApiService: DataDirectoryApiService,
+    private masterDataApiService: MasterDataApiService,
   ) {
     this.entryCategories$ = this._entryCategoriesRefreshSubject.pipe(
-      switchMap(() => this.dataDirectoryApiService.getEntryCategories()),
+      switchMap(() => this.masterDataApiService.getEntryCategories()),
       shareReplay(1),
       catchError(() => {
         this.notificationsService.error('Error', 'Couldn\t load entry categories.');

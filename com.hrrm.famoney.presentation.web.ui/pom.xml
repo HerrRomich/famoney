@@ -36,7 +36,7 @@
         </dependency>
         <dependency>
             <groupId>com.hrrm.famoney</groupId>
-            <artifactId>com.hrrm.famoney.application.api.data-directory</artifactId>
+            <artifactId>com.hrrm.famoney.application.api.master-data</artifactId>
         </dependency>
 
         <dependency>
@@ -60,7 +60,7 @@
                         <configuration>
                             <resourceBundles>
                                 <resourceBundle>${project.groupId}:com.hrrm.famoney.application.api.accounts:${project.version}</resourceBundle>
-                                <resourceBundle>${project.groupId}:com.hrrm.famoney.application.api.data-directory:${project.version}</resourceBundle>
+                                <resourceBundle>${project.groupId}:com.hrrm.famoney.application.api.master-data:${project.version}</resourceBundle>
                             </resourceBundles>
                             <attachToMain>false</attachToMain>
                         </configuration>
@@ -76,7 +76,7 @@
                             <directory>src/angular/src/app/shared/apis/accounts</directory>
                         </fileset>
                         <fileset>
-                            <directory>src/angular/src/app/shared/apis/data-directory</directory>
+                            <directory>src/angular/src/app/shared/apis/master-data</directory>
                         </fileset>
                     </filesets>
                 </configuration>
@@ -105,14 +105,14 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>generate-data-directory-api</id>
+                        <id>generate-master-data-api</id>
                         <goals>
                             <goal>generate</goal>
                         </goals>
                         <phase>prepare-package</phase>
                         <configuration>
-                            <inputSpec>${project.build.directory}/maven-shared-archive-resources/data-directory.json</inputSpec>
-                            <output>src/angular/src/app/shared/apis/data-directory</output>
+                            <inputSpec>${project.build.directory}/maven-shared-archive-resources/master-data.json</inputSpec>
+                            <output>src/angular/src/app/shared/apis/master-data</output>
                         </configuration>
                     </execution>
                 </executions>

@@ -1,0 +1,1 @@
+package com.hrrm.famoney.api.masterdata.internal;

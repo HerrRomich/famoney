@@ -7,7 +7,7 @@ import {
 import { Observable, EMPTY, forkJoin } from 'rxjs';
 import { FormGroup } from '@angular/forms';
 import { debounceTime, switchMap, map, startWith, shareReplay } from 'rxjs/operators';
-import { EntryCategoryDto } from '@famoney-apis/data-directory/model/entry-category.dto';
+import { EntryCategoryDto } from '@famoney-apis/master-data/model/entry-category.dto';
 import { TranslateService } from '@ngx-translate/core';
 import { getLocaleNumberSymbol, NumberSymbol } from '@angular/common';
 

@@ -15,7 +15,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.log.LoggerFactory;
 
-import com.hrrm.famoney.application.api.datadirectory.resources.EntryCategoriesApi;
+import com.hrrm.famoney.application.api.masterdata.resources.EntryCategoriesApi;
 import com.hrrm.famoney.domain.accounts.migrations.v01.V1M2Accounts;
 import com.hrrm.famoney.infrastructure.persistence.migrations.MigrationNamespace;
 

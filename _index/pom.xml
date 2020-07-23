@@ -47,12 +47,12 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>com.hrrm.famoney.application.api.data-directory</artifactId>
+            <artifactId>com.hrrm.famoney.application.api.master-data</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>com.hrrm.famoney.application.api.data-directory.impl</artifactId>
+            <artifactId>com.hrrm.famoney.application.api.master-data.impl</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -92,12 +92,12 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>com.hrrm.famoney.domain.data-directory</artifactId>
+            <artifactId>com.hrrm.famoney.domain.master-data</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>com.hrrm.famoney.domain.data-directory.migrations</artifactId>
+            <artifactId>com.hrrm.famoney.domain.master-data.migrations</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
