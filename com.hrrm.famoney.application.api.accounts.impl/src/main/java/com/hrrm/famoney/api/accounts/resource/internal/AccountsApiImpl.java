@@ -1,5 +1,6 @@
 package com.hrrm.famoney.api.accounts.resource.internal;
 
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -40,7 +41,6 @@ import com.hrrm.famoney.api.accounts.dto.AccountDTO;
 import com.hrrm.famoney.api.accounts.dto.AccountDataDTO;
 import com.hrrm.famoney.api.accounts.dto.impl.AccountDTOImpl;
 import com.hrrm.famoney.api.accounts.dto.impl.AccountDataDTOImpl;
-import com.hrrm.famoney.api.accounts.internal.AccountsApiService;
 import com.hrrm.famoney.api.accounts.resource.AccountsApi;
 import com.hrrm.famoney.api.accounts.resource.internalexceptions.AccountsApiError;
 import com.hrrm.famoney.api.accounts.sse.ChangeAccountEventDTO;
@@ -53,6 +53,7 @@ import io.swagger.v3.oas.annotations.Hidden;
 
 @Component(service = {
         AccountsApi.class,
+        AccountsApiService.class,
         EventHandler.class
 })
 @JaxrsResource
@@ -62,14 +63,14 @@ import io.swagger.v3.oas.annotations.Hidden;
         AccountsApiImpl.ACCOUNTS_CHANGE_TOPIC
 })
 @RequireEventAdmin
-public class AccountsApiImpl implements AccountsApi, EventHandler {
+public class AccountsApiImpl implements AccountsApi, AccountsApiService, EventHandler {
 
     public static final String ACCOUNTS_CHANGE_TOPIC = "com/hrrm/famoney/event/accounts";
+    private static final String NO_ACCOUNT_IS_FOUND_MESSAGE = "No account is found for id: {0}.";
 
     private final Logger logger;
     private final AccountRepository accountRepository;
     private final TransactionControl txControl;
-    private final AccountsApiService accountsApiService;
 
     @Context
     private HttpServletResponse httpServletResponse;
@@ -83,13 +84,11 @@ public class AccountsApiImpl implements AccountsApi, EventHandler {
 
     @Activate
     public AccountsApiImpl(@Reference(service = LoggerFactory.class) final Logger logger,
-            @Reference final AccountRepository accountRepository, @Reference final TransactionControl txControl,
-            @Reference final AccountsApiService accountsApiService) {
+            @Reference final AccountRepository accountRepository, @Reference final TransactionControl txControl) {
         super();
         this.logger = logger;
         this.accountRepository = accountRepository;
         this.txControl = txControl;
-        this.accountsApiService = accountsApiService;
         pushStreamProvider = new PushStreamProvider();
         changeAccountEvents = pushStreamProvider.createSimpleEventSource(ChangeAccountEventDTO.class);
     }
@@ -175,7 +174,7 @@ public class AccountsApiImpl implements AccountsApi, EventHandler {
     public AccountDataDTO changeAccount(@NotNull final Integer accountId, @NotNull final AccountDataDTO accountData) {
         try {
             return txControl.required(() -> {
-                final var account = accountsApiService.getAccountByIdOrThrowNotFound(accountId,
+                final var account = getAccountByIdOrThrowNotFound(accountId,
                         AccountsApiError.NO_ACCOUNT_BY_CHANGE);
                 account.setName(accountData.getName())
                     .setOpenDate(accountData.getOpenDate())
@@ -186,6 +185,19 @@ public class AccountsApiImpl implements AccountsApi, EventHandler {
         } catch (final ScopedWorkException ex) {
             throw ex.as(ApiException.class);
         }
+    }
+
+    @Override
+    public Account getAccountByIdOrThrowNotFound(@NotNull final Integer accountId, final AccountsApiError error) {
+        return accountRepository.find(accountId)
+            .orElseThrow(() -> {
+                final var errorMessage = MessageFormat.format(NO_ACCOUNT_IS_FOUND_MESSAGE, accountId);
+                final var exception = new ApiException(error,
+                    errorMessage);
+                logger.warn(errorMessage);
+                logger.trace(errorMessage, exception);
+                return exception;
+            });
     }
 
     @Override
@@ -214,7 +226,7 @@ public class AccountsApiImpl implements AccountsApi, EventHandler {
     public AccountDTO getAccount(@NotNull final Integer accountId) {
         logger.debug("Getting account info with ID: {}",
                 accountId);
-        final var account = accountsApiService.getAccountByIdOrThrowNotFound(accountId,
+        final var account = getAccountByIdOrThrowNotFound(accountId,
                 AccountsApiError.NO_ACCOUNT_ON_GET_ACCOUNT);
         logger.debug("Got account info with ID: {}",
                 account.getId());

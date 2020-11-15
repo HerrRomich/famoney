@@ -1,5 +1,0 @@
-Bundle-Version: 1.0.0.${tstamp}
-
-Private-Package: com.hrrm.famoney.domain.accounts.migrations
-	
--dsannotations-options: inherit

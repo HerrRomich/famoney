@@ -8,13 +8,13 @@ import { HttpClientModule } from '@angular/common/http';
 
 const accountsApiConfigFactory = () => {
   return new AccountsApiConfiguration({
-    basePath: '/famoney/api/accounts',
+    basePath: '/famoney/apis/accounts-domain',
   });
 };
 
 const masterDataApiConfigFactory = () => {
   return new MasterDataApiConfiguration({
-    basePath: '/famoney/api/master-data',
+    basePath: '/famoney/apis/master-data-domain',
   });
 };
 

@@ -18,7 +18,7 @@ import com.hrrm.famoney.infrastructure.jaxrs.ApiSpecification;
 })
 @JaxrsName("com.hrrm.famoney.application.api.accounts")
 @JaxrsApplicationBase("/" + AccountsApiSpecification.API_PATH)
-@HttpWhiteboardContextSelect("(" + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME + "=com.hrrm.famoney.api)")
+@HttpWhiteboardContextSelect("(" + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME + "=com.hrrm.famoney.apis)")
 @JSONRequired
 public class AccountsApplication extends AccountsApiSpecification {
 

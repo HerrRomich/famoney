@@ -9,8 +9,8 @@
     </parent>
     <artifactId>com.hrrm.famoney.domain.master-data</artifactId>
 
-    <name>Data Dictionary Domain Model</name>
-    <description>Domain model for all data dictionaries</description>
+    <name>Master Data Domain Model</name>
+    <description>Domain model for whole master data</description>
 
     <dependencies>
         <dependency>
@@ -70,6 +70,16 @@
 
     <build>
         <plugins>
+			<plugin>
+				<groupId>biz.aQute.bnd</groupId>
+				<artifactId>bnd-maven-plugin</artifactId>
+				<configuration>
+					<bnd><![CDATA[
+						Meta-Persistence: META-INF/persistence.xml
+						]]>
+					</bnd>
+				</configuration>
+			</plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>

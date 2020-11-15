@@ -9,5 +9,5 @@ public interface ApiSpecification {
     String getDescription();
 
     InputStream getSpecificationStream();
-
+    
 }

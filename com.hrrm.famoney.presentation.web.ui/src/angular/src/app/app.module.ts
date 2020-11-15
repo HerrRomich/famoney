@@ -1,36 +1,12 @@
-import { BrowserModule } from '@angular/platform-browser';
+import { MaterialModule } from './shared/modules/material.module';
 import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { AngularModule } from '@famoney-shared/modules/angular.module';
+import { ApisModule } from '@famoney-shared/modules/apis.module';
+import { SharedModule } from '@famoney-shared/modules/shared.module';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { SimpleNotificationsModule } from 'angular2-notifications';
-import { AngularModule } from '@famoney-shared/modules/angular.module';
-import { MatButtonModule } from '@angular/material/button';
-import { MAT_DATE_LOCALE, MatNativeDateModule, DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
-import { MatIconModule } from '@angular/material/icon';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { FlexLayoutModule } from '@angular/flex-layout';
-import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
-import { ApisModule } from '@famoney-shared/modules/apis.module';
-import { TranslateModule, TranslateService, TranslateLoader } from '@ngx-translate/core';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
-import { HttpClient } from '@angular/common/http';
-import localeRu from '@angular/common/locales/ru';
-import { registerLocaleData } from '@angular/common';
-
-registerLocaleData(localeRu);
-
-export const MY_FORMATS = {
-  parse: {
-    dateInput: 'L',
-  },
-  display: {
-    dateInput: 'L',
-    monthYearLabel: 'MMM YYYY',
-    dateA11yLabel: 'LL',
-    monthYearA11yLabel: 'MMMM YYYY',
-  },
-};
 
 @NgModule({
   declarations: [AppComponent],
@@ -39,37 +15,9 @@ export const MY_FORMATS = {
     AppRoutingModule,
     BrowserAnimationsModule,
     AngularModule,
-    MatToolbarModule,
-    MatIconModule,
-    MatButtonModule,
-    MatNativeDateModule,
-    FlexLayoutModule,
-    SimpleNotificationsModule.forRoot({
-      timeOut: 5000,
-    }),
-    TranslateModule.forRoot({
-      defaultLanguage: 'ru',
-      loader: {
-        provide: TranslateLoader,
-        useFactory: (httpClient: HttpClient) => new TranslateHttpLoader(httpClient, 'assets/i18n/'),
-        deps: [HttpClient],
-      },
-    }),
+    MaterialModule,
     ApisModule,
-  ],
-  providers: [
-    {
-      provide: MAT_DATE_LOCALE,
-      useFactory: (translateService: TranslateService) => translateService.currentLang ?? translateService.defaultLang,
-      deps: [TranslateService],
-    },
-    {
-      provide: DateAdapter,
-      useClass: MomentDateAdapter,
-      deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS],
-    },
-    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
-    { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { strict: true } },
+    SharedModule
   ],
   bootstrap: [AppComponent],
 })

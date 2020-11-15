@@ -14,7 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
     description = "Master data requests.") })
 public abstract class MasterDataApiSpecification extends Application implements ApiSpecification {
 
-    public static final String API_PATH = "master-data";
+    public static final String API_PATH = "master-data-domain";
 
     @Override
     public final String getPath() {
@@ -29,6 +29,11 @@ public abstract class MasterDataApiSpecification extends Application implements 
     @Override
     public final InputStream getSpecificationStream() {
         return MasterDataApiSpecification.class.getResourceAsStream("/master-data.json");
+    }
+
+    @Override
+    public String toString() {
+        return "MasterDataApiSpecification [path=" + getPath() + ", description=" + getDescription() + "]";
     }
 
 }

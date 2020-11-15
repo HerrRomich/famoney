@@ -44,7 +44,7 @@ public class SwaggerApisImpl implements SwaggerApis {
     }
 
     @Reference(cardinality = ReferenceCardinality.MULTIPLE, bind = "bindApiSpecification",
-            policy = ReferencePolicy.DYNAMIC)
+            unbind = "unbindApiSpecification", policy = ReferencePolicy.STATIC)
     public void bindApiSpecification(ApiSpecification apiSpecification) {
         apiSpecifications.computeIfAbsent(apiSpecification.getPath(),
                 path -> {
@@ -57,8 +57,8 @@ public class SwaggerApisImpl implements SwaggerApis {
     public void unbindApiSpecification(ApiSpecification apiSpecification) {
         apiSpecifications.computeIfPresent(apiSpecification.getPath(),
                 (path, spec) -> {
-                    logger.info("Unregistered OpenAPI specification for name: {0}",
-                            apiSpecification.getPath());
+                    logger.info("Unregistered OpenAPI specification for name: {}",
+                            spec.getPath());
                     return null;
                 });
     }

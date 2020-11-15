@@ -1,9 +1,7 @@
 package com.hrrm.famoney.api.accounts.resource.internal;
 
-import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +42,6 @@ import org.osgi.service.log.LoggerFactory;
 import org.osgi.service.transaction.control.ScopedWorkException;
 import org.osgi.service.transaction.control.TransactionControl;
 import org.osgi.service.transaction.control.TransactionException;
-import org.osgi.util.promise.Promises;
 
 import com.hrrm.famoney.api.accounts.dto.EntryDataDTO;
 import com.hrrm.famoney.api.accounts.dto.EntryItemDataDTO;
@@ -54,14 +51,11 @@ import com.hrrm.famoney.api.accounts.dto.MovementDataDTOBuilder;
 import com.hrrm.famoney.api.accounts.dto.impl.MovementDTOImpl;
 import com.hrrm.famoney.api.accounts.dto.impl.RefundDataDTOImpl;
 import com.hrrm.famoney.api.accounts.dto.impl.TransferDataDTOImpl;
-import com.hrrm.famoney.api.accounts.internal.AccountsApiService;
+import com.hrrm.famoney.api.accounts.internal.MovementApiService;
 import com.hrrm.famoney.api.accounts.resource.AccountMovementsApi;
 import com.hrrm.famoney.api.accounts.resource.internalexceptions.AccountsApiError;
 import com.hrrm.famoney.api.accounts.sse.impl.ChangeMovementEventDTOImpl;
-import com.hrrm.famoney.application.service.accounts.MovementsService;
-import com.hrrm.famoney.domain.accounts.Account;
 import com.hrrm.famoney.domain.accounts.movement.Entry;
-import com.hrrm.famoney.domain.accounts.movement.EntryItem;
 import com.hrrm.famoney.domain.accounts.movement.Movement;
 import com.hrrm.famoney.domain.accounts.movement.Refund;
 import com.hrrm.famoney.domain.accounts.movement.Transfer;
@@ -89,10 +83,10 @@ public class AccountMovementsApiImpl implements AccountMovementsApi, EventHandle
 
     private final Logger logger;
     private final MovementRepository movementRepository;
-    private final MovementsService movementsService;
+    private final AccountsApiService accountsApiService;
+    private final MovementApiService movementsApiService;
     private final TransactionControl txControl;
     private final EventAdmin eventAdmin;
-    private final AccountsApiService accountsApiService;
 
     @Context
     private HttpServletResponse httpServletResponse;
@@ -105,16 +99,17 @@ public class AccountMovementsApiImpl implements AccountMovementsApi, EventHandle
 
     @Activate
     public AccountMovementsApiImpl(@Reference(service = LoggerFactory.class) final Logger logger,
-            @Reference final MovementRepository movementRepository, @Reference final MovementsService movementsService,
-            @Reference final TransactionControl txControl, @Reference final EventAdmin eventAdmin,
-            @Reference final AccountsApiService accountsApiService) {
+            @Reference final MovementRepository movementRepository,
+            @Reference final AccountsApiService accountsApiService,
+            @Reference final MovementApiService movementsApiService, @Reference final TransactionControl txControl,
+            @Reference final EventAdmin eventAdmin) {
         super();
         this.logger = logger;
         this.movementRepository = movementRepository;
-        this.movementsService = movementsService;
+        this.accountsApiService = accountsApiService;
+        this.movementsApiService = movementsApiService;
         this.txControl = txControl;
         this.eventAdmin = eventAdmin;
-        this.accountsApiService = accountsApiService;
     }
 
     @Deactivate
@@ -126,19 +121,16 @@ public class AccountMovementsApiImpl implements AccountMovementsApi, EventHandle
     public List<MovementDTO> getMovements(@NotNull final Integer accountId, final Integer offset, final Integer limit) {
         final var offsetOptional = Optional.ofNullable(offset);
         final var limitOptional = Optional.ofNullable(limit);
-        logger.debug("Getting all movemnts of account with id: {}, offset: {} and count: {}.",
-                accountId,
-                offsetOptional.map(Object::toString)
-                    .orElse("\"from beginning\""),
-                limitOptional.map(Object::toString)
-                    .orElse("\"all\""));
+        logger.debug("Getting all movemnts of account with id: {}, offset: {} and count: {}.", accountId, offsetOptional
+            .map(Object::toString)
+            .orElse("\"from beginning\""), limitOptional.map(Object::toString)
+                .orElse("\"all\""));
         try {
             return txControl.required(() -> {
-                accountsApiService.getAccountByIdOrThrowNotFound(accountId,
+                final var account = accountsApiService.getAccountByIdOrThrowNotFound(accountId,
                         AccountsApiError.NO_ACCOUNT_ON_GET_ALL_ACCOUNT_MOVEMENTS);
-                final var movements = movementRepository.getMovementsByAccountIdOffsetAndLimit(accountId,
-                        offsetOptional,
-                        limitOptional);
+                final var movements = movementRepository.getMovementsByAccountIdWithOffsetAndLimitOrderedByDate(account,
+                        offset, limit);
                 List<MovementDTO> movementDTOs = movements.stream()
                     .map(movement -> MovementDTOImpl.builder()
                         .id(movement.getId())
@@ -146,12 +138,8 @@ public class AccountMovementsApiImpl implements AccountMovementsApi, EventHandle
                         .total(movement.getTotal())
                         .build())
                     .collect(Collectors.toList());
-                logger.debug("Got {} movemnts of account with ID: {}",
-                        movementDTOs.size(),
-                        accountId);
-                logger.trace("Got movemnts of account with ID: {}. {}",
-                        accountId,
-                        movementDTOs);
+                logger.debug("Got {} movemnts of account with ID: {}", movementDTOs.size(), accountId);
+                logger.trace("Got movemnts of account with ID: {}. {}", accountId, movementDTOs);
                 return movementDTOs;
             });
         } catch (final ScopedWorkException e) {
@@ -160,29 +148,25 @@ public class AccountMovementsApiImpl implements AccountMovementsApi, EventHandle
     }
 
     @Override
-    public MovementDTO getMovement(@NotNull Integer accountId, @NotNull Integer movementId) {
-        logger.debug("Getting movement info.");
-        logger.trace("Geting movement info by id {} from account with id: {} with data: {}",
-                movementId,
-                accountId);
+    public MovementDTO getMovement(@NotNull final Integer accountId, @NotNull final Integer movementId) {
+        logger.debug("Geting movement info by id {} from account with id: {} with data: {}", movementId, accountId);
         try {
             return txControl.required(() -> {
                 final var account = accountsApiService.getAccountByIdOrThrowNotFound(accountId,
                         AccountsApiError.NO_ACCOUNT_ON_ADD_MOVEMENT);
                 return movementRepository.find(movementId)
+                    .filter(movement -> account.equals(movement.getAccount()))
                     .map(movement -> MovementDTOImpl.builder()
                         .id(movement.getId())
                         .data(convertMovement(movement))
                         .build())
                     .orElseThrow(() -> {
-                        final var errorMessage = MessageFormat.format(NO_ACCOUNT_MOVEMENT_IS_FOUND_MESSAGE,
-                                account.getId(),
-                                movementId);
+                        final var errorMessage = MessageFormat.format(NO_ACCOUNT_MOVEMENT_IS_FOUND_MESSAGE, account
+                            .getId(), movementId);
                         final var exception = new ApiException(AccountsApiError.NO_MOVEMENT_ON_GET_MOVEMENT,
                             errorMessage);
                         logger.warn(errorMessage);
-                        logger.trace(errorMessage,
-                                exception);
+                        logger.trace(errorMessage, exception);
                         return exception;
                     });
             });
@@ -192,81 +176,90 @@ public class AccountMovementsApiImpl implements AccountMovementsApi, EventHandle
     }
 
     @Override
-    public MovementDTO addMovement(@NotNull Integer accountId, MovementDataDTO movementDataDTO) {
-        logger.debug("Adding movement");
-        logger.trace("Adding movement to account id: {} with data: {}",
-                accountId,
-                movementDataDTO);
+    public MovementDTO changeMovement(@NotNull final Integer accountId, @NotNull final Integer movementId,
+            MovementDataDTO movementDataDTO) {
+        logger.debug("Changing movement id: {} in account id: {}.", movementId, accountId);
         try {
             var movementDTO = txControl.required(() -> {
                 final var account = accountsApiService.getAccountByIdOrThrowNotFound(accountId,
-                        AccountsApiError.NO_ACCOUNT_ON_ADD_MOVEMENT);
-                Movement movement = null;
-                if (movementDataDTO instanceof EntryDataDTO) {
-                    movement = createEntryMovement(account,
-                            movementDataDTO);
-                }
-                final var resultMovement = movementsService.addMovement(movement);
-                httpServletResponse.setStatus(Status.CREATED.getStatusCode());
-                final var location = uriInfo.getAbsolutePathBuilder()
-                    .path(AccountMovementsApi.class,
-                            "getMovement")
-                    .build(account.getId(),
-                            resultMovement.getId());
-                httpServletResponse.setHeader(HttpHeaders.LOCATION,
-                        location.toString());
-                MovementDataDTO data = convertMovement(movement);
+                        AccountsApiError.NO_ACCOUNT_ON_CHANGE_MOVEMENT);
+                final var movementToChange = movementRepository.find(movementId)
+                    .filter(movement -> account.equals(movement.getAccount()))
+                    .orElseThrow(() -> {
+                        final var errorMessage = MessageFormat.format(NO_ACCOUNT_MOVEMENT_IS_FOUND_MESSAGE, account
+                            .getId(), movementId);
+                        final var exception = new ApiException(AccountsApiError.NO_MOVEMENT_ON_CHANGE_MOVEMENT,
+                            errorMessage);
+                        logger.warn(errorMessage);
+                        logger.trace(errorMessage, exception);
+                        return exception;
+                    });
+                final var resultMovement = movementsApiService.updateMovement(movementToChange, movementDataDTO);
+                MovementDataDTO data = convertMovement(resultMovement);
                 return MovementDTOImpl.builder()
-                    .id(movement.getId())
+                    .id(resultMovement.getId())
                     .data(data)
                     .total(data.getAmount())
                     .build();
             });
             logger.debug("A movement was added to account.");
-            logger.trace("A movement was added to account by id : {}. A new id: {} was generated.",
-                    accountId,
+            logger.trace("A movement was added to account by id : {}. A new id: {} was generated.", accountId,
                     movementDTO.getId());
-            final var changeEvnetProperties = new HashMap<String, Object>();
-            changeEvnetProperties.put("com.hrrm.famoney.event.acconts.id",
-                    accountId);
-            changeEvnetProperties.put("com.hrrm.famoney.event.acconts.movements.id",
-                    movementDTO.getId());
-            eventAdmin.postEvent(new Event(MOVEMENTS_CHANGE_TOPIC,
-                changeEvnetProperties));
+            putChangeEvent(accountId, movementDTO);
             return movementDTO;
         } catch (TransactionException e) {
             String message = "Problem during adding a movement to account.";
-            logger.error(message,
-                    e);
+            logger.error(message, e);
             throw new ApiException(message);
         } catch (ScopedWorkException e) {
             throw e.as(ApiException.class);
         }
     }
 
-    private Movement createEntryMovement(final Account account, MovementDataDTO movementDataDTO) {
-        Movement movement;
-        final var entryDataDTO = (EntryDataDTO) movementDataDTO;
-        movement = new Entry().setEntryItems(entryDataDTO.getEntryItems()
-            .stream()
-            .map(entryItemDataDTO -> new EntryItem().setCategoryId(entryItemDataDTO.getCategoryId())
-                .setAmount(entryItemDataDTO.getAmount())
-                .setComments(entryItemDataDTO.getComments()))
-            .collect(Collectors.toList()))
-            .setAccount(account)
-            .setAmount(entryDataDTO.getAmount())
-            .setDate(entryDataDTO.getDate()
-                .atTime(LocalTime.now()))
-            .setBookingDate(entryDataDTO.getBookingDate()
-                .map(bookingDate -> bookingDate.atTime(LocalTime.now()))
-                .orElse(null))
-            .setBudgetPeriod(entryDataDTO.getBudgetPeriod()
-                .orElse(null))
-            .setTotal(BigDecimal.ZERO);
-        return movement;
+    @Override
+    public MovementDTO addMovement(@NotNull final Integer accountId, final MovementDataDTO movementDataDTO) {
+        logger.debug("Adding movement.");
+        logger.trace("Adding movement to account id: {} with data: {}", accountId, movementDataDTO);
+        try {
+            var movementDTO = txControl.required(() -> {
+                final var account = accountsApiService.getAccountByIdOrThrowNotFound(accountId,
+                        AccountsApiError.NO_ACCOUNT_ON_ADD_MOVEMENT);
+                final var resultMovement = movementsApiService.addMovement(account, movementDataDTO);
+                httpServletResponse.setStatus(Status.CREATED.getStatusCode());
+                final var location = uriInfo.getAbsolutePathBuilder()
+                    .path(AccountMovementsApi.class, "getMovement")
+                    .build(account.getId(), resultMovement.getId());
+                httpServletResponse.setHeader(HttpHeaders.LOCATION, location.toString());
+                MovementDataDTO data = convertMovement(resultMovement);
+                return MovementDTOImpl.builder()
+                    .id(resultMovement.getId())
+                    .data(data)
+                    .total(data.getAmount())
+                    .build();
+            });
+            logger.debug("A movement was added to account.");
+            logger.trace("A movement was added to account id : {}. A new id: {} was generated.", accountId, movementDTO
+                .getId());
+            putChangeEvent(accountId, movementDTO);
+            return movementDTO;
+        } catch (TransactionException e) {
+            String message = "Problem during adding a movement to account.";
+            logger.error(message, e);
+            throw new ApiException(message);
+        } catch (ScopedWorkException e) {
+            throw e.as(ApiException.class);
+        }
     }
 
-    private MovementDataDTO convertMovement(Movement movement) {
+    private void putChangeEvent(final Integer accountId, final MovementDTO movementDTO) {
+        final var changeEvnetProperties = new HashMap<String, Object>();
+        changeEvnetProperties.put("com.hrrm.famoney.event.acconts.id", accountId);
+        changeEvnetProperties.put("com.hrrm.famoney.event.acconts.movements.id", movementDTO.getId());
+        eventAdmin.postEvent(new Event(MOVEMENTS_CHANGE_TOPIC,
+            changeEvnetProperties));
+    }
+
+    private MovementDataDTO convertMovement(final Movement movement) {
         return getMovementDataDTOBuilder(movement).date(movement.getDate()
             .toLocalDate())
             .bookingDate(Optional.ofNullable(movement.getBookingDate())
@@ -276,7 +269,7 @@ public class AccountMovementsApiImpl implements AccountMovementsApi, EventHandle
             .build();
     }
 
-    private MovementDataDTOBuilder<? extends MovementDataDTO> getMovementDataDTOBuilder(Movement movement) {
+    private MovementDataDTOBuilder<? extends MovementDataDTO> getMovementDataDTOBuilder(final Movement movement) {
         if (movement instanceof Entry) {
             var entry = (Entry) movement;
             Iterable<EntryItemDataDTO> iterable = () -> entry.getEntryItems()
@@ -300,24 +293,13 @@ public class AccountMovementsApiImpl implements AccountMovementsApi, EventHandle
     @GET
     @Path("events")
     @Produces(MediaType.SERVER_SENT_EVENTS)
-    public void sendChangeMovement(@PathParam("accountId") Integer accountId, @Context SseEventSink sink) {
-        accountsBroadcasters.computeIfAbsent(accountId,
-                k -> new AccountBroadcaster(accountId))
+    public void sendChangeMovement(@PathParam("accountId") final Integer accountId, @Context final SseEventSink sink) {
+        accountsBroadcasters.computeIfAbsent(accountId, k -> new AccountBroadcaster(accountId))
             .register(sink);
-        Promises.resolved("Roman")
-            .delay(10000)
-            .onSuccess(t -> {
-                sink.send(sse.newEvent("Test",
-                        t));
-            })
-            .thenAccept(f -> {
-                sink.send(sse.newEvent("Quest",
-                        f));
-            });
     }
 
     @Override
-    public void handleEvent(Event event) {
+    public void handleEvent(final Event event) {
         switch (event.getTopic()) {
         case MOVEMENTS_CHANGE_TOPIC:
             publishMovementChange(event);
@@ -325,19 +307,19 @@ public class AccountMovementsApiImpl implements AccountMovementsApi, EventHandle
         }
     }
 
-    private void publishMovementChange(Event event) {
+    private void publishMovementChange(final Event event) {
         Integer accountId = (Integer) event.getProperty("com.hrrm.famoney.event.acconts.id");
         Integer movementId = (Integer) event.getProperty("com.hrrm.famoney.event.acconts.movements.id");
-        accountsBroadcasters.compute(accountId,
-                (key, value) -> {
-                    value.broadcast(sse.newEventBuilder()
-                        .data(ChangeMovementEventDTOImpl.builder()
-                            .accountId(accountId)
-                            .movementId(movementId)
-                            .build())
-                        .build());
-                    return value;
-                });
+        accountsBroadcasters.compute(accountId, (key, value) -> {
+            value.broadcast(sse.newEventBuilder()
+                .data(ChangeMovementEventDTOImpl.builder()
+                    .accountId(accountId)
+                    .movementId(movementId)
+                    .build())
+                .mediaType(MediaType.APPLICATION_JSON_TYPE)
+                .build());
+            return value;
+        });
     }
 
     private final class AccountBroadcaster {
@@ -345,23 +327,23 @@ public class AccountMovementsApiImpl implements AccountMovementsApi, EventHandle
         private final SseBroadcaster broadcaster;
         private Long count = 0l;
 
-        public AccountBroadcaster(Integer accountId) {
+        public AccountBroadcaster(final Integer accountId) {
             super();
             this.accountId = accountId;
             broadcaster = AccountMovementsApiImpl.this.sse.newBroadcaster();
             broadcaster.onClose(this::closeSink);
         }
 
-        public synchronized void register(SseEventSink sseEventSink) {
+        public synchronized void register(final SseEventSink sseEventSink) {
             broadcaster.register(sseEventSink);
             count++;
         }
 
-        public synchronized CompletionStage<?> broadcast(OutboundSseEvent event) {
+        public synchronized CompletionStage<?> broadcast(final OutboundSseEvent event) {
             return broadcaster.broadcast(event);
         }
 
-        private synchronized void closeSink(SseEventSink sseEventSink) {
+        private synchronized void closeSink(final SseEventSink sseEventSink) {
             count--;
             if (count == 0) {
                 broadcaster.close();

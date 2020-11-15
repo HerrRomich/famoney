@@ -5,32 +5,32 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import javax.validation.constraints.NotNull;
-
+import com.hrrm.famoney.domain.accounts.Account;
 import com.hrrm.famoney.domain.accounts.movement.Movement;
 import com.hrrm.famoney.domain.accounts.repository.AccountsDomainRepository;
 
 public interface MovementRepository extends AccountsDomainRepository<Movement> {
 
-    List<Movement> findByAccountIdBetweenDates(@NotNull Integer accountId, LocalDateTime dateFrom,
+    List<Movement> findByAccountBetweenDates(Account account, LocalDateTime dateFrom,
             LocalDateTime dateTo);
 
-    List<Movement> findByAccountIdBetweenBookingDates(@NotNull Integer accountId, LocalDateTime dateFrom,
+    List<Movement> findByAccountBetweenBookingDates(Account account, LocalDateTime dateFrom,
             LocalDateTime dateTo);
 
-    Long getMoventsCountByAccountId(@NotNull Integer accountId);
+    Long getMoventsCountByAccount(Account account);
 
-    List<Movement> findMovementsByAccountIdAfterDate(@NotNull Integer accountId, LocalDateTime dateFrom,
-            Optional<Integer> limitOptional);
+    List<Movement> findMovementsByAccountAfterDate(Account account, LocalDateTime dateFrom, Integer limit);
 
-    List<Movement> findMovementsByAccountIdAfterBookingDate(@NotNull Integer accountId, LocalDateTime dateFrom,
-            Optional<Integer> limitOptional);
+    List<Movement> findMovementsByAccountAfterBookingDate(Account account, LocalDateTime dateFrom,
+            Integer limit);
 
-    Optional<Movement> findNextMovementByAccountIdBeforeDate(Integer accountId, Integer movementId);
+    Optional<Movement> findNextMovementByAccountIdBeforeDate(Account account, LocalDateTime date);
 
-    void adjustMovementSumsByAccountIdAfterDate(Integer accountId, LocalDateTime fromDate, BigDecimal amount);
+    Optional<Movement> findNextMovementByAccountIdBeforeBookingDate(Account account, LocalDateTime date);
 
-    List<Movement> getMovementsByAccountIdOffsetAndLimit(@NotNull Integer accountId, Optional<Integer> offsetOptional,
-            Optional<Integer> limitOptional);
+    void adjustMovementSumsByAccountAfterDate(Account account, LocalDateTime fromDate, BigDecimal amount);
+
+    List<Movement> getMovementsByAccountIdWithOffsetAndLimitOrderedByDate(Account account, Integer offset,
+            Integer limit);
 
 }

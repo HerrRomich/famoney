@@ -9,24 +9,24 @@ const routes: Routes = [
   },
   {
     path: 'accounts',
-    loadChildren: () => import('./modules/accounts/accounts.module').then(m => m.AccountsModule),
+    loadChildren: () => import('./features/accounts/accounts.module').then(m => m.AccountsModule),
   },
   {
     path: 'budget',
-    loadChildren: () => import('./modules/budget/budget.module').then(m => m.BudgetModule),
+    loadChildren: () => import('./features/budget/budget.module').then(m => m.BudgetModule),
   },
   {
     path: 'calendar',
-    loadChildren: () => import('./modules/calendar/calendar.module').then(m => m.CalendarModule),
+    loadChildren: () => import('./features/calendar/calendar.module').then(m => m.CalendarModule),
   },
   {
     path: 'reports',
-    loadChildren: () => import('./modules/reports/reports.module').then(m => m.ReportsModule),
+    loadChildren: () => import('./features/reports/reports.module').then(m => m.ReportsModule),
   },
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes, { useHash: true, enableTracing: false })],
+  imports: [RouterModule.forRoot(routes, { useHash: true, enableTracing: false, relativeLinkResolution: 'legacy' })],
   exports: [RouterModule],
 })
 export class AppRoutingModule {}

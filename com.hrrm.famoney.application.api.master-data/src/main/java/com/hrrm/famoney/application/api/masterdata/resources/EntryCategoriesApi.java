@@ -11,7 +11,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.hrrm.famoney.application.api.masterdata.dto.EntryCategoriesDTO;
-import com.hrrm.famoney.application.api.masterdata.dto.EntryCategoryDataDTO;
+import com.hrrm.famoney.application.api.masterdata.dto.EntryCategoryDTO;
 import com.hrrm.famoney.infrastructure.jaxrs.ApiErrorDTO;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,7 +37,7 @@ public interface EntryCategoriesApi {
     @ApiResponse(responseCode = "404", description = "No parent entry category was found for specified id.",
         content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(
             implementation = ApiErrorDTO.class)))
-    void addEntryCategory(EntryCategoryDataDTO entryCategory);
+    void addEntryCategory(EntryCategoryDTO<?> entryCategoryDto);
 
     @PUT
     @Path("{id}")
@@ -51,7 +51,7 @@ public interface EntryCategoriesApi {
     @ApiResponse(responseCode = "404", description = "No parent entry category was found for specified id.",
         content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(
             implementation = ApiErrorDTO.class)))
-    EntryCategoryDataDTO changeEntryCategory(@PathParam("id") Integer id, EntryCategoryDataDTO entryCategory);
+    <T extends EntryCategoryDTO<?>> T changeEntryCategory(@PathParam("id") Integer id, T entryCategoryDto);
 
     @DELETE
     @Path("{id}")

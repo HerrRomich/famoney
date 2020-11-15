@@ -18,4 +18,6 @@ public interface JpaRepository<T extends DomainEntity<P>, P extends Serializable
 
     void flush();
 
+    void delete(T entity);
+
 }

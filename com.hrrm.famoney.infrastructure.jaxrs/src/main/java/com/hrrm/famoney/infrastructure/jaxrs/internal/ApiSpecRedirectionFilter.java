@@ -21,7 +21,7 @@ import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardFilterPatter
 @HttpWhiteboardFilterPattern("/*")
 @HttpWhiteboardContextSelect("("
         + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME
-        + "=com.hrrm.famoney.api)")
+        + "=com.hrrm.famoney.apis)")
 public class ApiSpecRedirectionFilter implements Filter {
 
     @Override

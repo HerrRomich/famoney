@@ -26,7 +26,7 @@ import com.hrrm.infrastructure.web.swagger.ui.SwaggerApis;
 @HttpWhiteboardFilterPattern("/*")
 @HttpWhiteboardContextSelect("("
     + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME
-    + "=com.hrrm.famoney.api.spec)")
+    + "=com.hrrm.famoney.apis.spec)")
 public class ApiSpecFilter implements Filter {
 
     private static final Pattern API_JSON_PATTERN = Pattern.compile("/(.*)\\.json$");

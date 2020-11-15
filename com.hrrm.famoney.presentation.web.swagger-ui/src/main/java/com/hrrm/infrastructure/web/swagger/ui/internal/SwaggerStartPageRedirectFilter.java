@@ -11,6 +11,6 @@ import com.hrrm.famoney.infrastructure.jetty.StartPageRedirectFilter;
 
 @Component(service = Filter.class)
 @HttpWhiteboardFilterPattern("/*")
-@HttpWhiteboardContextSelect("(" + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME + "=com.hrrm.famoney.api.spec)")
+@HttpWhiteboardContextSelect("(" + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME + "=com.hrrm.famoney.apis.spec)")
 public class SwaggerStartPageRedirectFilter extends StartPageRedirectFilter {
 }

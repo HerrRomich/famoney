@@ -22,7 +22,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>com.hrrm.famoney.infrastructure.jetty</artifactId>
+            <artifactId>com.hrrm.famoney.infrastructure.core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

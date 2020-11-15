@@ -1,5 +1,0 @@
-Bundle-Version: 1.0.0.${tstamp}
-Export-Package: com.hrrm.faminey.infrastracture.logging
-
--includeresource: \
-    OSGI-INF=src/main/resources/OSGI-INF

@@ -4,7 +4,7 @@ import javax.ws.rs.core.Response.Status;
 
 public interface ApiError {
 
-    Integer getCode();
+    String getCode();
 
     String getMessage();
 

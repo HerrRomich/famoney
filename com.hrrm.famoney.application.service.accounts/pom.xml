@@ -15,6 +15,10 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>com.hrrm.famoney.infrastructure.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>com.hrrm.famoney.domain.accounts</artifactId>
         </dependency>
         <dependency>

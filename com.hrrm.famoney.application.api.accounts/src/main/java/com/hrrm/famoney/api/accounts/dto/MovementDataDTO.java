@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -32,8 +34,10 @@ public interface MovementDataDTO extends DTO {
     @Schema(required = true)
     LocalDate getDate();
 
+    @JsonInclude(Include.NON_NULL)
     Optional<LocalDate> getBookingDate();
 
+    @JsonInclude(Include.NON_NULL)
     Optional<LocalDate> getBudgetPeriod();
 
     @Schema(required = true)

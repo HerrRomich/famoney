@@ -12,12 +12,6 @@ export class ServerEventsService {
   connectToServer<T extends ServerEvent>(url: string): Observable<T> {
     return new Observable<T>(subscriber => {
       const eventSource = new EventSource(url);
-      eventSource.addEventListener('message', event => {
-        this._ngZone.run(() => {
-          subscriber.next(event.data);
-        });
-      })
-
       eventSource.onmessage = event => {
         this._ngZone.run(() => {
           subscriber.next(event.data);

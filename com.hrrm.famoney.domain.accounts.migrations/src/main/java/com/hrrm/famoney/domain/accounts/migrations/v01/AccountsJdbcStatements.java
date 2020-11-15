@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import com.hrrm.famoney.infrastructure.persistence.migrations.JdbcMigrationStetemnets;
 import com.hrrm.famoney.infrastructure.persistence.migrations.MigrationException;
 
-@SuppressWarnings("java:S101")
 public class AccountsJdbcStatements extends JdbcMigrationStetemnets {
 
     public AccountsJdbcStatements(final Connection connection, final ClassLoader classLoader) {

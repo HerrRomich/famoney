@@ -16,7 +16,6 @@ import org.osgi.service.log.LoggerFactory;
 import com.hrrm.famoney.application.api.masterdata.dto.EntryCategoriesDTO;
 import com.hrrm.famoney.application.api.masterdata.dto.EntryCategoryDTO;
 import com.hrrm.famoney.application.api.masterdata.dto.EntryCategoryDTOBuilder;
-import com.hrrm.famoney.application.api.masterdata.dto.EntryCategoryDataDTO;
 import com.hrrm.famoney.application.api.masterdata.dto.ExpenseCategoryDTO;
 import com.hrrm.famoney.application.api.masterdata.dto.IncomeCategoryDTO;
 import com.hrrm.famoney.application.api.masterdata.dto.impl.EntryCategoriesDTOImpl;
@@ -85,14 +84,14 @@ public class EntryCategoriesApiImpl implements EntryCategoriesApi {
     }
 
     @Override
-    public void addEntryCategory(final EntryCategoryDataDTO entryCategory) {
+    public void addEntryCategory(final EntryCategoryDTO<?> entryCategoryDto) {
         // TODO Auto-generated method stub
         //
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public EntryCategoryDataDTO changeEntryCategory(final Integer id, final EntryCategoryDataDTO entryCategory) {
+    public <T extends EntryCategoryDTO<?>> T changeEntryCategory(final Integer id, final T entryCategoryDto) {
         // TODO Auto-generated method stub
         // return null;
         throw new UnsupportedOperationException();

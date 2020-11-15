@@ -8,7 +8,6 @@ import java.util.Optional;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.metamodel.SingularAttribute;
-import javax.validation.constraints.NotNull;
 
 import org.eclipse.persistence.internal.jpa.querydef.CommonAbstractCriteriaImpl;
 import org.osgi.service.component.annotations.Activate;
@@ -19,6 +18,7 @@ import org.osgi.service.log.LoggerFactory;
 import org.osgi.service.transaction.control.TransactionControl;
 import org.osgi.service.transaction.control.jpa.JPAEntityManagerProvider;
 
+import com.hrrm.famoney.domain.accounts.Account;
 import com.hrrm.famoney.domain.accounts.AccountsDomainEntity_;
 import com.hrrm.famoney.domain.accounts.movement.Movement;
 import com.hrrm.famoney.domain.accounts.movement.Movement_;
@@ -28,27 +28,32 @@ import com.hrrm.famoney.domain.accounts.repository.internal.AccountsDomainReposi
 @Component(service = MovementRepository.class)
 public class MovementRepositoryImpl extends AccountsDomainRepositoryImpl<Movement> implements MovementRepository {
 
-    private static final String FIND_MOVEMENTS_BY_ACCOUNT_ID_BETWEEN_DATES = Movement.class.getName()
-        .concat("#findMovementsByAccountIdBetweenDates");
-    private static final String FIND_MOVEMENTS_BY_ACCOUNT_ID_BETWEEN_BOOKING_DATES = Movement.class.getName()
-        .concat("#findMovementsByAccountIdBetweenBookingDates");
+    private static final String GET_MOVEMENTS_COUNT_BY_ACCOUNT = Movement.class.getName()
+        .concat("#getMoventsCountByAccount");
+    private static final String FIND_MOVEMENTS_BY_ACCOUNT_BETWEEN_DATES = Movement.class.getName()
+        .concat("#findMovementsByAccountBetweenDates");
+    private static final String FIND_MOVEMENTS_BY_ACCOUNT_BETWEEN_BOOKING_DATES = Movement.class.getName()
+        .concat("#findMovementsByAccountBetweenBookingDates");
 
-    private static final String FIND_MOVEMENTS_BY_ACCOUNT_ID_AFTER_MOVEMENT_DATE = Movement.class.getName()
-        .concat("#findMovementsByAccountIdAfterMovementDate");
-    private static final String FIND_MOVEMENTS_BY_ACCOUNT_ID_AFTER_BOOKING_DATE = Movement.class.getName()
-        .concat("#findMovementsByAccountIdAfterBookingDate");
-    private static final String FIND_NEXT_MOVEMENT_BY_ACCOUNT_ID_BEFORE_DATE = Movement.class.getName()
-        .concat("#findNextMovementByAccountIdBeforeDate");
-    private static final String ADJUST_MOVEMENTS_BY_ACCOUNT_ID_AFTER_DATE = Movement.class.getName()
-        .concat("#adjustMovementsByAccountIdAfterDate");
-    private static final String GET_MOVEMENTS_BY_ACCOUNT_ID_OFFSET_AND_LIMIT = Movement.class.getName()
-        .concat("#getMovementsByAccountIdOffsetAndLimit");
+    private static final String FIND_MOVEMENTS_BY_ACCOUNT_AFTER_MOVEMENT_DATE = Movement.class.getName()
+        .concat("#findMovementsByAccountAfterMovementDate");
+    private static final String FIND_MOVEMENTS_BY_ACCOUNT_AFTER_BOOKING_DATE = Movement.class.getName()
+        .concat("#findMovementsByAccountAfterBookingDate");
+    private static final String FIND_NEXT_MOVEMENT_BY_ACCOUNT_BEFORE_DATE = Movement.class.getName()
+        .concat("#findNextMovementByAccountBeforeDate");
+    private static final String FIND_NEXT_MOVEMENT_BY_ACCOUNT_BEFORE_BOOKING_DATE = Movement.class.getName()
+        .concat("#findNextMovementByAccountBeforeBookingDate");
+    private static final String ADJUST_MOVEMENTS_BY_ACCOUNT_AFTER_DATE = Movement.class.getName()
+        .concat("#adjustMovementsByAccountAfterDate");
+    private static final String GET_MOVEMENTS_BY_ACCOUNT_ORDERED_BY_DATE = Movement.class.getName()
+        .concat("#getMovementsByAccountOffsetAndLimit");
 
-    private static final String ACCOUNT_ID_PARAMETER_NAME = "accountId";
+    private static final String ACCOUNT_PARAMETER_NAME = "account";
     private static final String DATE_FROM_PARAMETER_NAME = "dateFrom";
     private static final String DATE_TO_PARAMETER_NAME = "dateTo";
     private static final String AMOUNT_PARAMETER_NAME = "amount";
-    private static final String MOVEMENT_ID_PARAMETER_NAME = "movementId";
+    private static final String MOVEMENT_DATE_PARAMETER_NAME = "date";
+    private static final String BOOKING_DATE_PARAMETER_NAME = "bookingDate";
 
     private Logger logger;
 
@@ -58,8 +63,7 @@ public class MovementRepositoryImpl extends AccountsDomainRepositoryImpl<Movemen
         super(loggerFactory,
             txControl,
             entityManagerProvider);
-        this.logger = loggerFactory.getLogger(MovementRepositoryImpl.class,
-                Logger.class);
+        this.logger = loggerFactory.getLogger(MovementRepositoryImpl.class, Logger.class);
     }
 
     @Override
@@ -68,35 +72,22 @@ public class MovementRepositoryImpl extends AccountsDomainRepositoryImpl<Movemen
     }
 
     @Override
-    public List<Movement> findByAccountIdBetweenDates(@NotNull final Integer accountId, final LocalDateTime dateFrom,
+    public List<Movement> findByAccountBetweenDates(final Account account, final LocalDateTime dateFrom,
             final LocalDateTime dateTo) {
-        logger.debug("Searching all movements by specified acount id: {} between dates {} and {}.",
-                accountId,
-                dateFrom,
+        logger.debug("Searching all movements by specified acount {} between dates {} and {}.", account, dateFrom,
                 dateTo);
         final List<Movement> movements = getTxControl().required(() -> {
-            final var query = getNamedQueryOrAddNew(FIND_MOVEMENTS_BY_ACCOUNT_ID_BETWEEN_DATES,
-                    Movement.class,
+            final var query = getNamedQueryOrAddNew(FIND_MOVEMENTS_BY_ACCOUNT_BETWEEN_DATES, Movement.class,
                     this::createFindMovementsByAccountIdBetweenDatesQuery);
-            return query.setParameter(ACCOUNT_ID_PARAMETER_NAME,
-                    accountId)
-                .setParameter(DATE_FROM_PARAMETER_NAME,
-                        dateFrom)
-                .setParameter(DATE_TO_PARAMETER_NAME,
-                        dateTo)
+            return query.setParameter(ACCOUNT_PARAMETER_NAME, account)
+                .setParameter(DATE_FROM_PARAMETER_NAME, dateFrom)
+                .setParameter(DATE_TO_PARAMETER_NAME, dateTo)
                 .getResultList();
         });
-        logger.debug("Found {} movements by specified acount id: {} between dates {} and {}.",
-                movements.size(),
-                accountId,
-                dateFrom,
-                dateTo);
-        logger.trace("Found {} movements by specified acount id: {} between dates {} and {}./p/n{}",
-                movements.size(),
-                accountId,
-                dateFrom,
-                dateTo,
-                movements);
+        logger.debug("Found {} movements by specified acount id: {} between dates {} and {}.", movements.size(),
+                account, dateFrom, dateTo);
+        logger.trace("Found {} movements by specified acount id: {} between dates {} and {}./p/n{}", movements.size(),
+                account, dateFrom, dateTo, movements);
         return movements;
     }
 
@@ -104,54 +95,33 @@ public class MovementRepositoryImpl extends AccountsDomainRepositoryImpl<Movemen
         final var cb = getEntityManager().getCriteriaBuilder();
         final var criteriaQuery = cb.createQuery(Movement.class);
         final var root = criteriaQuery.from(Movement.class);
-        final var accountIdParameter = cb.parameter(Integer.class,
-                ACCOUNT_ID_PARAMETER_NAME);
-        final var dateFromParameter = cb.parameter(LocalDateTime.class,
-                DATE_FROM_PARAMETER_NAME);
-        final var dateToParameter = cb.parameter(LocalDateTime.class,
-                DATE_TO_PARAMETER_NAME);
-        criteriaQuery.where(cb.and(cb.equal(root.get(Movement_.account)
-            .get(AccountsDomainEntity_.id),
-                accountIdParameter),
-                cb.greaterThanOrEqualTo(root.get(Movement_.date),
-                        dateFromParameter),
-                cb.lessThan(root.get(Movement_.date),
-                        dateToParameter)))
+        final var accountParameter = cb.parameter(Integer.class, ACCOUNT_PARAMETER_NAME);
+        final var dateFromParameter = cb.parameter(LocalDateTime.class, DATE_FROM_PARAMETER_NAME);
+        final var dateToParameter = cb.parameter(LocalDateTime.class, DATE_TO_PARAMETER_NAME);
+        criteriaQuery.where(cb.and(cb.equal(root.get(Movement_.account), accountParameter), cb.greaterThanOrEqualTo(root
+            .get(Movement_.date), dateFromParameter), cb.lessThan(root.get(Movement_.date), dateToParameter)))
             .orderBy(cb.asc(root.get(Movement_.date)));
         return getEntityManager().createQuery(criteriaQuery);
     }
 
     @Override
-    public List<Movement> findByAccountIdBetweenBookingDates(@NotNull final Integer accountId,
-            final LocalDateTime dateFrom, final LocalDateTime dateTo) {
-        logger.debug("Searching all movements by specified acount id: {} between booking dates {} and {}.",
-                accountId,
-                dateFrom,
-                dateTo);
+    public List<Movement> findByAccountBetweenBookingDates(final Account account, final LocalDateTime dateFrom,
+            final LocalDateTime dateTo) {
+        logger.debug("Searching all movements by specified acount {} between booking dates {} and {}.", account,
+                dateFrom, dateTo);
         final List<Movement> movements = getTxControl().required(() -> {
-            final var query = getNamedQueryOrAddNew(FIND_MOVEMENTS_BY_ACCOUNT_ID_BETWEEN_BOOKING_DATES,
-                    Movement.class,
+            final var query = getNamedQueryOrAddNew(FIND_MOVEMENTS_BY_ACCOUNT_BETWEEN_BOOKING_DATES, Movement.class,
                     this::createFindMovementsByAccountIdBetweenBookingDatesQuery);
-            return query.setParameter(ACCOUNT_ID_PARAMETER_NAME,
-                    accountId)
-                .setParameter(DATE_FROM_PARAMETER_NAME,
-                        dateFrom)
-                .setParameter(DATE_TO_PARAMETER_NAME,
-                        dateTo)
+            return query.setParameter(ACCOUNT_PARAMETER_NAME, account)
+                .setParameter(DATE_FROM_PARAMETER_NAME, dateFrom)
+                .setParameter(DATE_TO_PARAMETER_NAME, dateTo)
                 .getResultList();
         });
-        logger.debug("Found {} movements by specified acount id: {} between booking dates {} and {}.",
-                movements.size(),
-                accountId,
-                dateFrom,
-                dateTo);
+        logger.debug("Found {} movements by specified acount id: {} between booking dates {} and {}.", movements.size(),
+                account, dateFrom, dateTo);
         logger.trace(l -> l.trace(
-                "Found {} movements by specified acount id: {} between booking dates {} and {}./p/n{}",
-                movements.size(),
-                accountId,
-                dateFrom,
-                dateTo,
-                movements));
+                "Found {} movements by specified acount id: {} between booking dates {} and {}./p/n{}", movements
+                    .size(), account, dateFrom, dateTo, movements));
         return movements;
     }
 
@@ -159,87 +129,55 @@ public class MovementRepositoryImpl extends AccountsDomainRepositoryImpl<Movemen
         final var cb = getEntityManager().getCriteriaBuilder();
         final var criteriaQuery = cb.createQuery(Movement.class);
         final var root = criteriaQuery.from(Movement.class);
-        final var accountIdParameter = cb.parameter(Integer.class,
-                ACCOUNT_ID_PARAMETER_NAME);
-        final var dateFromParameter = cb.parameter(LocalDateTime.class,
-                DATE_FROM_PARAMETER_NAME);
-        final var dateToParameter = cb.parameter(LocalDateTime.class,
-                DATE_TO_PARAMETER_NAME);
-        criteriaQuery.where(cb.and(cb.equal(root.get(Movement_.account)
-            .get(AccountsDomainEntity_.id),
-                accountIdParameter),
-                cb.greaterThanOrEqualTo(root.get(Movement_.bookingDate),
-                        dateFromParameter),
-                cb.lessThan(root.get(Movement_.bookingDate),
-                        dateToParameter)))
-            .orderBy(cb.asc(root.get(Movement_.bookingDate)));
+        final var accountParameter = cb.parameter(Account.class, ACCOUNT_PARAMETER_NAME);
+        final var dateFromParameter = cb.parameter(LocalDateTime.class, DATE_FROM_PARAMETER_NAME);
+        final var dateToParameter = cb.parameter(LocalDateTime.class, DATE_TO_PARAMETER_NAME);
+        criteriaQuery.where(cb.and(cb.equal(root.get(Movement_.account), accountParameter), cb.greaterThanOrEqualTo(cb
+            .coalesce(root.get(Movement_.bookingDate), root.get(Movement_.date)), dateFromParameter), cb.lessThan(cb
+                .coalesce(root.get(Movement_.bookingDate), root.get(Movement_.date)), dateToParameter)))
+            .orderBy(cb.asc(cb.coalesce(root.get(Movement_.bookingDate), root.get(Movement_.date))));
         return getEntityManager().createQuery(criteriaQuery);
     }
 
     @Override
-    public Long getMoventsCountByAccountId(@NotNull final Integer accountId) {
-        logger.debug("Calculating count of movements by specified acount id: {}.",
-                accountId);
-        final long movementsCount = getTxControl().required(() -> getMoventsCountByAccountIdQuery().setParameter(
-                ACCOUNT_ID_PARAMETER_NAME,
-                accountId)
-            .getSingleResult());
-        logger.debug("Found {} movements by specified acount id: {}.",
-                movementsCount,
-                accountId);
+    public Long getMoventsCountByAccount(final Account account) {
+        logger.debug("Calculating count of movements by specified acount {}.", account);
+        final long movementsCount = getTxControl().required(() -> getNamedQueryOrAddNew(GET_MOVEMENTS_COUNT_BY_ACCOUNT,
+                Long.class, this::createMoventsCountByAccountQuery).setParameter(ACCOUNT_PARAMETER_NAME, account)
+                    .getSingleResult());
+        logger.debug("Found {} movements by specified acount id: {}.", movementsCount, account);
         return movementsCount;
     }
 
-    private TypedQuery<Long> getMoventsCountByAccountIdQuery() {
-        final var queryName = Movement.class.getName()
-            .concat("#getMoventsCountByAccountId");
-        return getNamedQueryOrAddNew(queryName,
-                Long.class,
-                this::createMoventsCountByAccountIdQuery);
-    }
-
-    private TypedQuery<Long> createMoventsCountByAccountIdQuery() {
+    private TypedQuery<Long> createMoventsCountByAccountQuery() {
         final var cb = getEntityManager().getCriteriaBuilder();
         final var criteriaQuery = cb.createQuery(Long.class);
         final var root = criteriaQuery.from(Movement.class);
-        final var accountIdParameter = cb.parameter(Integer.class,
-                ACCOUNT_ID_PARAMETER_NAME);
+        final var accountIdParameter = cb.parameter(Integer.class, ACCOUNT_PARAMETER_NAME);
         criteriaQuery.select(cb.count(root))
-            .where(cb.equal(root.get(Movement_.account)
-                .get(AccountsDomainEntity_.id),
-                    accountIdParameter));
+            .where(cb.equal(root.get(Movement_.account), accountIdParameter));
         return getEntityManager().createQuery(criteriaQuery);
     }
 
     @Override
-    public List<Movement> findMovementsByAccountIdAfterDate(@NotNull final Integer accountId,
-            final LocalDateTime dateFrom, final Optional<Integer> limitOptional) {
+    public List<Movement> findMovementsByAccountAfterDate(final Account account, final LocalDateTime dateFrom,
+            final Integer limit) {
         return getTxControl().required(() -> {
-            final var query = getNamedQueryOrAddNew(FIND_MOVEMENTS_BY_ACCOUNT_ID_AFTER_MOVEMENT_DATE,
-                    Movement.class,
+            final var query = getNamedQueryOrAddNew(FIND_MOVEMENTS_BY_ACCOUNT_AFTER_MOVEMENT_DATE, Movement.class,
                     () -> createFindMovementsByAccountIdAfterDateQuery(Movement_.date));
             final var orderText = "movement date";
-            return findMovementsByAccountIdAfterDate(accountId,
-                    dateFrom,
-                    limitOptional,
-                    query,
-                    orderText);
+            return findMovementsByAccountAfterDate(account, dateFrom, limit, query, orderText);
         });
     }
 
     @Override
-    public List<Movement> findMovementsByAccountIdAfterBookingDate(@NotNull final Integer accountId,
-            final LocalDateTime dateFrom, final Optional<Integer> limitOptional) {
+    public List<Movement> findMovementsByAccountAfterBookingDate(final Account account, final LocalDateTime dateFrom,
+            final Integer limit) {
         return getTxControl().required(() -> {
-            final var query = getNamedQueryOrAddNew(FIND_MOVEMENTS_BY_ACCOUNT_ID_AFTER_BOOKING_DATE,
-                    Movement.class,
+            final var query = getNamedQueryOrAddNew(FIND_MOVEMENTS_BY_ACCOUNT_AFTER_BOOKING_DATE, Movement.class,
                     () -> createFindMovementsByAccountIdAfterDateQuery(Movement_.bookingDate));
             final var orderText = "booking date";
-            return findMovementsByAccountIdAfterDate(accountId,
-                    dateFrom,
-                    limitOptional,
-                    query,
-                    orderText);
+            return findMovementsByAccountAfterDate(account, dateFrom, limit, query, orderText);
         });
     }
 
@@ -248,134 +186,128 @@ public class MovementRepositoryImpl extends AccountsDomainRepositoryImpl<Movemen
         final var cb = getEntityManager().getCriteriaBuilder();
         final var criteriaQuery = cb.createQuery(Movement.class);
         final var root = criteriaQuery.from(Movement.class);
-        final var accountIdParameter = cb.parameter(Integer.class,
-                ACCOUNT_ID_PARAMETER_NAME);
-        final var dateFromParameter = cb.parameter(LocalDateTime.class,
-                DATE_FROM_PARAMETER_NAME);
+        final var accountIdParameter = cb.parameter(Integer.class, ACCOUNT_PARAMETER_NAME);
+        final var dateFromParameter = cb.parameter(LocalDateTime.class, DATE_FROM_PARAMETER_NAME);
         criteriaQuery.where(cb.and(cb.equal(root.get(Movement_.account)
-            .get(AccountsDomainEntity_.id),
-                accountIdParameter),
-                cb.greaterThanOrEqualTo(root.get(dateAttribute),
-                        dateFromParameter)))
+            .get(AccountsDomainEntity_.id), accountIdParameter), cb.greaterThanOrEqualTo(root.get(dateAttribute),
+                    dateFromParameter)))
             .orderBy(cb.asc(root.get(dateAttribute)));
         return getEntityManager().createQuery(criteriaQuery);
     }
 
-    private List<Movement> findMovementsByAccountIdAfterDate(final Integer accountId, final LocalDateTime dateFrom,
-            final Optional<Integer> limitOptional, final TypedQuery<Movement> query, final String orderText) {
-        logger.debug("Searching all movements by specified acount id: {} after {} {} with count {}.",
-                accountId,
-                orderText,
-                dateFrom,
-                limitOptional.map(Object::toString)
-                    .orElse("ALL"));
+    private List<Movement> findMovementsByAccountAfterDate(final Account account, final LocalDateTime dateFrom,
+            final Integer limit, final TypedQuery<Movement> query, final String orderText) {
+        final var limitOptional = Optional.ofNullable(limit);
+        logger.debug("Searching all movements by specified acount id: {} after {} {} with count {}.", account,
+                orderText, dateFrom, limitOptional.map(Object::toString)
+                    .orElse("All"));
 
         limitOptional.ifPresent(query::setMaxResults);
-        final var movements = query.setParameter(ACCOUNT_ID_PARAMETER_NAME,
-                accountId)
-            .setParameter(DATE_FROM_PARAMETER_NAME,
-                    dateFrom)
+        final var movements = query.setParameter(ACCOUNT_PARAMETER_NAME, account)
+            .setParameter(DATE_FROM_PARAMETER_NAME, dateFrom)
             .getResultList();
-        logger.debug("Found {} movements by specified acount id: {} after {} " + "{} with count {}.",
-                movements.size(),
-                accountId,
-                orderText,
-                dateFrom,
-                limitOptional.map(Object::toString)
+        logger.debug("Found {} movements by specified acount id: {} after {} " + "{} with count {}.", movements.size(),
+                account, orderText, dateFrom, limitOptional.map(Object::toString)
                     .orElse("ALL"));
         logger.trace(l -> l.trace("Found {} movements by specified acount id: {} after {} " + "{} with count {}./p/n{}",
-                movements.size(),
-                accountId,
-                orderText,
-                dateFrom,
-                movements));
+                movements.size(), account, orderText, dateFrom, movements));
         return movements;
     }
 
     @Override
-    public Optional<Movement> findNextMovementByAccountIdBeforeDate(Integer accountId, Integer movementId) {
+    public Optional<Movement> findNextMovementByAccountIdBeforeDate(final Account account, final LocalDateTime date) {
         logger.debug("Searching the next movement in a specified account before specified date.");
-        logger.trace("Searching the next movement in an account with id: {} before date: {}.",
-                accountId,
-                movementId);
+        logger.trace("Searching the next movement in an account with id: {} before date: {}.", account.getId(), date);
         return getTxControl().required(() -> {
-            final var query = getNamedQueryOrAddNew(FIND_NEXT_MOVEMENT_BY_ACCOUNT_ID_BEFORE_DATE,
-                    Movement.class,
-                    this::createFindNextMovementByAccountIdBeforeDateQuery);
-            query.setParameter(ACCOUNT_ID_PARAMETER_NAME,
-                    accountId);
-            query.setParameter(MOVEMENT_ID_PARAMETER_NAME,
-                    movementId);
+            final var query = getNamedQueryOrAddNew(FIND_NEXT_MOVEMENT_BY_ACCOUNT_BEFORE_DATE, Movement.class,
+                    this::createFindNextMovementByAccountBeforeDateQuery);
+            query.setParameter(ACCOUNT_PARAMETER_NAME, account);
+            query.setParameter(MOVEMENT_DATE_PARAMETER_NAME, date);
             query.setMaxResults(1);
             var movements = query.getResultList();
             if (movements.isEmpty()) {
                 logger.debug("There is no movements in a specified account before specified date.");
-                logger.trace("There is no movements in an account with id: {} before date: {}.",
-                        accountId,
-                        movementId);
+                logger.trace("There is no movements in an account {} before date: {}.", account, date);
                 return Optional.empty();
             } else {
                 final var movement = movements.get(0);
                 logger.debug("The next movement is found in a specified account before specified date.");
                 logger.trace(l -> l.trace("The next movement {} is found in an account with id: {} before date: {}.",
-                        movement,
-                        accountId,
-                        movementId));
+                        movement, account, date));
                 return Optional.of(movement);
             }
         });
     }
 
-    private TypedQuery<Movement> createFindNextMovementByAccountIdBeforeDateQuery() {
+    private TypedQuery<Movement> createFindNextMovementByAccountBeforeDateQuery() {
         final var cb = getEntityManager().getCriteriaBuilder();
         final var criteriaQuery = cb.createQuery(Movement.class);
         final var root = criteriaQuery.from(Movement.class);
-        final var accountIdParameter = cb.parameter(Integer.class,
-                ACCOUNT_ID_PARAMETER_NAME);
-        final var movementIdParameter = cb.parameter(Integer.class,
-                MOVEMENT_ID_PARAMETER_NAME);
-        final var subQuery = criteriaQuery.subquery(LocalDateTime.class);
-        final var subRoot = subQuery.from(Movement.class);
-        subQuery.select(subRoot.get(Movement_.date))
-            .where(cb.and(cb.equal(subRoot.get(Movement_.account)
-                .get(AccountsDomainEntity_.id),
-                    accountIdParameter),
-                    cb.equal(subRoot.get(AccountsDomainEntity_.id),
-                            movementIdParameter)));
-        criteriaQuery.where(cb.and(cb.equal(root.get(Movement_.account)
-            .get(AccountsDomainEntity_.id),
-                accountIdParameter),
-                cb.lessThan(root.get(Movement_.date),
-                        subQuery.select(subRoot.get(Movement_.date)))))
+        final var accountParameter = cb.parameter(Account.class, ACCOUNT_PARAMETER_NAME);
+        final var movementDateParameter = cb.parameter(LocalDateTime.class, MOVEMENT_DATE_PARAMETER_NAME);
+        criteriaQuery.where(cb.and(cb.equal(root.get(Movement_.account), accountParameter), cb.lessThan(root.get(
+                Movement_.date), movementDateParameter)))
             .orderBy(cb.desc(root.get(Movement_.date)));
         return getEntityManager().createQuery(criteriaQuery);
     }
 
     @Override
-    public void adjustMovementSumsByAccountIdAfterDate(Integer accountId, LocalDateTime fromDate, BigDecimal amount) {
+    public Optional<Movement> findNextMovementByAccountIdBeforeBookingDate(final Account account,
+            final LocalDateTime date) {
+        logger.debug("Searching the next movement in a specified account before specified booking date.");
+        logger.trace("Searching the next movement in an account with id: {} before booking date: {}.", account.getId(),
+                date);
+        return getTxControl().required(() -> {
+            final var query = getNamedQueryOrAddNew(FIND_NEXT_MOVEMENT_BY_ACCOUNT_BEFORE_BOOKING_DATE, Movement.class,
+                    this::createFindNextMovementByAccountBeforeBookingDateQuery);
+            query.setParameter(ACCOUNT_PARAMETER_NAME, account);
+            query.setParameter(MOVEMENT_DATE_PARAMETER_NAME, date);
+            query.setMaxResults(1);
+            var movements = query.getResultList();
+            if (movements.isEmpty()) {
+                logger.debug("There is no movements in a specified account before specified booking date.");
+                logger.trace("There is no movements in an account {} before booking date: {}.", account, date);
+                return Optional.empty();
+            } else {
+                final var movement = movements.get(0);
+                logger.debug("The next movement is found in a specified account before specified booking date.");
+                logger.trace(l -> l.trace(
+                        "The next movement {} is found in an account with id: {} before booking date: {}.", movement,
+                        account, date));
+                return Optional.of(movement);
+            }
+        });
+    }
+
+    private TypedQuery<Movement> createFindNextMovementByAccountBeforeBookingDateQuery() {
+        final var cb = getEntityManager().getCriteriaBuilder();
+        final var criteriaQuery = cb.createQuery(Movement.class);
+        final var root = criteriaQuery.from(Movement.class);
+        final var accountParameter = cb.parameter(Account.class, ACCOUNT_PARAMETER_NAME);
+        final var bookingDateParameter = cb.parameter(LocalDateTime.class, BOOKING_DATE_PARAMETER_NAME);
+        criteriaQuery.where(cb.and(cb.equal(root.get(Movement_.account), accountParameter), cb.lessThan(cb.coalesce(root
+            .get(Movement_.bookingDate), root.get(Movement_.date)), bookingDateParameter)))
+            .orderBy(cb.desc(cb.coalesce(root.get(Movement_.bookingDate), root.get(Movement_.date))));
+        return getEntityManager().createQuery(criteriaQuery);
+    }
+
+    @Override
+    public void adjustMovementSumsByAccountAfterDate(Account account, LocalDateTime fromDate, BigDecimal amount) {
         logger.debug("Adjusting all movement sums in a specified account after specified date on a specified amount.");
-        logger.debug("Adjusting all movement sums in an account with id: {} after date: {} on an amount: {}.",
-                accountId,
-                fromDate,
-                amount);
+        logger.debug("Adjusting all movement sums in an account with id: {} after date: {} on an amount: {}.", account,
+                fromDate, amount);
         getTxControl().required(() -> {
-            final var query = getNamedQueryOrAddNew(ADJUST_MOVEMENTS_BY_ACCOUNT_ID_AFTER_DATE,
+            final var query = getNamedQueryOrAddNew(ADJUST_MOVEMENTS_BY_ACCOUNT_AFTER_DATE,
                     this::createAdjustMovementsByAccountIdAfterDateQuery);
-            query.setParameter(ACCOUNT_ID_PARAMETER_NAME,
-                    accountId);
-            query.setParameter(DATE_FROM_PARAMETER_NAME,
-                    fromDate);
-            query.setParameter(AMOUNT_PARAMETER_NAME,
-                    amount);
+            query.setParameter(ACCOUNT_PARAMETER_NAME, account);
+            query.setParameter(DATE_FROM_PARAMETER_NAME, fromDate);
+            query.setParameter(AMOUNT_PARAMETER_NAME, amount);
             final var adjustedMovementsCount = query.executeUpdate();
             logger.debug(
                     "Adjusting sums of {} movment(s) in a specified account after specified date on a specified amount.",
                     adjustedMovementsCount);
             logger.debug("Adjusting sums of {} movment(s) in an account with id: {} after date: {} on an amount: {}.",
-                    adjustedMovementsCount,
-                    accountId,
-                    fromDate,
-                    amount);
+                    adjustedMovementsCount, account, fromDate, amount);
             return null;
         });
     }
@@ -384,66 +316,49 @@ public class MovementRepositoryImpl extends AccountsDomainRepositoryImpl<Movemen
         final var cb = getEntityManager().getCriteriaBuilder();
         final var criteriaUpdate = cb.createCriteriaUpdate(Movement.class);
         final var root = criteriaUpdate.from(Movement.class);
-        final var accountIdParameter = cb.parameter(Integer.class,
-                ACCOUNT_ID_PARAMETER_NAME);
-        final var dateFromParameter = cb.parameter(LocalDateTime.class,
-                DATE_FROM_PARAMETER_NAME);
-        final var amountParameter = cb.parameter(BigDecimal.class,
-                AMOUNT_PARAMETER_NAME);
-        ((CommonAbstractCriteriaImpl) criteriaUpdate).addParameter(amountParameter);
-        criteriaUpdate.set(Movement_.total,
-                cb.sum(root.get(Movement_.total),
-                        amountParameter));
-        criteriaUpdate.where(cb.and(cb.equal(root.get(Movement_.account)
-            .get(AccountsDomainEntity_.id),
-                accountIdParameter),
-                cb.greaterThan(root.get(Movement_.date),
-                        dateFromParameter)));
+        final var accountParameter = cb.parameter(Account.class, ACCOUNT_PARAMETER_NAME);
+        final var dateFromParameter = cb.parameter(LocalDateTime.class, DATE_FROM_PARAMETER_NAME);
+        final var amountParameter = cb.parameter(BigDecimal.class, AMOUNT_PARAMETER_NAME);
+        ((CommonAbstractCriteriaImpl<?>) criteriaUpdate).addParameter(amountParameter);
+        criteriaUpdate.set(Movement_.total, cb.sum(root.get(Movement_.total), amountParameter));
+        criteriaUpdate.where(cb.and(cb.equal(root.get(Movement_.account), accountParameter), cb.greaterThan(root.get(
+                Movement_.date), dateFromParameter)));
         return getEntityManager().createQuery(criteriaUpdate);
     }
 
     @Override
-    public List<Movement> getMovementsByAccountIdOffsetAndLimit(@NotNull Integer accountId,
-            Optional<Integer> offsetOptional, Optional<Integer> limitOptional) {
+    public List<Movement> getMovementsByAccountIdWithOffsetAndLimitOrderedByDate(final Account account,
+            final Integer offset, final Integer limit) {
+        final var offsetOptional = Optional.ofNullable(offset);
+        final var limitOptional = Optional.ofNullable(limit);
         logger.debug(
                 "Getting specified count of movements in a specified account from specified position ordered by date.");
-        logger.debug("Getting {} movement(s) in an account with id: {}, from position: {} ordered by date.",
-                limitOptional.map(limit -> limit.toString())
-                    .orElse("all"),
-                accountId,
-                offsetOptional.orElse(0));
+        final var limitText = limitOptional.map(Object::toString)
+            .orElse("all");
+        final var offsetOrDefault = offsetOptional.orElse(0);
+        logger.debug("Getting {} movement(s) in an account with id: {}, from position: {} ordered by date.", limitText,
+                account.getId(), offsetOrDefault);
         return getTxControl().required(() -> {
-            final var query = getNamedQueryOrAddNew(GET_MOVEMENTS_BY_ACCOUNT_ID_OFFSET_AND_LIMIT,
-                    Movement.class,
-                    this::createGetMovementsByAccountId);
-            query.setParameter(ACCOUNT_ID_PARAMETER_NAME,
-                    accountId);
-            offsetOptional.ifPresent(offset -> query.setFirstResult(offset));
-            limitOptional.ifPresent(limit -> query.setMaxResults(limit));
+            final var query = getNamedQueryOrAddNew(GET_MOVEMENTS_BY_ACCOUNT_ORDERED_BY_DATE, Movement.class,
+                    this::createGetMovementsByAccountIdOrderedByDate);
+            query.setParameter(ACCOUNT_PARAMETER_NAME, account);
+            offsetOptional.ifPresent(query::setFirstResult);
+            limitOptional.ifPresent(query::setMaxResults);
             final var movements = query.getResultList();
             logger.debug("Found {} movment(s) in a specified account after specified date on a specified amount.",
                     movements.size());
             logger.debug("Found {} movement(s) in an account with id: {}, from position: {} ordered by date: {}",
-                    movements.size(),
-                    accountId,
-                    limitOptional.map(limit -> limit.toString())
-                        .orElse("all"),
-                    accountId,
-                    offsetOptional.orElse(0),
-                    movements);
+                    movements.size(), account, offsetOrDefault, movements);
             return movements;
         });
     }
 
-    private TypedQuery<Movement> createGetMovementsByAccountId() {
+    private TypedQuery<Movement> createGetMovementsByAccountIdOrderedByDate() {
         final var cb = getEntityManager().getCriteriaBuilder();
         final var criteriaQuery = cb.createQuery(Movement.class);
         final var root = criteriaQuery.from(Movement.class);
-        final var accountIdParameter = cb.parameter(Integer.class,
-                ACCOUNT_ID_PARAMETER_NAME);
-        criteriaQuery.where(cb.equal(root.get(Movement_.account)
-            .get(AccountsDomainEntity_.id),
-                accountIdParameter))
+        final var accountParameter = cb.parameter(Account.class, ACCOUNT_PARAMETER_NAME);
+        criteriaQuery.where(cb.equal(root.get(Movement_.account), accountParameter))
             .orderBy(cb.asc(root.get(Movement_.date)));
         return getEntityManager().createQuery(criteriaQuery);
     }

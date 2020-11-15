@@ -15,7 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 })
 public abstract class AccountsApiSpecification extends Application implements ApiSpecification {
 
-    public static final String API_PATH = "accounts";
+    public static final String API_PATH = "accounts-domain";
 
     @Override
     public final String getPath() {
@@ -30,6 +30,11 @@ public abstract class AccountsApiSpecification extends Application implements Ap
     @Override
     public final InputStream getSpecificationStream() {
         return AccountsApiSpecification.class.getResourceAsStream("/accounts.json");
+    }
+
+    @Override
+    public String toString() {
+        return "AccountsApiSpecification [path=" + getPath() + ", description=" + getDescription() + "]";
     }
 
 }

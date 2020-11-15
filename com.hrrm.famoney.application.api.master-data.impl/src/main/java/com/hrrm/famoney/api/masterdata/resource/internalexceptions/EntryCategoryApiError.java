@@ -6,21 +6,19 @@ import com.hrrm.famoney.infrastructure.jaxrs.ApiError;
 
 public enum EntryCategoryApiError implements ApiError {
 
-    NO_ENTRY_CATEGORY_BY_CHANGE(1002, "No entry category was found for request on entry category change.", Status.NOT_FOUND);
+    NO_ENTRY_CATEGORY_BY_CHANGE("No entry category was found for request on entry category change.", Status.NOT_FOUND);
 
-    private final Integer code;
     private final String message;
     private final Status status;
 
-    EntryCategoryApiError(final int code, final String message, final Status status) {
-        this.code = code;
+    EntryCategoryApiError(final String message, final Status status) {
         this.message = message;
         this.status = status;
     }
 
     @Override
-    public Integer getCode() {
-        return code;
+    public String getCode() {
+        return toString();
     }
 
     @Override

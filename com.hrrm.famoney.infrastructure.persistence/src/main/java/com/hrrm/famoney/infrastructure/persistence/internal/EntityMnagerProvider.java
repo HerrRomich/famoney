@@ -32,24 +32,19 @@ public class EntityMnagerProvider {
             @Reference final TransactionControl txControl) {
         this.jpaPproviderFactory = jpaPproviderFactory;
         final Map<String, Object> jpaProperties = new HashMap<>();
-        jpaProperties.put("javax.persistence.dataSource",
-                ds);
+        jpaProperties.put("javax.persistence.dataSource", ds);
         final Map<String, Object> resourceProviderProperties = new HashMap<>();
-        resourceProviderProperties.put("osgi.connection.pooling.enabled",
-                false);
-        final var entityManagerProvider = jpaPproviderFactory.getProviderFor(emfb,
-                jpaProperties,
+        resourceProviderProperties.put("osgi.connection.pooling.enabled", false);
+        final var entityManagerProvider = jpaPproviderFactory.getProviderFor(emfb, jpaProperties,
                 resourceProviderProperties);
         final Dictionary<String, String> props = new Hashtable<>();
         final var name = properties.get("name")
             .toString();
         if (name != null) {
-            props.put("name",
-                    name);
+            props.put("name", name);
         }
         entityManagerProviderRegistration = context.registerService(JPAEntityManagerProvider.class,
-                entityManagerProvider,
-                props);
+                entityManagerProvider, props);
     }
 
     @Deactivate

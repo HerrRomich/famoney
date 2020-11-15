@@ -64,7 +64,6 @@ public class JsonProviderPrototypeServiceFactory implements
         jdk8Module.configureAbsentsAsNulls(true);
         mapper.registerModule(jdk8Module);
         mapper.registerModule(new JavaTimeModule());
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         return new JacksonJsonProvider(mapper, list.toArray(new Annotations[list.size()]));
     }

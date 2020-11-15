@@ -1,5 +1,0 @@
-Bundle-Version: 1.0.0.${tstamp}
-
-	
--dsannotations-options: inherit
--privatepackage: com.hrrm.famoney.infrastructure.persistence.migrations

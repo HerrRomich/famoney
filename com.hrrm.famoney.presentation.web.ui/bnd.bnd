@@ -1,5 +1,0 @@
-Bundle-Version: 1.0.0.${tstamp}
-
--includeresource: \
-    ui=src/main/resources/ui
-Private-Package: com.hrrm.famoney.presentation.ui.internal

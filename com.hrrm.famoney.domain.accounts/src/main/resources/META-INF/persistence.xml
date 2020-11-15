@@ -11,9 +11,9 @@
         <exclude-unlisted-classes>false</exclude-unlisted-classes>
         <properties>
             <property name="eclipselink.logging.logger"
-                value="JavaLogger" />
+                value="ServerLogger" />
             <property name="eclipselink.logging.level.sql"
-                value="FINEST" />
+                value="ALL" />
             <property name="eclipselink.logging.parameters"
                 value="true" />
         </properties>

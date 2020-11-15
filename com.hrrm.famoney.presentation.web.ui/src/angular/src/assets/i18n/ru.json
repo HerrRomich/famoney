@@ -49,6 +49,19 @@
           "tooltip": "Добавить возврат"
         }
       },
+      "element": {
+        "menu": {
+          "move": {
+            "title": "перенести"
+          },
+          "change": {
+            "title": "изменить"
+          },
+          "delete": {
+            "title": "удалить"
+          }
+        }
+      },
       "errors": {
         "noAccount": "Кошелек не выбран!"
       }
@@ -67,7 +80,8 @@
         "entryDate": {
           "title": "Дата записи",
           "errors": {
-            "invalid": "Ошибка формата!"
+            "invalid": "Ошибка формата!",
+            "required": "Обязательное поле!"
           }
         },
         "bookingDate": {

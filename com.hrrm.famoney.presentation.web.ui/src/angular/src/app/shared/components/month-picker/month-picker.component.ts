@@ -1,32 +1,12 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDatepicker, MAT_SINGLE_DATE_SELECTION_MODEL_PROVIDER } from '@angular/material/datepicker';
 import { MonthCalendarHeaderComponent } from './month-calendar-header.component';
-import { DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS } from '@angular/material/core';
-import { MatDatepicker } from '@angular/material/datepicker';
-import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
-
-export const MY_FORMATS = {
-  parse: {
-    dateInput: 'MMM YYYY',
-  },
-  display: {
-    dateInput: 'MMM YYYY',
-    monthYearLabel: 'MMM YYYY',
-    dateA11yLabel: 'LL',
-    monthYearA11yLabel: 'MMMM YYYY',
-  },
-};
 
 @Component({
   selector: 'fm-monthpicker',
   template: '',
   providers: [
-    {
-      provide: DateAdapter,
-      useClass: MomentDateAdapter,
-      deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS],
-    },
-    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
-    { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { strict: true } },
+    MAT_SINGLE_DATE_SELECTION_MODEL_PROVIDER,
   ],
 })
 export class MonthPickerComponent<D> extends MatDatepicker<D> implements OnInit {

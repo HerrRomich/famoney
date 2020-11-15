@@ -24,8 +24,35 @@ export interface FlatEntryCategory extends EntryCategory {
   level: number;
 }
 
+export class FlatEntryCategoryObject implements Readonly<FlatEntryCategory> {
+  readonly id: number;
+  readonly type: 'income' | 'expense';
+  readonly name: string;
+  readonly path: string;
+  readonly fullPath: string;
+  readonly level: number;
+
+  constructor(data: FlatEntryCategory) {
+    this.id = data.id;
+    this.type = data.type;
+    this.name = data.name;
+    this.path = data.path;
+    this.fullPath = data.fullPath;
+    this.level = data.level;
+  }
+
+  getCategorySign() {
+    switch (this.type) {
+      case 'expense':
+        return -1;
+      case 'income':
+        return 1;
+    }
+  }
+}
+
 interface EntryCategories {
-  flatEntryCategories: Map<number, FlatEntryCategory>;
+  flatEntryCategories: Map<number, FlatEntryCategoryObject>;
   expenses: EntryCategory[];
   incomes: EntryCategory[];
 }
@@ -39,10 +66,7 @@ export class EntryCategoryService {
   readonly entryCategoriesForVisualisation$: Observable<EntryCategories>;
   private _entryCategoriesRefreshSubject = new BehaviorSubject<void>(undefined);
 
-  constructor(
-    private notificationsService: NotificationsService,
-    private masterDataApiService: MasterDataApiService,
-  ) {
+  constructor(private notificationsService: NotificationsService, private masterDataApiService: MasterDataApiService) {
     this.entryCategories$ = this._entryCategoriesRefreshSubject.pipe(
       switchMap(() => this.masterDataApiService.getEntryCategories()),
       shareReplay(1),
@@ -53,13 +77,13 @@ export class EntryCategoryService {
     );
     this.entryCategoriesForVisualisation$ = this.entryCategories$.pipe(
       map(entryCategories => {
-        const flatEntryCategories = new Map<number, FlatEntryCategory>();
+        const flatEntryCategories = new Map<number, FlatEntryCategoryObject>();
         this.flattenEntryCategories(flatEntryCategories, entryCategories.expenses);
         this.flattenEntryCategories(flatEntryCategories, entryCategories.incomes);
         return {
           flatEntryCategories: flatEntryCategories,
           expenses: entryCategories.expenses,
-          incomes: entryCategories.incomes
+          incomes: entryCategories.incomes,
         };
       }),
       shareReplay(1),
@@ -67,21 +91,26 @@ export class EntryCategoryService {
   }
 
   private flattenEntryCategories(
-    result: Map<number, FlatEntryCategory>,
+    result: Map<number, FlatEntryCategoryObject>,
     entryCategories?: EntryCategoryDto[],
     level = 1,
     path = '',
   ) {
-    entryCategories?.forEach(entryCategory => {
-      const fullPath = (path ? path + pathSeparator : '') + entryCategory.name;
-      result.set(entryCategory.id, {
-        ...entryCategory,
-        path: path,
-        fullPath: fullPath,
-        level: level,
+    entryCategories
+      ?.filter(entryCategory => entryCategory.id)
+      .forEach(entryCategory => {
+        const fullPath = (path ? path + pathSeparator : '') + entryCategory.name;
+        result.set(
+          entryCategory.id,
+          new FlatEntryCategoryObject({
+            ...entryCategory,
+            path: path,
+            fullPath: fullPath,
+            level: level,
+          }),
+        );
+        this.flattenEntryCategories(result, entryCategory.children, level + 1, fullPath);
       });
-      this.flattenEntryCategories(result, entryCategory.children, level + 1, fullPath);
-    });
   }
 
   refreshEntryCategories() {

@@ -1,7 +1,7 @@
 @import '~@angular/cdk/_overlay';
 @import '~@angular/material/_theming';
-@import './app/modules/accounts/pages/accounts/components/account-tags-popup.theme';
-@import './app/modules/accounts/pages/accounts/components/account-entry-dialog.theme';
+@import './styles/form-field-inf-width';
+@import './styles/thin-toggle-button';
 @include mat-core();
 
 $fm-app-primary: mat-palette($mat-amber);

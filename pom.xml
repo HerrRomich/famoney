@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
@@ -23,7 +22,7 @@
 		<org.apache.aries.jpa.version>2.7.2-SNAPSHOT</org.apache.aries.jpa.version>
 		<jackson.core.version>2.10.1</jackson.core.version>
 		<org.apache.aries.tx-control.version>1.0.1</org.apache.aries.tx-control.version>
-		<org.immutables.version>2.8.3</org.immutables.version>
+		<org.immutables.version>2.8.8</org.immutables.version>
 		<org.mapstruct.version>1.3.1.Final</org.mapstruct.version>
 		<eclipselink-maven-plugin.version>2.7.5.1</eclipselink-maven-plugin.version>
 		<junit.jupiter.version>5.5.2</junit.jupiter.version>
@@ -32,6 +31,11 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>com.hrrm.famoney.infrastructure.core</artifactId>
+				<version>${project.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>com.hrrm.famoney.infrastructure.jetty</artifactId>
@@ -361,7 +365,7 @@
 			<dependency>
 				<groupId>org.flywaydb</groupId>
 				<artifactId>flyway-core</artifactId>
-				<version>6.3.0</version>
+				<version>7.0.4</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.servicemix.specs</groupId>
@@ -645,7 +649,7 @@
 # Generate an OSGi Contract Requirement for bundles that depend on the Servlet API
 # (see https://www.osgi.org/portable-java-contract-definitions/)
 -contract: JavaServlet
-  
+-includeresource.all: -src/main/resources  
 # Force Declarative Services bundles to declare a requirement for DS version 1.3
 # even when they only use features from a previous version
 -dsannotations-options: extender, inherit
@@ -674,7 +678,7 @@
 					<configuration>
 						<includeJar>true</includeJar>
 						<localURLs>${local.index.policy}</localURLs>
-						<addMvnURLs>false</addMvnURLs>
+						<addMvnURLs>true</addMvnURLs>
 					</configuration>
 					<executions>
 						<execution>
@@ -934,6 +938,7 @@
 		<module>_distro</module>
 		<module>_index</module>
 		<module>_assembly</module>
+		<module>com.hrrm.famoney.infrastructure.core</module>
 		<module>com.hrrm.famoney.infrastructure.jetty</module>
 		<module>com.hrrm.famoney.presentation.web.swagger-ui</module>
 		<module>com.hrrm.famoney.infrastructure.jaxrs</module>
@@ -949,11 +954,7 @@
 		<module>com.hrrm.famoney.application.api.master-data</module>
 		<module>com.hrrm.famoney.application.api.master-data.impl</module>
 		<module>com.hrrm.famoney.domain.accounts.migrations</module>
-		<module>
-            com.hrrm.famoney.infrastructure.persistence.migrations
-        </module>
-		<module>
-            com.hrrm.famoney.domain.master-data.migrations
-        </module>
+		<module>com.hrrm.famoney.infrastructure.persistence.migrations</module>
+		<module>com.hrrm.famoney.domain.master-data.migrations</module>
 	</modules>
 </project>

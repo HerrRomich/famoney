@@ -44,6 +44,7 @@ import com.hrrm.famoney.function.throwing.ThrowingConsumer;
 import com.hrrm.famoney.function.throwing.ThrowingFunction;
 import com.hrrm.famoney.function.throwing.ThrowingIntConsumer;
 import com.hrrm.famoney.function.throwing.ThrowingRunnable;
+import com.hrrm.famoney.function.throwing.ThrowingSupplier;
 import com.hrrm.famoney.infrastructure.persistence.migrations.MigrationException;
 
 public class V2M2InitialMovements implements JavaMigration {
@@ -347,7 +348,7 @@ public class V2M2InitialMovements implements JavaMigration {
     }
 
     private <T extends EntryCategoryDTO<T>> Integer findCategoryIdByCategory(final T foundCategory,
-            final ArrayDeque<String> categoryLevels) {
+            final ArrayDeque<String> categoryLevels) throws MigrationException {
         if (categoryLevels.isEmpty()) {
             return foundCategory.getId();
         }
@@ -357,8 +358,8 @@ public class V2M2InitialMovements implements JavaMigration {
             .filter(value -> value.getName()
                 .equals(categoryLevel))
             .findFirst()
-            .map(value -> findCategoryIdByCategory(value,
-                    categoryLevels))
+            .map(ThrowingFunction.sneaky(value -> findCategoryIdByCategory(value,
+                    categoryLevels)))
             .orElse(foundCategory.getId());
     }
 

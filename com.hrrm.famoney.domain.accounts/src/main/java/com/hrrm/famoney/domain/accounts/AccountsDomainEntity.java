@@ -10,10 +10,12 @@ import com.hrrm.famoney.infrastructure.persistence.DomainEntity;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 
 @MappedSuperclass
 @EqualsAndHashCode
 @Getter
+@ToString
 public abstract class AccountsDomainEntity implements DomainEntity<Integer> {
 
     public static final String SCHEMA_NAME = "accounts";

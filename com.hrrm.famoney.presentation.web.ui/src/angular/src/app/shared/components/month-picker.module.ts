@@ -10,7 +10,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MonthpickerInputDirective } from './month-picker/month-picker-input.directive';
 
 @NgModule({
-  entryComponents: [MonthPickerComponent, MonthCalendarHeaderComponent],
   declarations: [MonthPickerComponent, MonthCalendarHeaderComponent, MonthpickerInputDirective],
   imports: [
     MatDatepickerModule,
@@ -22,14 +21,8 @@ import { MonthpickerInputDirective } from './month-picker/month-picker-input.dir
     ReactiveFormsModule,
   ],
   exports: [
-    MatDatepickerModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    FlexLayoutModule,
-    FormsModule,
-    ReactiveFormsModule,
     MonthPickerComponent,
+    MonthCalendarHeaderComponent,
     MonthpickerInputDirective,
   ],
 })
