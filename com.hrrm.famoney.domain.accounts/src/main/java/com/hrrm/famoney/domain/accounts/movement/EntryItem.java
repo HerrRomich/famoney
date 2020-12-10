@@ -19,6 +19,9 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class EntryItem {
 
+    @Column(name = "pos")
+    private Integer position;
+
     @Column(name = "category_id")
     private Integer categoryId;
 

@@ -38,6 +38,10 @@
             <groupId>com.hrrm.famoney</groupId>
             <artifactId>com.hrrm.famoney.application.api.master-data</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.hrrm.famoney</groupId>
+            <artifactId>com.hrrm.famoney.application.api.accounts.impl</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.felix</groupId>
@@ -60,6 +64,7 @@
                         <configuration>
                             <resourceBundles>
                                 <resourceBundle>${project.groupId}:com.hrrm.famoney.application.api.accounts:${project.version}</resourceBundle>
+                                <resourceBundle>${project.groupId}:com.hrrm.famoney.application.api.accounts.impl:${project.version}</resourceBundle>
                                 <resourceBundle>${project.groupId}:com.hrrm.famoney.application.api.master-data:${project.version}</resourceBundle>
                             </resourceBundles>
                             <attachToMain>false</attachToMain>
@@ -74,6 +79,9 @@
                     <filesets>
                         <fileset>
                             <directory>src/angular/src/app/shared/apis/accounts</directory>
+                        </fileset>
+                        <fileset>
+                            <directory>src/angular/src/app/shared/apis/account-events</directory>
                         </fileset>
                         <fileset>
                             <directory>src/angular/src/app/shared/apis/master-data</directory>
@@ -102,6 +110,17 @@
                         <configuration>
                             <inputSpec>${project.build.directory}/maven-shared-archive-resources/accounts.json</inputSpec>
                             <output>src/angular/src/app/shared/apis/accounts</output>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-account-events-api</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <phase>prepare-package</phase>
+                        <configuration>
+                            <inputSpec>${project.build.directory}/maven-shared-archive-resources/account-events.json</inputSpec>
+                            <output>src/angular/src/app/shared/apis/account-events</output>
                         </configuration>
                     </execution>
                     <execution>

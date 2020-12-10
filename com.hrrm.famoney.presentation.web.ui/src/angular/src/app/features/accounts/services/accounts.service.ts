@@ -1,8 +1,10 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AccountsApiService } from '@famoney-apis/accounts';
 import { NotificationsService } from 'angular2-notifications';
-import { BehaviorSubject, combineLatest, EMPTY, Observable } from 'rxjs';
-import { catchError, map, shareReplay } from 'rxjs/operators';
+import * as moment from 'moment';
+import { BehaviorSubject, combineLatest, EMPTY, Observable, throwError } from 'rxjs';
+import { catchError, map, shareReplay, takeWhile } from 'rxjs/operators';
 
 const ACCOUNT_TAGS_STORAGE = 'ACCOUNT_TAGS_STORAGE';
 const ACCOUNT_ID_STORAGE = 'ACCOUNT_ID_STORAGE';
@@ -85,4 +87,21 @@ export class AccountsService {
     }
     input.next(newValue);
   };
+
+  getAccount(accountId: number) {
+    return this._accountsApiService.getAccount(accountId, 'response').pipe(
+      map(response => {
+        if (response.ok && response.body) {
+          const operationTimestamp = moment(response.headers.get('fm-operation-timestamp'));
+          return [operationTimestamp, response.body] as const;
+        } else {
+          throw new HttpErrorResponse({
+            ...response,
+            error: response.body,
+            url: response.url || undefined,
+          });
+        }
+      }),
+    );
+  }
 }

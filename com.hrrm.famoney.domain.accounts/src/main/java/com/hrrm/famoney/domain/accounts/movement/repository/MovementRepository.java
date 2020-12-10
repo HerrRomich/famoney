@@ -1,7 +1,6 @@
 package com.hrrm.famoney.domain.accounts.movement.repository;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,26 +10,17 @@ import com.hrrm.famoney.domain.accounts.repository.AccountsDomainRepository;
 
 public interface MovementRepository extends AccountsDomainRepository<Movement> {
 
-    List<Movement> findByAccountBetweenDates(Account account, LocalDateTime dateFrom,
-            LocalDateTime dateTo);
+    Long getMovementsCountByAccount(Account account);
 
-    List<Movement> findByAccountBetweenBookingDates(Account account, LocalDateTime dateFrom,
-            LocalDateTime dateTo);
+    Optional<Movement> findNextMovementByAccountIdBeforePosition(Account account, Integer position);
 
-    Long getMoventsCountByAccount(Account account);
+    void rollbackMovementPositionsAndSumsByAccountAfterPosition(Movement movement, Integer positionBefore);
 
-    List<Movement> findMovementsByAccountAfterDate(Account account, LocalDateTime dateFrom, Integer limit);
+    void adjustMovementPositionsAndSumsByAccountAfterPosition(Movement movement, Integer positionAfter);
 
-    List<Movement> findMovementsByAccountAfterBookingDate(Account account, LocalDateTime dateFrom,
+    List<Movement> getMovementsByAccountIdWithOffsetAndLimitOrderedByPos(Account account, Integer offset,
             Integer limit);
 
-    Optional<Movement> findNextMovementByAccountIdBeforeDate(Account account, LocalDateTime date);
-
-    Optional<Movement> findNextMovementByAccountIdBeforeBookingDate(Account account, LocalDateTime date);
-
-    void adjustMovementSumsByAccountAfterDate(Account account, LocalDateTime fromDate, BigDecimal amount);
-
-    List<Movement> getMovementsByAccountIdWithOffsetAndLimitOrderedByDate(Account account, Integer offset,
-            Integer limit);
+    Integer getLastPositionByAccountOnDate(Account account, LocalDate date);
 
 }

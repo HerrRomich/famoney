@@ -1,7 +1,7 @@
+import { CdkVirtualScrollViewport, FixedSizeVirtualScrollStrategy } from '@angular/cdk/scrolling';
 import { Injectable } from '@angular/core';
-import { FixedSizeVirtualScrollStrategy, CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-import { Subject, Subscription, timer, combineLatest } from 'rxjs';
-import { tap, mergeMap, skipWhile, takeWhile } from 'rxjs/operators';
+import { combineLatest, Subject, Subscription, timer } from 'rxjs';
+import { mergeMap, skipWhile, takeWhile, tap } from 'rxjs/operators';
 
 @Injectable()
 export class AccountMovementsViertualScrollStrategy extends FixedSizeVirtualScrollStrategy {
@@ -38,7 +38,7 @@ export class AccountMovementsViertualScrollStrategy extends FixedSizeVirtualScro
     this.dataChanged.next();
   }
 
-  switchAccount(movementCount: number) {
+  switchAccount(operationTimestamp: moment.Moment, movementCount: number) {
     this.accountSwitched.next(movementCount);
   }
 

@@ -1,8 +1,7 @@
 package com.hrrm.famoney.api.accounts.dto;
 
 import java.math.BigDecimal;
-
-import javax.annotation.Nullable;
+import java.util.Optional;
 
 import org.immutables.value.Value;
 
@@ -27,7 +26,6 @@ public interface EntryItemDataDTO {
     @Schema(required = true)
     BigDecimal getAmount();
 
-    @Nullable
-    String getComments();
+    Optional<String> getComments();
 
 }

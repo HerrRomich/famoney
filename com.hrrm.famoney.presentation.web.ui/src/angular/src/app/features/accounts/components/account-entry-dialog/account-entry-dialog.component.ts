@@ -5,12 +5,12 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AccountsApiService, ApiErrorDto, EntryDataDto, EntryItemDataDto, MovementDto } from '@famoney-apis/accounts';
 import { EntryCategoryService, FlatEntryCategoryObject } from '@famoney-shared/services/entry-category.service';
 import { LocaleService } from '@famoney-shared/services/locale.service';
+import { ParseNumberService } from '@famoney-shared/services/parse-numbers.service';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationsService } from 'angular2-notifications';
 import * as moment from 'moment';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
-import { ParseNumberService } from './../../../../shared/services/parse-numbers.service';
 import { AccountEntry, EntryDialogData, EntryItem } from './../../models/account-entry.model';
 
 @Component({

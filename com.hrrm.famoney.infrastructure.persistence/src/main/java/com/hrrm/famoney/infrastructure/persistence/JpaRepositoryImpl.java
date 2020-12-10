@@ -76,8 +76,18 @@ public abstract class JpaRepositoryImpl<T extends DomainEntity<P>, P extends Ser
                 resultClass));
     }
 
+    protected final <S> TypedQuery<S> getNamedQueryOrAddNew(final QueryNames queryName, final Class<S> resultClass,
+            final Supplier<TypedQuery<S>> querySupplier) {
+        return getNamedQueryOrAddQueryInternal(queryName.getFullName(), querySupplier, qn -> entityManager.createNamedQuery(qn,
+                resultClass));
+    }
+
     protected final Query getNamedQueryOrAddNew(final String queryName, final Supplier<Query> querySupplier) {
         return getNamedQueryOrAddQueryInternal(queryName, querySupplier, entityManager::createNamedQuery);
+    }
+
+    protected final Query getNamedQueryOrAddNew(final QueryNames queryName, final Supplier<Query> querySupplier) {
+        return getNamedQueryOrAddQueryInternal(queryName.getFullName(), querySupplier, entityManager::createNamedQuery);
     }
 
     private <S extends Query> S getNamedQueryOrAddQueryInternal(final String queryName, final Supplier<S> querySupplier,

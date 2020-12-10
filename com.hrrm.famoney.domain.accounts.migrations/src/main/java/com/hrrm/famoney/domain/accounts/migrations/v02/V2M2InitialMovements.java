@@ -44,7 +44,6 @@ import com.hrrm.famoney.function.throwing.ThrowingConsumer;
 import com.hrrm.famoney.function.throwing.ThrowingFunction;
 import com.hrrm.famoney.function.throwing.ThrowingIntConsumer;
 import com.hrrm.famoney.function.throwing.ThrowingRunnable;
-import com.hrrm.famoney.function.throwing.ThrowingSupplier;
 import com.hrrm.famoney.infrastructure.persistence.migrations.MigrationException;
 
 public class V2M2InitialMovements implements JavaMigration {
@@ -73,7 +72,7 @@ public class V2M2InitialMovements implements JavaMigration {
     private EntryCategoriesDTO entryCategories;
 
     private static final List<Pair<Pattern, String>> CATEGORY_PROCESSORS = List.of(Pair.of(Pattern.compile(
-            "^Питание: Продукты"),
+            "Питание: Продукты"),
             "Продукты"));
 
     public V2M2InitialMovements(final LoggerFactory loggerFactory,

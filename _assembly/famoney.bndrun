@@ -71,7 +71,6 @@
 	com.hrrm.famoney.application.api.accounts.impl;version='[0.0.1,0.0.2)',\
 	com.hrrm.famoney.application.api.master-data;version='[0.0.1,0.0.2)',\
 	com.hrrm.famoney.application.api.master-data.impl;version='[0.0.1,0.0.2)',\
-	com.hrrm.famoney.application.service.accounts;version='[0.0.1,0.0.2)',\
 	com.hrrm.famoney.domain.accounts;version='[0.0.1,0.0.2)',\
 	com.hrrm.famoney.domain.accounts.migrations;version='[0.0.1,0.0.2)',\
 	com.hrrm.famoney.domain.master-data;version='[0.0.1,0.0.2)',\
@@ -89,7 +88,6 @@
 	jakarta.validation.jakarta.validation-api;version='[2.0.2,2.0.3)',\
 	jakarta.xml.bind-api;version='[2.3.2,2.3.3)',\
 	javax.ws.rs-api;version='[2.1.99,2.1.100)',\
-	org.apache.aries.component-dsl.component-dsl;version='[1.2.2,1.2.3)',\
 	org.apache.aries.jax.rs.whiteboard;version='[1.0.8,1.0.9)',\
 	org.apache.aries.jpa.container;version='[2.7.2,2.7.3)',\
 	org.apache.aries.jpa.eclipselink.adapter;version='[2.7.2,2.7.3)',\
@@ -164,4 +162,5 @@
 	slf4j.api;version='[1.7.25,1.7.26)',\
 	slf4j.simple;version='[1.7.25,1.7.26)',\
 	tx-control-provider-jpa-xa;version='[1.0.1,1.0.2)',\
-	tx-control-service-xa;version='[1.0.1,1.0.2)'
+	tx-control-service-xa;version='[1.0.1,1.0.2)',\
+	tx-control-provider-jdbc-xa;version='[1.0.1,1.0.2)'

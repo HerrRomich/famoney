@@ -15,7 +15,7 @@
     <logger name="com.hrrm.famoney.api.accounts.resource" level="INFO"/>
     <logger name="com.hrrm.famoney.api.masterdata.resource" level="INFO"/>
     <logger name="org.apache.aries.jax.rs" level="INFO"/>
-    <logger name="org.eclipse.jetty" level="INFO"/>
+    <logger name="org.eclipse.jetty.server" level="INFO"/>
 
     <root level="INFO">
         <appender-ref ref="STDOUT" />

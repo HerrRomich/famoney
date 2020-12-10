@@ -8,8 +8,6 @@
 		"org.apache.felix.https.keystore:binary": "/etc/keystore/keystore",
 		"org.apache.felix.https.keystore.password": "welcome1",
 		"org.apache.felix.http.context_path": "/famoney",
-		"org.apache.felix.jetty.gziphandler.enable": "true",
-		"org.apache.felix.jetty.gzip.syncFlush": true,
 		"org.apache.felix.jetty.gzip.excludedMimeTypes": "text/event-stream"
 	}
 }

@@ -1,6 +1,6 @@
 package com.hrrm.famoney.api.accounts.dto;
 
-import javax.annotation.Nullable;
+import java.util.Optional;
 
 import org.immutables.value.Value;
 
@@ -31,7 +31,6 @@ public interface TransferDataDTO extends MovementDataDTO {
     @Schema(required = true)
     Integer getOppositAccountId();
 
-    @Nullable
-    String getComments();
+    Optional<String> getComments();
 
 }

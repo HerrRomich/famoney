@@ -1,7 +1,5 @@
 import { Injectable, NgZone } from '@angular/core';
-import { Observable, Observer } from 'rxjs';
-
-export interface ServerEvent {}
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -9,7 +7,7 @@ export interface ServerEvent {}
 export class ServerEventsService {
   constructor(private _ngZone: NgZone) {}
 
-  connectToServer<T extends ServerEvent>(url: string): Observable<T> {
+  connectToServer<T>(url: string): Observable<T> {
     return new Observable<T>(subscriber => {
       const eventSource = new EventSource(url);
       eventSource.onmessage = event => {
