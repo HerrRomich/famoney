@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
-import javax.sql.XADataSource;
+import javax.sql.DataSource;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -24,16 +24,16 @@ public class JDBCConnectionProvider {
     @Activate
     public JDBCConnectionProvider(final BundleContext context, final Map<String, Object> properties, 
             @Reference final JDBCConnectionProviderFactory jdbcProviderFactory,
-            @Reference(name = "data_source") final XADataSource ds) {
+            @Reference(name = "data_source") final DataSource ds) {
         super();
         this.jdbcProviderFactory = jdbcProviderFactory;
         final Map<String, Object> resourceProviderProperties = new HashMap<>();
+        resourceProviderProperties.put("osgi.connection.pooling.enabled", false);
         final var provider = jdbcProviderFactory.getProviderFor(ds, resourceProviderProperties);
         final Dictionary<String, String> props = new Hashtable<>();
-        final var name = properties.get("name")
-            .toString();
+        final var name = properties.get("name");
         if (name != null) {
-            props.put("name", name);
+            props.put("name", name.toString());
         }
         jdbcConnectionProviderRegistration = context.registerService(org.osgi.service.transaction.control.jdbc.JDBCConnectionProvider.class, provider, props);
     }

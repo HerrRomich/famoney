@@ -87,7 +87,7 @@ public class AccountsApiImpl implements AccountsApi, AccountsApiService {
             .map(this::createTagPredicate)
             .orElse(Predicates.alwaysTrue());
         return txControl.requiresNew(() -> {
-            final var accountsStream = accountRepository.findAll()
+            final var accountsStream = accountRepository.findAllOrderedByName()
                 .stream()
                 .filter(tagFilterCondition);
 

@@ -1,8 +1,11 @@
 package com.hrrm.famoney.api.accounts.events.dto;
 
+import java.util.Optional;
+
 import org.immutables.value.Value;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.hrrm.famoney.api.accounts.dto.MovementDataDTO;
 import com.hrrm.famoney.infrastructure.jaxrs.ImmutableDtoStyle;
 
 import io.swagger.v3.oas.annotations.extensions.Extension;

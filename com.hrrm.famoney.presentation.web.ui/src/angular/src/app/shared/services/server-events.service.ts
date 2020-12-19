@@ -12,7 +12,7 @@ export class ServerEventsService {
       const eventSource = new EventSource(url);
       eventSource.onmessage = event => {
         this._ngZone.run(() => {
-          subscriber.next(event.data);
+          subscriber.next(JSON.parse(event.data));
         });
       };
       eventSource.onerror = error => {

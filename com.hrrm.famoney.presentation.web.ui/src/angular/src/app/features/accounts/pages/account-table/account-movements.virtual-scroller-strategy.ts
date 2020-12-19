@@ -1,20 +1,18 @@
 import { CdkVirtualScrollViewport, FixedSizeVirtualScrollStrategy } from '@angular/cdk/scrolling';
 import { Injectable } from '@angular/core';
-import { combineLatest, Subject, Subscription, timer } from 'rxjs';
+import { Subject, Subscription, timer } from 'rxjs';
 import { mergeMap, skipWhile, takeWhile, tap } from 'rxjs/operators';
 
 @Injectable()
 export class AccountMovementsViertualScrollStrategy extends FixedSizeVirtualScrollStrategy {
   private viewport?: CdkVirtualScrollViewport;
-  private dataChanged: Subject<void>;
-  private accountSwitched: Subject<number>;
+  private _accountSwitched$: Subject<number>;
   private dataLengthChangedProcessorSubscription: Subscription;
 
   constructor() {
     super(40, 600, 800);
-    this.dataChanged = new Subject();
-    this.accountSwitched = new Subject();
-    this.dataLengthChangedProcessorSubscription = combineLatest([this.dataChanged, this.accountSwitched])
+    this._accountSwitched$ = new Subject();
+    this.dataLengthChangedProcessorSubscription = this._accountSwitched$
       .pipe(
         tap(() => this.viewport?.scrollToIndex(0)),
         mergeMap(() =>
@@ -33,13 +31,8 @@ export class AccountMovementsViertualScrollStrategy extends FixedSizeVirtualScro
     super.attach(viewport);
   }
 
-  onDataLengthChanged() {
-    super.onDataLengthChanged();
-    this.dataChanged.next();
-  }
-
   switchAccount(operationTimestamp: moment.Moment, movementCount: number) {
-    this.accountSwitched.next(movementCount);
+    this._accountSwitched$.next(movementCount);
   }
 
   detach() {

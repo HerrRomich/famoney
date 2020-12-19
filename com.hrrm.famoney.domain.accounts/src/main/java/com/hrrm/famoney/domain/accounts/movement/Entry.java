@@ -1,5 +1,6 @@
 package com.hrrm.famoney.domain.accounts.movement;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CollectionTable;
@@ -29,6 +30,6 @@ public class Entry extends Movement {
     @ElementCollection
     @CollectionTable(name = "entry_item", joinColumns = @JoinColumn(name = "entry_id"))
     @JoinFetch(JoinFetchType.INNER)
-    private List<EntryItem> entryItems;
+    private List<EntryItem> entryItems = new ArrayList<>();
 
 }

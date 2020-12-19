@@ -1,18 +1,32 @@
 import { CdkVirtualScrollViewport, VIRTUAL_SCROLL_STRATEGY } from '@angular/cdk/scrolling';
-import { Component, Inject, OnDestroy, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { AfterViewInit, Component, Inject, OnDestroy, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { EcoFabSpeedDialActionsComponent, EcoFabSpeedDialComponent } from '@ecodev/fab-speed-dial';
-import { AccountDto, EntryDataDto, MovementDto } from '@famoney-apis/accounts';
+import { MovementEventDto } from '@famoney-apis/account-events';
+import { AccountDto, MovementDto } from '@famoney-apis/accounts';
 import { AccountsService } from '@famoney-features/accounts/services/accounts.service';
 import { EntryCategoryService } from '@famoney-shared/services/entry-category.service';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationsService } from 'angular2-notifications';
-import { EMPTY, Subject, Subscription } from 'rxjs';
-import { debounceTime, delay, filter, map, retryWhen, shareReplay, switchMap, tap } from 'rxjs/operators';
+import * as moment from 'moment';
+import { Moment } from 'moment';
+import { BehaviorSubject, EMPTY, iif, merge, of, Subject, Subscription } from 'rxjs';
+import {
+  debounceTime,
+  delay,
+  filter,
+  map,
+  pairwise,
+  retryWhen,
+  shareReplay,
+  startWith,
+  switchMap,
+  tap,
+} from 'rxjs/operators';
 import { AccountEntryDialogComponent } from '../../components/account-entry-dialog';
-import { MovementsService } from '../../services/movements.service';
 import { EntryDialogData } from '../../models/account-entry.model';
+import { MovementsService } from '../../services/movements.service';
 import { AccountMovementsViertualScrollStrategy } from './account-movements.virtual-scroller-strategy';
 import { MovementDataSource } from './movement-data-source';
 
@@ -41,10 +55,10 @@ export class AccountTableComponent implements AfterViewInit, OnDestroy {
   @ViewChild(CdkVirtualScrollViewport)
   viewPort!: CdkVirtualScrollViewport;
 
+  private _updateTrigger = new Subject<Moment>();
   private _speedDialHovered$ = new Subject<boolean>();
 
   private _speedDialTriggerSubscription?: Subscription;
-  private _movementsChangeEventsSubscription: Subscription;
 
   private _fabSpeedDialOpenChangeSubbscription?: Subscription;
   private _accountDTO?: AccountDto;
@@ -64,33 +78,43 @@ export class AccountTableComponent implements AfterViewInit, OnDestroy {
       map(params => Number.parseInt(params.get('accountId') ?? '', 10)),
       tap(() => (this._accountDTO = undefined)),
       filter(accountId => accountId !== NaN),
-      switchMap(accountId => this._accountsService.getAccount(accountId)),
-      tap(([operationTimestamp, accountDTO]) => {
-        this._accountDTO = accountDTO;
-        this._accountMovementsViertualScrollStrategy.switchAccount(operationTimestamp, accountDTO.movementCount);
+      switchMap(accountId => {
+        let prevTimestamp = moment();
+        return merge(this._updateTrigger, this._movementsService.getMovementsChangeEventsByAccountId(accountId)).pipe(
+          map(timestamp => ['subsequent', timestamp] as const),
+          startWith(['initial', moment(0)] as const),
+          switchMap(([round, timestamp]) => {
+            if (round === 'initial' || timestamp.isAfter(prevTimestamp)) {
+              return this._accountsService.getAccount(accountId).pipe(
+                tap(([operationTimestamp, accountDTO]) => {
+                  prevTimestamp = operationTimestamp;
+                  if (round === 'initial') {
+                    this._accountDTO = accountDTO;
+                    this._accountMovementsViertualScrollStrategy.switchAccount(
+                      operationTimestamp,
+                      accountDTO.movementCount,
+                    );
+                  }
+                }),
+              );
+            } else {
+              return EMPTY;
+            }
+          }),
+        );
       }),
+      map(([, accountDTO]) => accountDTO),
       shareReplay(1),
     );
     this.movementDataSource = new MovementDataSource(this._movementsService, account$);
-    this._movementsChangeEventsSubscription = account$
-      .pipe(
-        switchMap(([,accountDTO]) => this._movementsService.getMovementsChangeEvents(accountDTO.id)),
-        tap(() => {
-          this._accountMovementsViertualScrollStrategy.onDataLengthChanged();
-        }),
-        retryWhen(errors => errors.pipe(delay(10000))),
-      )
-      .subscribe();
   }
 
   ngAfterViewInit() {
-    this._fabSpeedDialOpenChangeSubbscription = this.fabSpeedDial!.openChange
-      .pipe(
-        tap(opened => {
-          this.fabSpeedDial!.fixed = !opened;
-        }),
-      )
-      .subscribe();
+    this._fabSpeedDialOpenChangeSubbscription = this.fabSpeedDial!.openChange.pipe(
+      tap(opened => {
+        this.fabSpeedDial!.fixed = !opened;
+      }),
+    ).subscribe();
 
     this._speedDialTriggerSubscription = this._speedDialHovered$
       .pipe(
@@ -104,7 +128,6 @@ export class AccountTableComponent implements AfterViewInit, OnDestroy {
 
   ngOnDestroy() {
     this._fabSpeedDialOpenChangeSubbscription?.unsubscribe();
-    this._movementsChangeEventsSubscription.unsubscribe();
     this._speedDialTriggerSubscription?.unsubscribe();
   }
 
@@ -158,9 +181,27 @@ export class AccountTableComponent implements AfterViewInit, OnDestroy {
       this.showNoAccountErrorNotification();
       return;
     }
+    const accountId = this._accountDTO.id;
     this.openAccountEntryDialog({
-      accountId: this._accountDTO.id,
-    });
+      accountId: accountId,
+    })
+      .pipe(
+        tap(value => {
+          if (value) {
+            const [operationTimestamp, movement] = value;
+            const movementEvent: MovementEventDto = {
+              event: 'movementAdd',
+              accountId: accountId,
+              timestamp: operationTimestamp.format(),
+              position: movement.position,
+              movementData: movement.data,
+            };
+            this._updateTrigger.next(moment(movementEvent.timestamp));
+            this._accountMovementsViertualScrollStrategy.scrollToIndex(movementEvent.position, 'smooth');
+          }
+        }),
+      )
+      .subscribe();
   }
 
   private showNoAccountErrorNotification() {
@@ -178,7 +219,11 @@ export class AccountTableComponent implements AfterViewInit, OnDestroy {
   }
 
   private openAccountEntryDialog(data: EntryDialogData) {
-    const accountEntryDialogRef = this._accountEntryDialogComponent.open<AccountEntryDialogComponent, EntryDialogData, MovementDto>(AccountEntryDialogComponent, {
+    const accountEntryDialogRef = this._accountEntryDialogComponent.open<
+      AccountEntryDialogComponent,
+      EntryDialogData,
+      [Moment, MovementDto]
+    >(AccountEntryDialogComponent, {
       width: '520px',
       minWidth: '520px',
       maxWidth: '520px',
@@ -187,8 +232,7 @@ export class AccountTableComponent implements AfterViewInit, OnDestroy {
       hasBackdrop: true,
       data: data,
     });
-    return accountEntryDialogRef
-      .afterClosed();
+    return accountEntryDialogRef.afterClosed();
   }
 
   addTransfer() {
@@ -204,12 +248,30 @@ export class AccountTableComponent implements AfterViewInit, OnDestroy {
       this.showNoAccountErrorNotification();
       return;
     }
+    const accountId = this._accountDTO.id;
     if (movement.data?.type === 'entry') {
       this.openAccountEntryDialog({
-        accountId: this._accountDTO.id,
+        accountId: accountId,
         movementId: movement.id,
         entryData: movement.data,
-      });
+      })
+        .pipe(
+          tap(value => {
+            if (value) {
+              const [operationTimestamp, movement] = value;
+              const movementEvent: MovementEventDto = {
+                event: 'movementAdd',
+                accountId: accountId,
+                timestamp: operationTimestamp.format(),
+                position: movement.position,
+                movementData: movement.data,
+              };
+              this._updateTrigger.next(moment(movementEvent.timestamp));
+              this._accountMovementsViertualScrollStrategy.scrollToIndex(movementEvent.position, 'smooth');
+            }
+          }),
+        )
+        .subscribe();
     }
   }
 }

@@ -74,8 +74,9 @@ public class MovementApiService {
         accountRepository.lock(account, LockModeType.PESSIMISTIC_WRITE);
         Integer newPosition = movementRepository.getLastPositionByAccountOnDate(account, movementDataDTO.getDate());
         movement = setMovementAttributes(account, movement, movementDataDTO).setPosition(newPosition);
+        adjustAccountMovements(movement, newPosition);
         final var addedMovement = movementRepository.save(movement);
-        adjustAccountMovements(addedMovement, newPosition);
+        movementRepository.flush();
         return addedMovement;
     }
 

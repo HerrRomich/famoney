@@ -1,12 +1,11 @@
-import { NotificationsService } from 'angular2-notifications';
-import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { MovementChangeEventDto } from '@famoney-apis/account-events';
-import { AccountsApiService, ApiErrorDto, Configuration as AccountsApiConfiguration } from '@famoney-apis/accounts';
+import { MovementEventDto } from '@famoney-apis/account-events';
+import { AccountsApiService, Configuration as AccountsApiConfiguration, EntryDataDto } from '@famoney-apis/accounts';
 import { ServerEventsService } from '@famoney-shared/services/server-events.service';
+import { processServerResponse } from '@famoney-shared/utils/stream-operators.utils';
+import { NotificationsService } from 'angular2-notifications';
 import * as moment from 'moment';
-import { catchError, map } from 'rxjs/operators';
-import { EMPTY } from 'rxjs';
+import { filter, map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -20,30 +19,30 @@ export class MovementsService {
   ) {}
 
   getMovements(accountId: number, offset: number, limit: number) {
-    return this._accountsApiService.getMovements(accountId, offset, limit, 'response').pipe(
-      map(response => {
-        if (response.ok && response.body) {
-          const operationTimestamp = moment(response.headers.get('fm-operation-timestamp'));
-          return [operationTimestamp, response.body] as const;
-        } else {
-          throw new HttpErrorResponse({
-            ...response,
-            error: response.body,
-            url: response.url || undefined,
-          });
-        }
-      }),
-      catchError(err => {
-        const {error: ApiErrorDto} = err;
-        this.notificationsService.error('Error', error.description);
-        return EMPTY;
-      }),
-    );
+    return this._accountsApiService
+      .getMovements(accountId, offset, limit, 'response')
+      .pipe(processServerResponse(this.notificationsService));
   }
 
-  getMovementsChangeEvents(accountId: number) {
-    return this._serverEventsService.connectToServer<MovementChangeEventDto>(
-      `${this._accountsApiConfiguration.basePath}/accounts/${accountId}/movements/events`,
-    );
+  getMovementsChangeEventsByAccountId(accountId: number) {
+    return this._serverEventsService
+      .connectToServer<MovementEventDto>(
+        `${this._accountsApiConfiguration.basePath}/accounts/${accountId}/movements/events`,
+      )
+      .pipe(
+        filter(value => value.accountId === accountId),
+        map(value => moment(value.timestamp)),
+      );
+  }
+
+  addMovement(accountId: number, entryData: EntryDataDto) {
+    return this._accountsApiService
+      .addMovement(accountId, entryData, 'response')
+      .pipe(processServerResponse(this.notificationsService));
+  }
+  changeMovement(accountId: number, movementId: number, entryData: EntryDataDto) {
+    return this._accountsApiService
+      .changeMovement(accountId, movementId, entryData, 'response')
+      .pipe(processServerResponse(this.notificationsService));
   }
 }

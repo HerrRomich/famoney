@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
-import javax.sql.XADataSource;
+import javax.sql.DataSource;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -27,7 +27,7 @@ public class EntityMnagerProvider {
     @Activate
     public EntityMnagerProvider(final BundleContext context, final Map<String, Object> properties,
             @Reference final JPAEntityManagerProviderFactory jpaPproviderFactory, @Reference(
-                    name = "data_source") final XADataSource ds, @Reference(
+                    name = "data_source") final DataSource ds, @Reference(
                             name = "emfb") final EntityManagerFactoryBuilder emfb,
             @Reference final TransactionControl txControl) {
         this.jpaPproviderFactory = jpaPproviderFactory;

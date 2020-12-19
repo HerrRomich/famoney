@@ -8,4 +8,6 @@ public interface AccountRepository extends AccountsDomainRepository<Account> {
 
     List<String> findAllTags();
 
+    List<Account> findAllOrderedByName();
+
 }

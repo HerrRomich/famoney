@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -165,8 +166,8 @@
             <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>org.mariadb.jdbc</groupId>
-            <artifactId>mariadb-java-client</artifactId>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -186,6 +187,11 @@
         </dependency>
         <dependency>
             <groupId>org.ops4j.pax.jdbc</groupId>
+            <artifactId>pax-jdbc-common</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.jdbc</groupId>
             <artifactId>pax-jdbc-mariadb</artifactId>
             <scope>runtime</scope>
         </dependency>
@@ -201,17 +207,17 @@
         </dependency>
         <dependency>
             <groupId>org.apache.aries.tx-control</groupId>
-            <artifactId>tx-control-provider-jpa-xa</artifactId>
+            <artifactId>tx-control-provider-jpa-local</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.aries.tx-control</groupId>
-            <artifactId>tx-control-provider-jdbc-xa</artifactId>
+            <artifactId>tx-control-provider-jdbc-local</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.aries.tx-control</groupId>
-            <artifactId>tx-control-service-xa</artifactId>
+            <artifactId>tx-control-service-local</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -222,11 +228,6 @@
         <dependency>
             <groupId>org.ops4j.pax.jdbc</groupId>
             <artifactId>pax-jdbc-pool-common</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.ops4j.pax.jdbc</groupId>
-            <artifactId>pax-jdbc-pool-aries</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>

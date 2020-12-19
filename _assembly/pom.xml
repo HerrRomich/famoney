@@ -23,6 +23,17 @@
 
     <build>
         <plugins>
+             <plugin>
+                <groupId>biz.aQute.bnd</groupId>
+                <artifactId>bnd-indexer-maven-plugin</artifactId>
+                <configuration>
+                	<includeGzip>false</includeGzip>
+                	<includeJar>false</includeJar>
+                	<indexFiles>
+                		<include>*/target/*.jar</include>
+                	</indexFiles>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>biz.aQute.bnd</groupId>
                 <artifactId>bnd-export-maven-plugin</artifactId>

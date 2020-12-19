@@ -49,6 +49,8 @@ public class MasterDataMigration implements PreHook {
         final String[] locationArray = locations.split(",");
         final Flyway flyway = Flyway.configure(classLoader)
             .dataSource(ds)
+            .schemas("master_data")
+            .defaultSchema("master_data")
             .locations(locationArray)
             .javaMigrations(new V1M2EntryCategories(loggerFactory))
             .load();

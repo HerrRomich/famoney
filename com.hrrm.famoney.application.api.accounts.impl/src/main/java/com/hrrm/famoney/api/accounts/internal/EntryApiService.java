@@ -23,12 +23,13 @@ public class EntryApiService {
         return fillEntryAttributes(entryDataDTO, Entry::new);
     }
 
-    private Movement fillEntryAttributes(final EntryDataDTO entryDataDTO, final Supplier<Entry> entrySupplier) {
+    private Movement fillEntryAttributes(final EntryDataDTO entryDataDTO,
+        final Supplier<Entry> entrySupplier) {
         final var entry = entrySupplier.get();
         final var entryItems = entry.getEntryItems();
         var i = 0;
         List<EntryItemDataDTO> entryItemDTOs = entryDataDTO.getEntryItems();
-        while(i < entryItemDTOs.size()) {
+        while (i < entryItemDTOs.size()) {
             EntryItem entryItem;
             if (i < entryItems.size()) {
                 entryItem = entryItems.get(i);
@@ -38,11 +39,12 @@ public class EntryApiService {
             }
             final var entryItemDTO = entryItemDTOs.get(i);
             entryItem.setCategoryId(entryItemDTO.getCategoryId())
-            .setAmount(entryItemDTO.getAmount())
-            .setComments(entryItemDTO.getComments().orElse(null));
+                .setAmount(entryItemDTO.getAmount())
+                .setComments(entryItemDTO.getComments()
+                    .orElse(null));
             i++;
         }
-        while(i < entryItems.size()) {
+        while (i < entryItems.size()) {
             entryItems.remove(entryItems.size() - 1);
         }
         return entry.setAmount(entryDataDTO.getAmount())

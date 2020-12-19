@@ -1,16 +1,11 @@
 import { EntryDataDto } from '@famoney-apis/accounts';
-import * as moment from 'moment';
+import { AccountMovement, MovementDialogData } from './account-movement.model';
 
-export interface EntryDialogData {
-  readonly accountId: number;
-  readonly movementId?: number;
+export interface EntryDialogData extends MovementDialogData {
   readonly entryData?: EntryDataDto;
 }
 
-export interface AccountEntry {
-  entryDate?: moment.Moment;
-  bookingDate?: moment.Moment;
-  budgetPeriod?: moment.Moment;
+export interface AccountEntry extends AccountMovement {
   entryItems: EntryItem[];
 }
 
@@ -19,4 +14,3 @@ export interface EntryItem {
   amount: string;
   comments?: string;
 }
-
